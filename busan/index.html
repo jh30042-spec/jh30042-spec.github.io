@@ -4538,22 +4538,23 @@ function drawAngryBubbles(ctx, sim){
     const txt = String(o.bubble);
     ctx.save();
     ctx.globalAlpha = clamp(fade, 0, 1);
-    ctx.font = '900 16px system-ui,sans-serif';
-    const tw = Math.max(30, Math.ceil(textWidth(ctx, ctx.font, txt)) + 18);
-    const bh = 26;
+    /* 월드 좌표라 화면에서는 0.44배로 줄어든다 — 휴대폰에서 읽히는 크기로 */
+    ctx.font = '900 30px system-ui,sans-serif';
+    const tw = Math.max(52, Math.ceil(textWidth(ctx, ctx.font, txt)) + 22);
+    const bh = 42;
     const bx = clamp(o.x + angryShakeX(o), tw / 2 + 6, WORLD_W - tw / 2 - 6);
-    const by = o.y - o.h / 2 - 24 - (1 - pop) * 8;
-    ctx.fillStyle = 'rgba(255,255,255,0.96)';
-    rr(ctx, bx - tw / 2, by - bh / 2, tw, bh, 9);
+    const by = o.y - o.h / 2 - 36 - (1 - pop) * 10;
+    ctx.fillStyle = 'rgba(255,255,255,0.97)';
+    rr(ctx, bx - tw / 2, by - bh / 2, tw, bh, 12);
     ctx.fill();
     ctx.beginPath();
-    ctx.moveTo(bx - 5, by + bh / 2 - 1);
-    ctx.lineTo(bx + 5, by + bh / 2 - 1);
-    ctx.lineTo(bx, by + bh / 2 + 8);
+    ctx.moveTo(bx - 7, by + bh / 2 - 2);
+    ctx.lineTo(bx + 7, by + bh / 2 - 2);
+    ctx.lineTo(bx, by + bh / 2 + 11);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = '#1a1a22';
-    ctx.fillText(txt, bx, by + 1);
+    ctx.fillText(txt, bx, by + 2);
     ctx.restore();
   }
 }
