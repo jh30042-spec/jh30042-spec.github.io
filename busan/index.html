@@ -6358,7 +6358,11 @@ if (typeof document !== 'undefined'){
       overCtx = null;
       sim.paused = false;
       if (pauseOv) pauseOv.classList.add('hidden');
-      if (pauseBtn){ pauseBtn.classList.remove('on', 'paused'); pauseBtn.textContent = '⏸'; }
+      if (pauseBtn){
+        pauseBtn.classList.remove('on', 'paused');
+        pauseBtn.textContent = '⏸';
+        pauseBtn.setAttribute('aria-label', '일시정지');
+      }
       Sfx.engineStop();
       Sfx.bgmStop();
       hud.classList.remove('on');
