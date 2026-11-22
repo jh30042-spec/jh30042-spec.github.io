@@ -1645,7 +1645,7 @@ function newGame(opts){
     worldH: opts.worldH || 1422,
     lanePos: 4, targetLane: 4, laneVel: 0,
     speed: START_KMH, maxSpeed: START_KMH, topSpeed: START_KMH,
-    dist: 0, bonus: 0, score: 0,
+    dist: 0, bonus: 0, score: 0, doubleDist: 0,
     kalchi: 0, combo: 0, comboMaxEver: 0, maxCombo: 0, comboT: 0,
     time: 0, rush: 0, scroll: 0, dayT: 0, themeP: 0,
     theme: toCss(THEMES.day),
@@ -1687,7 +1687,7 @@ function start(sim){
   sim.dayT = 0;
   sim.spec = carSpec(sim.car);
   sim.shield = sim.spec.shield || 0;
-  sim.nitro = 0; sim.doubleT = 0; sim.invuln = 0;
+  sim.nitro = 0; sim.doubleT = 0; sim.invuln = 0; sim.doubleDist = 0;
   sim.hitstop = 0; sim.flashT = 0;
   sim.items = []; sim.itemTimer = 5.5;
   sim.wx = 'clear'; sim.wxInten = 0; sim.wxLeft = 0; sim.wxNext = 12 + (sim.seed % 8);
@@ -1996,7 +1996,11 @@ function makeParticles(sim, o){
   }
   return parts;
 }
-function finalScore(sim){ return Math.floor(sim.dist * 10) + sim.bonus; }
+function finalScore(sim){
+  /* 더블 점수 중 달린 거리는 두 배로 계산 */
+  const dbl = sim.doubleDist || 0;
+  return Math.floor(sim.dist * 10) + Math.floor(dbl * 10) + sim.bonus;
+}
 
 /* 칼치기 스파크 (가벼운 금속 불붕) */
 function spawnSparks(sim, o){
@@ -2205,7 +2209,9 @@ function update(sim, dt){
 
   /* --- distance / scroll --- */
   sim.scroll = (sim.scroll || 0) + sim.speed * SPD_SCALE * dt;
-  sim.dist += (sim.speed / KM_DIV) * dt;
+  const dGain = (sim.speed / KM_DIV) * dt;
+  sim.dist += dGain;
+  if (sim.doubleT > 0) sim.doubleDist = (sim.doubleDist || 0) + dGain;
 
   /* --- 라이벌 고스트 주행 (앞서 달리는 친구) --- */
   const ghosts = sim.ghosts || [];
