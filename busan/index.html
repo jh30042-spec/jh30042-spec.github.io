@@ -3086,9 +3086,13 @@ function drawVehicle(ctx, o){
   /* ---------------- 블랙 수퍼카 ---------------- */
   if (kind === 'supercar'){
     const bg = ctx.createLinearGradient(-w/2, 0, w/2, 0);
-    bg.addColorStop(0, '#05060a'); bg.addColorStop(0.42, '#272b38'); bg.addColorStop(0.72, '#14161e'); bg.addColorStop(1, '#05060a');
+    bg.addColorStop(0, '#0a0c12'); bg.addColorStop(0.34, '#4a5266'); bg.addColorStop(0.62, '#2b3140'); bg.addColorStop(1, '#0a0c12');
     ctx.fillStyle = bg;
     rr(ctx, -w*0.47, -h*0.50, w*0.94, h, w*0.26); ctx.fill();
+    /* 림 라이트 — 어두운 배경에서도 차체 윤곽이 보이게 */
+    ctx.strokeStyle = 'rgba(190,212,240,0.65)';
+    ctx.lineWidth = 2.2;
+    rr(ctx, -w*0.47, -h*0.50, w*0.94, h, w*0.26); ctx.stroke();
 
     /* 노즈 테이퍼 */
     ctx.fillStyle = 'rgba(255,255,255,0.06)';
@@ -3100,10 +3104,12 @@ function drawVehicle(ctx, o){
     ctx.closePath(); ctx.fill();
 
     /* 주항색 액센트 */
-    ctx.fillStyle = '#ff7a1a';
-    ctx.fillRect(-w*0.42, -h*0.13, w*0.84, h*0.022);
-    ctx.fillRect(-w*0.30, -h*0.47, w*0.05, h*0.5);
-    ctx.fillRect(w*0.25, -h*0.47, w*0.05, h*0.5);
+    ctx.fillStyle = '#ff8a1f';
+    ctx.fillRect(-w*0.42, -h*0.13, w*0.84, h*0.035);
+    ctx.fillRect(-w*0.31, -h*0.47, w*0.055, h*0.54);
+    ctx.fillRect(w*0.255, -h*0.47, w*0.055, h*0.54);
+    ctx.fillStyle = 'rgba(255,190,120,0.35)';
+    ctx.fillRect(-w*0.40, -h*0.06, w*0.80, h*0.012);
 
     /* 캐빈 */
     ctx.fillStyle = 'rgba(8,14,26,0.94)';
