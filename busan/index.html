@@ -975,6 +975,9 @@ function bgmTrackIdFor(leg){
    ========================================================= */
 const REC_KEY = 'busan8_endless_v1';
 const OLD_KEY = 'busan8_progress_v2';
+/* 기록 저장 에포크 — 값을 올리면 이전 버전이 기기에 남긴 최고 기록은 1회 0으로 리셋된다.
+   (서버 DB를 비워도 폰의 옛 기록이 순위표 1등으로 남는 문제를 막는 장치) */
+const RECORD_EPOCH = 2;
 const MemStore = (function(){
   const m = {};
   return {
@@ -990,7 +993,7 @@ function defaultStore(){
   return MemStore;
 }
 function blankRecords(){
-  return { bestKm:0, bestScore:0, bestSpeed:0, bestCombo:0, runs:0, totalKm:0, updated:0,
+  return { epoch:RECORD_EPOCH, bestKm:0, bestScore:0, bestSpeed:0, bestCombo:0, runs:0, totalKm:0, updated:0,
            bestSpot:'', bestCar:'', bestNick:'' };
 }
 function loadRecords(store){
@@ -1000,6 +1003,12 @@ function loadRecords(store){
     const raw = st.getItem(REC_KEY);
     if (raw){
       const o = JSON.parse(raw);
+      /* 구버전(에포크 없음·낮음) 기록은 이어받지 않고 1회 깔끔하게 0으로 리셋한다 */
+      if (!o || Number(o.epoch) !== RECORD_EPOCH){
+        saveRecords(r, st);
+        try { st.removeItem(OLD_KEY); } catch(e){}
+        return r;
+      }
       r.bestKm = Math.max(0, Number(o.bestKm) || 0);
       r.bestScore = Math.max(0, Number(o.bestScore) || 0);
       r.bestSpeed = Math.max(0, Number(o.bestSpeed) || 0);
@@ -1012,19 +1021,15 @@ function loadRecords(store){
       r.bestNick = normalizeNick(o.bestNick);
       return r;
     }
-    /* 예전 5단계 저장에서 최고 거리만 이어받기 */
-    const oldRaw = st.getItem(OLD_KEY);
-    if (oldRaw){
-      const o = JSON.parse(oldRaw);
-      r.bestKm = Math.max(0, Number(o.bestKm) || 0);
-      r.bestScore = Math.max(0, Number(o.bestScore) || 0);
-    }
+    /* 예전 5단계 저장(busan8_progress_v2)도 같은 구버전 데이터라 이어받지 않는다 */
+    if (st.getItem(OLD_KEY)) st.removeItem(OLD_KEY);
   } catch(e){}
   return r;
 }
 function saveRecords(r, store){
   const st = store || defaultStore();
   try {
+    r.epoch = RECORD_EPOCH;
     r.updated = Date.now();
     st.setItem(REC_KEY, JSON.stringify(r));
     return true;
@@ -1616,6 +1621,26 @@ function createServerRank(opts){
 }
 
 /* --- 순위표 --- */
+/*
+  순위표에 쓸 '내 기록'을 고른다.
+  - 서버 랭킹이 live: 서버에 올라간 내 기록(mine)만 믿는다.
+    서버에 내 기록이 없으면 순위표에도 내 기록을 올리지 않는다(옛 localStorage 기록이 끼어들지 않게).
+  - 오프라인·로딩 등 서버 판정 전: 기기의 최고 기록으로 폴백한다.
+*/
+function rankRecordsFor(status, localRecords, mine){
+  const r = Object.assign(blankRecords(), localRecords || {});
+  if (status !== 'live') return r;          /* 로컬 모드 폴백 */
+  if (mine && Number(mine.km) > 0){
+    r.bestKm = Math.max(0, Number(mine.km) || 0);
+    r.bestScore = Math.max(0, Number(mine.score) || 0);
+    r.bestCombo = Math.max(0, Number(mine.maxCombo) || 0);
+    r.bestSpot = typeof mine.spot === 'string' ? mine.spot : '';
+    r.runs = Math.max(1, Number(r.runs) || 0);
+  } else {
+    r.bestKm = 0; r.bestScore = 0; r.bestCombo = 0; r.bestSpot = ''; r.runs = 0;
+  }
+  return r;
+}
 function buildLeaderboard(profile, records, rivals, opts){
   const o = opts || {};
   const p = profile || blankProfile();
@@ -6416,7 +6441,7 @@ const API = {
   PLAYER: PLAYER, PLAYER_Y_OFF: PLAYER_Y_OFF,
   SPD_SCALE: SPD_SCALE, KM_DIV: KM_DIV, HIT: HIT, NEAR_MISS: NEAR_MISS,
   LEG_KM: LEG_KM, START_KMH: START_KMH, TOP_KMH: TOP_KMH, DAY_LEN: DAY_LEN, COMBO_WINDOW: COMBO_WINDOW,
-  REC_KEY: REC_KEY, THEMES: THEMES, SKY_KEYS: SKY_KEYS,
+  REC_KEY: REC_KEY, RECORD_EPOCH: RECORD_EPOCH, THEMES: THEMES, SKY_KEYS: SKY_KEYS,
   REGIONS: REGIONS, REGION_COUNT: REGION_COUNT, CYCLE_KM: CYCLE_KM,
   regionIdxAt: regionIdxAt, regionAt: regionAt, regionOfLeg: regionOfLeg, lapOfLeg: lapOfLeg,
   regionRoute: regionRoute, legRoute: legRoute, bgmTrackIdFor: bgmTrackIdFor,
@@ -6465,7 +6490,7 @@ const API = {
   mergeRival: mergeRival, addRivalToList: addRivalToList, registerRival: registerRival, resetRivals: resetRivals,
   describeStop: describeStop, encodeChallenge: encodeChallenge, decodeChallenge: decodeChallenge,
   challengeUrl: challengeUrl, parseChallengeFromSearch: parseChallengeFromSearch, challengeRecord: challengeRecord,
-  buildLeaderboard: buildLeaderboard, topRowsForDisplay: topRowsForDisplay, LEADERBOARD_TOP: LEADERBOARD_TOP,
+  buildLeaderboard: buildLeaderboard, rankRecordsFor: rankRecordsFor, topRowsForDisplay: topRowsForDisplay, LEADERBOARD_TOP: LEADERBOARD_TOP,
   entryForRun: entryForRun, rankOfRun: rankOfRun, nextTarget: nextTarget,
   markerY: markerY, makeGhosts: makeGhosts, legProgressPct: legProgressPct,
   SERVER_DB: SERVER_DB, SERVER_PATH: SERVER_PATH, SERVER_TIMEOUT: SERVER_TIMEOUT, SERVER_LIMIT: SERVER_LIMIT,
@@ -6808,18 +6833,9 @@ if (typeof document !== 'undefined'){
         myNick: profile.nick, limit: SERVER_RIVAL_MAX
       });
     }
-    /* 내 기록은 로컬 최고 + 서버에 올라간 내 최고 중 높은 쪽으로 순위를 매긴다 */
+    /* 순위표의 내 순위·기록: 서버가 live면 서버 기록만, 오프라인이면 로컬 최고 기록 */
     function rankRecords(mg){
-      const r = Object.assign(blankRecords(), sim.rec || loadRecords());
-      if (mg && mg.mine && mg.mine.km > (r.bestKm || 0) + 0.05){
-        r.bestKm = mg.mine.km;
-        r.bestScore = Math.max(r.bestScore || 0, mg.mine.score || 0);
-        r.bestCombo = Math.max(r.bestCombo || 0, mg.mine.maxCombo || 0);
-        if (mg.mine.spot) r.bestSpot = mg.mine.spot;
-      } else if (mg && mg.mine){
-        r.bestCombo = Math.max(r.bestCombo || 0, mg.mine.maxCombo || 0);
-      }
-      return r;
+      return rankRecordsFor(serverRank.state.status, sim.rec || loadRecords(), mg && mg.mine);
     }
 
     /* 서버 랭킹 상태 표시 (타이틀 · 게임오버) */
