@@ -383,7 +383,7 @@ function addObstacle(sim, props){ const o = makeObstacle(sim, props); sim.obstac
 function pickLane(sim, free, rng){
   const avoid = Math.round(sim.lanePos);
   const others = free.filter(function(i){ return i !== avoid; });
-  if (others.length && rng() < 0.75) return others[Math.floor(rng() * others.length)];
+  if (others.length && rng() < 0.86) return others[Math.floor(rng() * others.length)];
   return free[Math.floor(rng() * free.length)];
 }
 
@@ -469,7 +469,7 @@ function spawnObstacle(sim){
     x: laneCenter(lane),
     y: -200 - rng() * 60,
     w: 50, h: 104,
-    speed: 78 + rng() * 62,
+    speed: 85 + rng() * 65,
     color: CAR_COLORS[Math.floor(rng() * CAR_COLORS.length)],
     cutter: cutter,
     cutLane: cutLane,
@@ -634,7 +634,7 @@ function update(sim, dt){
     const o = sim.obstacles[i];
     if (o.dead || o.type === 'cone') continue;
     const dy = py - o.y;
-    if (dy < 30 || dy > 900) continue;
+    if (dy < 30 || dy > 560) continue;
     const latGap = Math.abs(o.x - px) - (o.w + PLAYER.w) / 2 * 0.55;
     if (latGap > 0) continue;
     if (!blocker || o.y > blocker.y) blocker = o;
