@@ -1481,9 +1481,13 @@ function drawCarLights(ctx, o, strength){
   ctx.beginPath(); ctx.arc(x - w*0.30, ry, 7 * strength, 0, 7); ctx.fill();
   ctx.beginPath(); ctx.arc(x + w*0.30, ry, 7 * strength, 0, 7); ctx.fill();
   const fy = y - h/2 + 5;
-  ctx.fillStyle = 'rgba(255,246,210,' + (0.12 * strength) + ')';
-  ctx.beginPath(); ctx.arc(x - w*0.32, fy - 10, 17 * strength, 0, 7); ctx.fill();
-  ctx.beginPath(); ctx.arc(x + w*0.32, fy - 10, 17 * strength, 0, 7); ctx.fill();
+  const gy = fy - 8, gr = 34 * strength;
+  const hg = ctx.createRadialGradient(x, gy, 0, x, gy, gr);
+  hg.addColorStop(0, 'rgba(255,246,210,' + (0.20 * strength) + ')');
+  hg.addColorStop(0.45, 'rgba(255,246,210,' + (0.09 * strength) + ')');
+  hg.addColorStop(1, 'rgba(255,246,210,0)');
+  ctx.fillStyle = hg;
+  ctx.beginPath(); ctx.arc(x, gy, gr, 0, 7); ctx.fill();
   ctx.restore();
 }
 
