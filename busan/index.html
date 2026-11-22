@@ -1464,10 +1464,10 @@ function drawCarLights(ctx, o, strength){
     if (strength < 0.6) return;
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    ctx.fillStyle = 'rgba(255,150,60,' + (0.22 * strength) + ')';
-    ctx.beginPath(); ctx.arc(x, y, 30, 0, 7); ctx.fill();
-    ctx.fillStyle = 'rgba(255,240,200,' + (0.55 * strength) + ')';
-    ctx.beginPath(); ctx.arc(x, y - h*0.05, 5, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,150,60,' + (0.14 * strength) + ')';
+    ctx.beginPath(); ctx.arc(x, y, 18, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,240,200,' + (0.5 * strength) + ')';
+    ctx.beginPath(); ctx.arc(x, y - h*0.05, 4, 0, 7); ctx.fill();
     ctx.restore();
     return;
   }
