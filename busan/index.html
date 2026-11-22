@@ -126,6 +126,8 @@
   .overlay.hidden{opacity:0;pointer-events:none}
   .overlay.top-space{justify-content:center}
 
+  #title{padding-bottom:calc(var(--u)*8.5);
+    padding-bottom:max(calc(var(--u)*8.5), env(safe-area-inset-bottom))}
   #title .tEmoji{font-size:calc(var(--u)*8.5);line-height:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,.6))}
   #title h1{
     margin:calc(var(--u)*2.4) 0 calc(var(--u)*1.2);font-size:calc(var(--u)*9.6);font-weight:900;
@@ -982,12 +984,16 @@ function drawCar(ctx, o){
       ctx.beginPath(); ctx.moveTo(x - w/2 + 5, yy); ctx.lineTo(x + w/2 - 5, yy); ctx.stroke();
     }
     // cab (front)
-    ctx.fillStyle = shade(o.color, -18);
+    ctx.fillStyle = '#3b4a63';
     rr(ctx, x - w/2 + 1, y - h/2 + 2, w - 2, h*0.27, 7);
     ctx.fill();
     ctx.fillStyle = 'rgba(22,32,48,0.9)';
     rr(ctx, x - w/2 + 7, y - h/2 + h*0.08, w - 14, h*0.11, 4);
     ctx.fill();
+    // roof marker lights
+    ctx.fillStyle = 'rgba(255,210,120,0.9)';
+    ctx.fillRect(x - 10, y - h/2 + 4, 4, 3);
+    ctx.fillRect(x + 6, y - h/2 + 4, 4, 3);
   } else if (isBus){
     // roof panel
     ctx.fillStyle = 'rgba(255,255,255,0.14)';
