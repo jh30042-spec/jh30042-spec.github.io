@@ -1843,7 +1843,8 @@ if (typeof document !== 'undefined'){
       sim.worldH = worldH;
       view.sx = cv.width / WORLD_W;
       view.sy = cv.height / worldH;
-      frame.style.setProperty('--u', (w / 100) + 'px');
+      // 세로가 짧은 창에서도 UI가 화면 밖으로 넘치지 않도록 폭/높이 중 작은 쪽 기준
+      frame.style.setProperty('--u', (Math.min(w, h * 0.52) / 100) + 'px');
     }
 
     let toastTimer = null;
