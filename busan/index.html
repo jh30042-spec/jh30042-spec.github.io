@@ -302,7 +302,7 @@
     <div class="oStats">
       <div><b id="oKm">0.0</b><span>도달 km</span></div>
       <div><b id="oScore">0</b><span>점수</span></div>
-      <div><b id="oSpd">0</b><span>최고 km/h</span></div>
+      <div><b id="oSpd">0</b><span>최고 속도</span></div>
       <div><b id="oCombo">x0</b><span>최대 콤보</span></div>
     </div>
     <div class="oBest" id="oBest"></div>
@@ -2031,7 +2031,8 @@ if (typeof document !== 'undefined'){
       if (r.bestKm > 0){
         tBest.innerHTML = '🏆 최고 <b>' + fmtKm(r.bestKm) + 'km</b> · ' + fmtNum(r.bestScore) + '점 · ' +
           Math.round(r.bestSpeed) + 'km/h';
-        tSub.textContent = '최고 콤보 x' + r.bestCombo + ' · ' + r.runs + '번 주행 · 총 ' + fmtKm(r.totalKm) + 'km';
+        tSub.textContent = (r.bestCombo > 0 ? '최고 콤보 x' + r.bestCombo + ' · ' : '') +
+          r.runs + '번 주행 · 총 ' + fmtKm(r.totalKm) + 'km';
       } else {
         tBest.innerHTML = '아직 기록 없음 <span>· 첫 주행이 곧 기록</span>';
         tSub.textContent = '갈수록 빨라진다 · 갈수록 막힌다 · 스치면 끝';
