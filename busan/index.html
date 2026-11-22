@@ -52,7 +52,7 @@
   #hud .col{flex:1;min-width:0}
   #hud .col.mid{flex:0 0 auto;text-align:center}
   #hud .col.right{text-align:right;padding-right:calc(var(--u)*1)}
-  .sec{font-size:calc(var(--u)*3.4);font-weight:900;letter-spacing:-.02em;line-height:1.15;
+  .sec{font-size:calc(var(--u)*3.2);font-weight:900;letter-spacing:-.02em;line-height:1.15;
     text-shadow:0 1px 6px rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#ffd479}
   .next{font-size:calc(var(--u)*2.7);font-weight:700;color:#9fd0ff;opacity:.92;margin-top:calc(var(--u)*.5);
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -75,7 +75,7 @@
   .lateBg{position:relative;flex:1;height:calc(var(--u)*1.9);border-radius:99px;background:rgba(255,255,255,.14);
     box-shadow:inset 0 1px 2px rgba(0,0,0,.5);overflow:hidden}
   #lateFill{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:99px;
-    background:linear-gradient(90deg,#3ddc97,#ffd479 55%,#ff5a5a);transition:width .1s linear}
+    background:linear-gradient(90deg,#2ee08a,#7fe0b0);transition:width .1s linear}
   .lateWrap .lt{font-size:calc(var(--u)*2.4);font-weight:900;color:#cfe4ff;font-variant-numeric:tabular-nums;
     min-width:calc(var(--u)*11);text-align:right}
 
@@ -353,35 +353,35 @@ const THEMES = {
    ========================================================= */
 const STAGES = [
   {
-    n:1, city:'서울', to:'천안', route:'서울 → 수원 → 천안', focus:'워밍업', theme:'day',
+    n:1, city:'서울', to:'천안', route:'서울 → 수원 → 천안', focus:'워밍업', short:'워밍업', theme:'day',
     km:80, kmDiv:128, secs:42, startKmh:120, maxKmh:250, trafficKmh:150, lateSec:64,
     gapMin:430, gapMax:680, blockMax:2, escapeMin:2, coneLen:3, coneMax:1,
     weights:{ pack:.44, truck:.30, cone:.16, cut:.10, zig:0 },
     land:[ {p:0.375, name:'수원', sub:'수원갈비', emoji:'🏰'}, {p:1, name:'천안', sub:'호두과자', emoji:'🥟'} ]
   },
   {
-    n:2, city:'천안', to:'대전', route:'천안 → 아산 → 대전', focus:'화물차 병목', theme:'day',
+    n:2, city:'천안', to:'대전', route:'천안 → 아산 → 대전', focus:'화물차 병목', short:'화물차 병목', theme:'day',
     km:55, kmDiv:174, secs:38, startKmh:135, maxKmh:262, trafficKmh:162, lateSec:58,
     gapMin:380, gapMax:600, blockMax:4, escapeMin:2, coneLen:4, coneMax:3,
     weights:{ pack:.22, truck:.36, cone:.26, cut:.11, zig:.05 },
     land:[ {p:0.46, name:'아산', sub:'온천', emoji:'♨️'}, {p:1, name:'대전', sub:'한밭수목원', emoji:'🌉'} ]
   },
   {
-    n:3, city:'대전', to:'대구', route:'대전 → 김천 → 대구', focus:'칼치기 지옥', theme:'dusk',
+    n:3, city:'대전', to:'대구', route:'대전 → 김천 → 대구', focus:'칼치기 지옥', short:'칼치기 지옥', theme:'dusk',
     km:125, kmDiv:105, secs:46, startKmh:165, maxKmh:292, trafficKmh:192, lateSec:70,
     gapMin:372, gapMax:612, blockMax:4, escapeMin:2, coneLen:3, coneMax:2,
     weights:{ pack:.28, truck:.08, cone:.10, cut:.44, zig:.10 },
     land:[ {p:0.50, name:'김천', sub:'자두', emoji:'🍑'}, {p:1, name:'대구', sub:'사과', emoji:'🍎'} ]
   },
   {
-    n:4, city:'대구', to:'경주', route:'대구 → 영천 → 경주', focus:'한밤중 고속도로', theme:'night',
+    n:4, city:'대구', to:'경주', route:'대구 → 영천 → 경주', focus:'한밤중 고속도로', short:'한밤중', theme:'night',
     km:65, kmDiv:200, secs:44, startKmh:185, maxKmh:308, trafficKmh:200, lateSec:66,
     gapMin:358, gapMax:596, blockMax:5, escapeMin:2, coneLen:3, coneMax:2,
     weights:{ pack:.30, truck:.05, cone:.10, cut:.35, zig:.20 },
     land:[ {p:0.52, name:'영천', sub:'포도', emoji:'🍇'}, {p:1, name:'경주', sub:'불국사', emoji:'⛩️'} ]
   },
   {
-    n:5, city:'경주', to:'부산', route:'경주 → 양산 → 부산', focus:'귀성길 헬', theme:'dawn',
+    n:5, city:'경주', to:'부산', route:'경주 → 양산 → 부산', focus:'귀성길 헬', short:'귀성길 헬', theme:'dawn',
     km:75, kmDiv:182, secs:48, startKmh:205, maxKmh:330, trafficKmh:228, lateSec:72,
     gapMin:340, gapMax:576, blockMax:6, escapeMin:2, coneLen:4, coneMax:2,
     weights:{ pack:.36, truck:.18, cone:.18, cut:.16, zig:.12 },
@@ -455,7 +455,7 @@ function makeInfiniteCfg(){
   const b = STAGES[STAGES.length-1];
   const c = Object.assign({}, b);
   c.n = 0; c.infinite = true;
-  c.city = '부산'; c.to = '서울'; c.route = '부산 → 서울 역주행 귀경'; c.focus = '무한 챌린지';
+  c.city = '부산'; c.to = '서울'; c.route = '부산 → 서울 역주행 귀경'; c.focus = '무한 챌린지'; c.short = '무한 귀경';
   c.theme = 'night';
   c.km = 1e9; c.kmDiv = 130;
   c.startKmh = 215; c.maxKmh = 325; c.trafficKmh = 235; c.lateSec = 1e9;
@@ -1868,7 +1868,7 @@ if (typeof document !== 'undefined'){
       } else {
         const remain = Math.max(0, cfg.km - sim.dist);
         remainKm.textContent = remain >= 10 ? Math.ceil(remain) : remain.toFixed(1);
-        secName.textContent = 'STAGE ' + (sim.stage+1) + ' · ' + cfg.focus;
+        secName.textContent = 'STAGE ' + (sim.stage+1) + ' · ' + (cfg.short || cfg.focus);
         const nl = cfg.land[sim.landIdx];
         if (nl){
           const d = Math.max(0, nl.p * cfg.km - sim.dist);
@@ -1880,6 +1880,8 @@ if (typeof document !== 'undefined'){
         const pct = sim.lateTotal > 0 ? clamp(left / sim.lateTotal * 100, 0, 100) : 0;
         lateWrapShow(1);
         lateFill.style.width = pct + '%';
+        lateFill.style.background = pct < 25 ? 'linear-gradient(90deg,#ff3b47,#ff7a5a)'
+          : (pct < 50 ? 'linear-gradient(90deg,#ffb020,#ffd479)' : 'linear-gradient(90deg,#2ee08a,#7fe0b0)');
         bestVal.textContent = '⏱ ' + left.toFixed(1) + 's';
         bestVal.classList.toggle('warn', pct < 25);
         const prog = clamp(sim.dist / cfg.km * 100, 0, 100);
