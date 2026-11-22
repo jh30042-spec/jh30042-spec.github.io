@@ -1,0 +1,21 @@
+{
+  "name": "busan-rush-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "서울→부산 무한질주 — Capacitor + AdMob 안드로이드 앱",
+  "scripts": {
+    "www": "node scripts/prepare-www.js",
+    "sync": "npm run www && cap sync android",
+    "add": "npm run www && cap add android",
+    "apk": "npm run sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "6.2.0",
+    "@capacitor/android": "6.2.3",
+    "@capacitor/core": "6.2.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "6.2.3"
+  }
+}

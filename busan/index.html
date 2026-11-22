@@ -351,6 +351,24 @@
     padding:calc(var(--u)*2.7) calc(var(--u)*1.4);margin-top:calc(var(--u)*1.5);border-radius:calc(var(--u)*3)
   }
 
+  /* ---------- AdMob 보상형 이어달리기 (네이티브 앱 전용) ---------- */
+  #reviveBtn{
+    width:100%;border:none;cursor:pointer;border-radius:calc(var(--u)*3.4);
+    display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.1);
+    padding:calc(var(--u)*3.0) calc(var(--u)*2.4);margin-top:calc(var(--u)*1.6);
+    font-family:inherit;font-size:calc(var(--u)*3.4);font-weight:900;letter-spacing:-.02em;
+    color:#2b1600;background:linear-gradient(180deg,#ffe08a,#ffab3d);
+    box-shadow:0 calc(var(--u)*1.2) 0 rgba(150,86,0,.65),0 calc(var(--u)*1.6) calc(var(--u)*4) rgba(255,160,40,.4);
+    touch-action:manipulation;white-space:nowrap;flex:0 0 auto;
+  }
+  #reviveBtn:active{transform:translateY(calc(var(--u)*.8));box-shadow:0 calc(var(--u)*.5) 0 rgba(150,86,0,.65)}
+  #reviveBtn:disabled{opacity:.7}
+  #reviveBtn.hidden{display:none}
+  /* 배너 광고가 떠 있는 동안에는 타이틀·게임오버 화면 아래 버튼이 배너에 가리지 않도록 */
+  body.ads-banner #title,body.ads-banner #over{
+    padding-bottom:calc(max(calc(var(--u)*4.2), calc(env(safe-area-inset-bottom) + var(--u)*1.4)) + 62px);
+  }
+
   /* ---------- end screen ---------- */
   #over .tag{
     align-self:center;font-size:calc(var(--u)*3);font-weight:800;letter-spacing:.12em;
@@ -567,6 +585,7 @@
       <div class="lbHead">🏆 순위표 <span id="lbMe">내 순위 —</span></div>
       <div id="lbList"></div>
     </div>
+    <button id="reviveBtn" class="hidden" aria-label="광고를 보고 이어달리기">📺 광고 보고 이어달리기</button>
     <button id="retryBtn" class="cta alt">다시 달리기 🔁</button>
     <div id="linkBox" class="hidden">
       <input id="linkInput" type="text" readonly aria-label="도전장 링크">
@@ -1861,6 +1880,7 @@ function newGame(opts){
     shake: 0, crashT: 0, crashCause: null, endInfo: null, endStats: null,
     gantry: null, horn: 0,
     newRec: { km:false, score:false, speed:false, combo:false },
+    revived: false,
     god: false
   };
   sim.landSeq = buildSeq(0);
@@ -1887,6 +1907,7 @@ function start(sim){
   sim.wx = 'clear'; sim.wxInten = 0; sim.wxLeft = 0; sim.wxNext = 12 + (sim.seed % 8);
   sim.mission = null; sim.missionCd = 9; sim.missionItemT = 0;
   sim.sirenCd = 5;
+  sim.revived = false;
   return sim;
 }
 
@@ -2250,6 +2271,32 @@ function endRun(sim, cause, info){
   sim.particles = makeParticles(sim, null);
   sim.speed = Math.max(0, sim.speed * 0.2);
   return [{ type:'crash', cause: cause, info: sim.endInfo, stats: sim.endStats }];
+}
+
+/* 보상형 광고를 보고 이어달리기: 게임 상태만 복구한다(UI는 boot에서 처리).
+   거리·점수는 그대로 두고, 실드 + 잠시 무적 상태로 현재 위치에서 다시 달린다. */
+function reviveSim(sim, opts){
+  if (!sim || sim.state !== 'crash' || sim.revived) return false;
+  opts = opts || {};
+  sim.revived = true;
+  const py = playerY(sim);
+  const clear = (opts.clearRange === undefined) ? 240 : opts.clearRange;
+  sim.obstacles = (sim.obstacles || []).filter(function(o){
+    return o.y - o.h / 2 > py + clear || o.y + o.h / 2 < py - clear;
+  });
+  sim.cams = (sim.cams || []).filter(function(c){ return c.y > py + clear || c.y < py - clear; });
+  sim.particles = [];
+  sim.impacts = [];
+  sim.state = 'playing';
+  sim.crashT = 0;
+  sim.shake = 0;
+  sim.hitstop = 0;
+  sim.danger = 0;
+  sim.spawnTimer = 0.9;
+  sim.speed = Math.max(sim.speed || 0, START_KMH * 0.85);
+  sim.shield = Math.max(1, sim.shield || 0);
+  sim.invuln = (opts.invuln === undefined) ? 3.2 : opts.invuln;
+  return true;
 }
 
 function crashAt(sim, o){
@@ -4661,6 +4708,280 @@ const Haptics = {
 };
 
 /* =========================================================
+   ads — AdMob 브릿지 (window.BusanAds)
+   · 웹(https://jh30042-spec.github.io/busan/)에서는 아무 것도 하지 않는다.
+     (window.Capacitor.isNativePlatform() 이 false면 모든 호출이 즉시 no-op)
+   · Capacitor 네이티브 앱에서만 배너/전면/보상형 광고가 동작한다.
+   · 광고 단위 ID는 android-app/admob-config.json 한 곳만 고치면 된다.
+   ========================================================= */
+const ADS_CONFIG_FILE = 'admob-config.json';
+const ADS_DEFAULT_CONFIG = {
+  enabled: true,
+  /* Google 공식 테스트 ID — 실제 ID 발급 전까지는 이 값으로 안전하게 테스트 */
+  appId: 'ca-app-pub-3940256099942544~3347511713',
+  bannerId: 'ca-app-pub-3940256099942544/6300978111',
+  interstitialId: 'ca-app-pub-3940256099942544/1033173712',
+  rewardedId: 'ca-app-pub-3940256099942544/5224354917',
+  testing: true,
+  interstitialEveryRuns: 3,      /* 3판 종료마다 전면 1회 */
+  interstitialCooldownSec: 45,   /* 전면 최소 간격 */
+  interstitialDelayMs: 1600      /* 게임오버 화면이 뜬 뒤 전면을 띄우기까지 */
+};
+
+function adsInt(v, dflt, min, max){
+  const n = Math.round(Number(v));
+  if (!isFinite(n)) return dflt;
+  return clamp(n, min, max);
+}
+
+/* admob-config.json(또는 부분 설정)을 안전한 설정으로 정규화 */
+function adsNormalizeConfig(raw){
+  const out = Object.assign({}, ADS_DEFAULT_CONFIG);
+  if (!raw || typeof raw !== 'object') return out;
+  const units = (raw.adUnits && typeof raw.adUnits === 'object') ? raw.adUnits : {};
+  function str(){
+    for (let i=0;i<arguments.length;i++){
+      const v = arguments[i];
+      if (typeof v === 'string' && v.trim()) return v.trim();
+    }
+    return '';
+  }
+  const appId = str(raw.appId, raw.applicationId, raw.APPLICATION_ID, units.appId);
+  const bannerId = str(raw.bannerId, raw.banner, units.banner);
+  const interstitialId = str(raw.interstitialId, raw.interstitial, units.interstitial);
+  const rewardedId = str(raw.rewardedId, raw.rewarded, units.rewarded);
+  if (appId) out.appId = appId;
+  if (bannerId) out.bannerId = bannerId;
+  if (interstitialId) out.interstitialId = interstitialId;
+  if (rewardedId) out.rewardedId = rewardedId;
+  if (typeof raw.enabled === 'boolean') out.enabled = raw.enabled;
+  if (typeof raw.testing === 'boolean') out.testing = raw.testing;
+  out.interstitialEveryRuns = adsInt(raw.interstitialEveryRuns, out.interstitialEveryRuns, 1, 100);
+  out.interstitialCooldownSec = adsInt(raw.interstitialCooldownSec, out.interstitialCooldownSec, 0, 3600);
+  out.interstitialDelayMs = adsInt(raw.interstitialDelayMs, out.interstitialDelayMs, 0, 15000);
+  return out;
+}
+
+function isNativeApp(){
+  if (typeof window === 'undefined' || !window || !window.Capacitor) return false;
+  const cap = window.Capacitor;
+  try {
+    if (typeof cap.isNativePlatform === 'function') return !!cap.isNativePlatform();
+  } catch(e){}
+  return cap.platform === 'android' || cap.platform === 'ios';
+}
+
+/*
+  createAdsController — 광고 브릿지의 본체. 브라우저·테스트 어디서든 같은 규칙으로 동작한다.
+  opts: { config, native, plugin, now, fetchConfig, onBannerChange }
+*/
+function createAdsController(opts){
+  opts = opts || {};
+  const cfg = adsNormalizeConfig(opts.config || ADS_DEFAULT_CONFIG);
+  const native = (opts.native !== undefined) ? !!opts.native : isNativeApp();
+  const clock = (typeof opts.now === 'function') ? opts.now : function(){ return Date.now(); };
+  const fetcher = (typeof opts.fetchConfig === 'function') ? opts.fetchConfig : null;
+  const onChange = (typeof opts.onBannerChange === 'function') ? opts.onBannerChange : function(){};
+  const plugin = (opts.plugin !== undefined) ? opts.plugin
+    : ((typeof window !== 'undefined' && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) || null);
+
+  const state = {
+    native: native,
+    active: !!(native && cfg.enabled && plugin && typeof plugin.showBanner === 'function'),
+    ready: false,
+    bannerShown: false,
+    screen: null,
+    runs: 0,
+    interShows: 0,
+    lastInterstitialAt: -Infinity,
+    interstitialBusy: false,
+    rewardBusy: false,
+    rewardedUsed: false,
+    lastError: ''
+  };
+  let interTimer = null;
+  let rewardResolve = null;
+  const listeners = [];
+
+  function noteError(e){
+    state.lastError = (e && (e.message || e.error || e.code)) ? String(e.message || e.error || e.code) : String(e || 'error');
+    return state.lastError;
+  }
+
+  function setBannerShown(on, screen){
+    const was = state.bannerShown;
+    state.bannerShown = !!on;
+    state.screen = screen || state.screen;
+    if (was !== state.bannerShown) onChange(state.bannerShown, state.screen);
+  }
+
+  function subscribe(){
+    if (!plugin || typeof plugin.addListener !== 'function') return Promise.resolve();
+    const names = [
+      'onRewardedVideoAdReward', 'onRewardedVideoAdDismissed', 'onRewardedVideoAdFailedToShow',
+      'onInterstitialAdDismissed', 'onInterstitialAdShowed'
+    ];
+    return Promise.all(names.map(function(name){
+      try {
+        return Promise.resolve(plugin.addListener(name, function(arg){
+          if (name === 'onRewardedVideoAdReward'){ settleReward(true); }
+          else if (name === 'onRewardedVideoAdDismissed' || name === 'onRewardedVideoAdFailedToShow'){ settleReward(false); }
+          else if (name === 'onInterstitialAdDismissed'){
+            state.interstitialBusy = false;
+            if (state.screen === 'title' || state.screen === 'over') showBanner(state.screen);
+          } else if (name === 'onInterstitialAdShowed'){
+            state.interstitialBusy = true;
+          }
+        })).then(function(h){ if (h) listeners.push(h); });
+      } catch(e){ noteError(e); }
+    })).catch(function(e){ noteError(e); });
+  }
+
+  function init(){
+    if (!state.active || state.ready) return Promise.resolve(state.ready);
+    let chain = Promise.resolve();
+    if (fetcher){
+      chain = chain.then(function(){ return fetcher(ADS_CONFIG_FILE); }).then(function(raw){
+        const merged = adsNormalizeConfig(Object.assign({}, cfg, raw || {}));
+        Object.keys(merged).forEach(function(k){ cfg[k] = merged[k]; });
+      }).catch(function(e){ noteError(e); });
+    }
+    return chain.then(function(){
+      return plugin.initialize({ initializeForTesting: !!cfg.testing });
+    }).then(function(){
+      state.ready = true;
+      return subscribe();
+    }).then(function(){ return true; }).catch(function(e){
+      noteError(e);
+      state.active = false;
+      return false;
+    });
+  }
+
+  function showBanner(screen){
+    state.screen = screen || state.screen || 'title';
+    if (!state.active) return Promise.resolve(false);
+    if (state.bannerShown && state.screen === screen) return Promise.resolve(true);
+    return Promise.resolve().then(function(){
+      return plugin.showBanner({
+        adId: cfg.bannerId,
+        adSize: 'ADAPTIVE_BANNER',
+        position: 'BOTTOM_CENTER',
+        margin: 0,
+        isTesting: !!cfg.testing
+      });
+    }).then(function(){
+      setBannerShown(true, screen);
+      return true;
+    }).catch(function(e){ noteError(e); return false; });
+  }
+
+  function hideBanner(){
+    if (!state.active || !state.bannerShown) { setBannerShown(false, state.screen); return Promise.resolve(false); }
+    return Promise.resolve().then(function(){ return plugin.hideBanner(); }).then(function(){
+      setBannerShown(false, state.screen);
+      return true;
+    }).catch(function(e){ noteError(e); return false; });
+  }
+
+  /* 화면 전환: 'title' | 'over' = 배너 표시, 'play' = 배너 반드시 숨김 */
+  function screen(name){
+    if (name === 'play') return hideBanner();
+    return showBanner(name);
+  }
+
+  function cancelInterstitial(){
+    if (interTimer){ clearTimeout(interTimer); interTimer = null; return true; }
+    return false;
+  }
+
+  function showInterstitial(){
+    if (!state.active || state.interstitialBusy) return Promise.resolve(false);
+    state.interstitialBusy = true;
+    hideBanner();
+    return Promise.resolve().then(function(){
+      return plugin.prepareInterstitial({ adId: cfg.interstitialId, isTesting: !!cfg.testing });
+    }).then(function(){ return plugin.showInterstitial(); }).then(function(){
+      state.lastInterstitialAt = clock();
+      state.interShows += 1;
+      /* 표시가 시작되면 예약 잠금은 풀어둔다 (닫힘 이벤트가 오지 않아도 막히지 않게) */
+      state.interstitialBusy = false;
+      return true;
+    }).catch(function(e){ noteError(e); state.interstitialBusy = false; return false; });
+  }
+
+  /* 판이 끝날 때마다 1회: 3판마다(쿨타임 포함) 전면 광고를 예약한다. */
+  function onRunEnd(){
+    state.runs += 1;
+    state.rewardedUsed = false;
+    if (!state.active) return Promise.resolve(false);
+    const every = Math.max(1, cfg.interstitialEveryRuns);
+    const dueByCount = (state.runs % every) === 0;
+    const dueByTime = (clock() - state.lastInterstitialAt) >= cfg.interstitialCooldownSec * 1000;
+    if (!dueByCount || !dueByTime) return Promise.resolve(false);
+    cancelInterstitial();
+    return new Promise(function(resolve){
+      interTimer = setTimeout(function(){
+        interTimer = null;
+        showInterstitial().then(resolve);
+      }, cfg.interstitialDelayMs);
+    });
+  }
+
+  function settleReward(ok){
+    const r = rewardResolve;
+    rewardResolve = null;
+    state.rewardBusy = false;
+    if (r) r(!!ok);
+  }
+
+  /* 보상형 광고 1회: 광고를 끝까지 보면 true, 중간에 닫으면 false */
+  function showRewarded(){
+    if (!state.active) return Promise.resolve(false);
+    if (state.rewardBusy) return Promise.resolve(false);
+    state.rewardBusy = true;
+    cancelInterstitial();
+    hideBanner();
+    return new Promise(function(resolve){
+      rewardResolve = resolve;
+      Promise.resolve().then(function(){
+        return plugin.prepareRewardVideoAd({ adId: cfg.rewardedId, isTesting: !!cfg.testing });
+      }).then(function(){
+        return plugin.showRewardVideoAd();
+      }).then(function(item){
+        if (item && typeof item === 'object' && item.amount !== undefined) settleReward(true);
+      }).catch(function(e){ noteError(e); settleReward(false); });
+    });
+  }
+
+  function destroy(){
+    cancelInterstitial();
+    settleReward(false);
+    while (listeners.length){
+      const h = listeners.pop();
+      try { if (h && typeof h.remove === 'function') h.remove(); } catch(e){}
+    }
+    hideBanner();
+  }
+
+  return {
+    config: cfg,
+    state: state,
+    isNative: function(){ return native; },
+    available: function(){ return state.active; },
+    init: init,
+    screen: screen,
+    showBanner: showBanner,
+    hideBanner: hideBanner,
+    onRunEnd: onRunEnd,
+    showInterstitial: showInterstitial,
+    cancelInterstitial: cancelInterstitial,
+    showRewarded: showRewarded,
+    destroy: destroy
+  };
+}
+
+/* =========================================================
    export for tests
    ========================================================= */
 const API = {
@@ -4715,12 +5036,14 @@ const API = {
   newGame: newGame, start: start, update: update, steer: steer, setLane: setLane,
   spawnWave: spawnWave, freeInBand: freeInBand, addObstacle: addObstacle, addCone: addCone,
   makeObstacle: makeObstacle,
-  pickEnding: pickEnding, endRun: endRun, crashAt: crashAt, finalScore: finalScore,
+  pickEnding: pickEnding, endRun: endRun, crashAt: crashAt, reviveSim: reviveSim, finalScore: finalScore,
   compareRecord: compareRecord, commitRun: commitRun,
   loadRecords: loadRecords, saveRecords: saveRecords, blankRecords: blankRecords,
   maxSpeedAt: maxSpeedAt, difficulty: difficulty, themeAt: themeAt, themeLabel: themeLabel,
   toCss: toCss, buildSeq: buildSeq, legTitle: legTitle, legRound: legRound,
-  MemStore: MemStore, Sfx: Sfx
+  MemStore: MemStore, Sfx: Sfx,
+  ADS_CONFIG_FILE: ADS_CONFIG_FILE, ADS_DEFAULT_CONFIG: ADS_DEFAULT_CONFIG,
+  adsNormalizeConfig: adsNormalizeConfig, isNativeApp: isNativeApp, createAdsController: createAdsController
 };
 
 if (typeof window !== 'undefined') window.BusanGame = API;
@@ -4801,8 +5124,29 @@ if (typeof document !== 'undefined'){
     const oSrvEl = document.getElementById('oSrv');
     const tSrvBtn = document.getElementById('tSrvBtn');
     const oSrvBtn = document.getElementById('oSrvBtn');
+    const reviveBtn = document.getElementById('reviveBtn');
     const serverRank = createServerRank({});
     let overCtx = null;
+
+    /* ---------- AdMob 브릿지 (네이티브 앱에서만 실제 동작) ---------- */
+    const ads = createAdsController({
+      fetchConfig: function(file){
+        if (typeof fetch !== 'function') return Promise.reject(new Error('no-fetch'));
+        return fetch(file, { cache: 'no-store' }).then(function(r){
+          if (!r.ok) throw new Error('config-' + r.status);
+          return r.json();
+        });
+      },
+      onBannerChange: function(on){
+        if (document && document.body && document.body.classList){
+          document.body.classList.toggle('ads-banner', !!on);
+        }
+      }
+    });
+    if (typeof window !== 'undefined') window.BusanAds = ads;
+    if (ads.available()){
+      ads.init().then(function(ok){ if (ok) ads.screen('title'); });
+    }
 
     let profile = loadProfile();
     if (nickInput) nickInput.value = profile.nick || '';
@@ -5281,6 +5625,10 @@ if (typeof document !== 'undefined'){
       if (camZoneEl) camZoneEl.classList.remove('on');
       const lbx = document.getElementById('linkBox');
       if (lbx) lbx.classList.add('hidden');
+      if (reviveBtn) reviveBtn.classList.add('hidden');
+      /* 플레이 중에는 배너 광고를 반드시 숨긴다 (오터치·시야 방해 방지) */
+      ads.screen('play');
+      ads.cancelInterstitial();
       hud.classList.add('on');
       backBtn.classList.add('on');
       Sfx.unlock();
@@ -5304,9 +5652,12 @@ if (typeof document !== 'undefined'){
       recordEl.classList.remove('show');
       if (camZoneEl) camZoneEl.classList.remove('on');
       overEl.classList.add('hidden');
+      if (reviveBtn) reviveBtn.classList.add('hidden');
       titleEl.classList.remove('hidden');
       sim = newGame({ worldH: sim.worldH, profile: profile });
       updateTitle();
+      ads.cancelInterstitial();
+      ads.screen('title');
     }
 
     function showOver(delay){
@@ -5444,7 +5795,10 @@ if (typeof document !== 'undefined'){
 
       retryBtn.textContent = '다시 달리기 🔁';
       shareBtn.textContent = '도전장 링크 보내기 🔗';
+      updateReviveButton();
       showOver(650);
+      ads.screen('over');
+      ads.onRunEnd();
 
       /* 실시간 서버 랭킹: 1km 이상이면 서버에 등록하고, 최신 순위를 다시 받아 순위표에 반영 */
       submitRunToServer(sim).then(function(){
@@ -5583,6 +5937,47 @@ if (typeof document !== 'undefined'){
       muteBtn.textContent = Sfx.isMuted() ? '🔇' : '🔊';
     }
     muteBtn.addEventListener('click', function(e){ e.stopPropagation(); toggleMute(); });
+    /* ---------- 보상형 광고 1회 이어달리기 ---------- */
+    function updateReviveButton(){
+      if (!reviveBtn) return;
+      const show = ads.available() && sim && sim.state === 'crash' && !sim.revived;
+      reviveBtn.classList.toggle('hidden', !show);
+    }
+
+    function reviveRun(){
+      if (!sim || !reviveSim(sim)) return false;
+      if (overTimer){ clearTimeout(overTimer); overTimer = null; }
+      overCtx = null;
+      overEl.classList.add('hidden');
+      if (reviveBtn) reviveBtn.classList.add('hidden');
+      Sfx.unlock();
+      Sfx.engineStart();
+      Sfx.engineSet(sim.speed);
+      hud.classList.add('on');
+      backBtn.classList.add('on');
+      ads.cancelInterstitial();
+      ads.screen('play');
+      banner('📺 이어달리기!', '실드 + 3초 무적 · ' + fmtKm(sim.dist) + 'km부터');
+      toast('🛡️ 다시 달린다 · 실드 + 3초 무적');
+      return true;
+    }
+
+    if (reviveBtn){
+      reviveBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        if (!sim || sim.state !== 'crash' || sim.revived) return;
+        reviveBtn.disabled = true;
+        const label = reviveBtn.textContent;
+        reviveBtn.textContent = '📺 광고 불러오는 중…';
+        ads.showRewarded().then(function(ok){
+          reviveBtn.disabled = false;
+          reviveBtn.textContent = label;
+          if (ok) reviveRun();
+          else toast('광고를 끝까지 봐야 이어달릴 수 있어');
+        });
+      });
+    }
+
     backBtn.addEventListener('click', function(e){ e.stopPropagation(); goTitle(); });
 
     startBtn.addEventListener('click', beginRun);
@@ -5755,6 +6150,8 @@ if (typeof document !== 'undefined'){
         sim: function(){ return sim; },
         begin: beginRun,
         title: goTitle,
+        revive: reviveRun,
+        ads: ads,
         setDay: function(p){ sim.dayT = (p % 1) * DAY_LEN; },
         crashNow: function(cause){
           if (sim.state !== 'playing') return false;

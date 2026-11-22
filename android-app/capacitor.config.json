@@ -1,0 +1,14 @@
+{
+  "appId": "com.busanrush.game",
+  "appName": "서울→부산 무한질주",
+  "webDir": "www",
+  "backgroundColor": "#070b14",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

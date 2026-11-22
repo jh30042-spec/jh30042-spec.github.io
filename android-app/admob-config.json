@@ -1,0 +1,12 @@
+{
+  "_readme": "광고 단위 ID를 바꿀 때는 이 파일 한 곳만 고치면 된다. 앱(App ID)·배너·전면·보상형 4개 값과 테스트 모드 여부. 실서비스 전에는 testing을 false로, ads의 4개 ID를 실제 발급값으로 바꾼다. 이 파일은 빌드할 때 www/admob-config.json 으로 복사되어 앱이 읽고, AndroidManifest 의 com.google.android.gms.ads.APPLICATION_ID 메타데이터도 이 값으로 주입된다.",
+  "appId": "ca-app-pub-3940256099942544~3347511713",
+  "bannerId": "ca-app-pub-3940256099942544/6300978111",
+  "interstitialId": "ca-app-pub-3940256099942544/1033173712",
+  "rewardedId": "ca-app-pub-3940256099942544/5224354917",
+  "testing": true,
+  "enabled": true,
+  "interstitialEveryRuns": 3,
+  "interstitialCooldownSec": 45,
+  "interstitialDelayMs": 1600
+}

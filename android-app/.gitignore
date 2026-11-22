@@ -1,0 +1,7 @@
+node_modules/
+android/
+www/index.html
+www/admob-config.json
+www/og-busan.png
+*.log
+.DS_Store
