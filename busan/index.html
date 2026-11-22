@@ -318,7 +318,7 @@ function newGame(opts){
     section: MILESTONES[0],
 
     scroll: 0,
-    blocked: false, blockT: 0,
+    blocked: false, blockT: 0, lastBlockT: -9,
     shake: 0, crashT: 0, finishT: 0,
     crashCause: null, endInfo: null,
     gantry: null,
@@ -637,21 +637,24 @@ function update(sim, dt){
     if (dy < 30 || dy > 900) continue;
     const latGap = Math.abs(o.x - px) - (o.w + PLAYER.w) / 2 * 0.55;
     if (latGap > 0) continue;
-    if (o.speed > sim.speed - 12) continue;
     if (!blocker || o.y > blocker.y) blocker = o;
   }
-  const wasBlocked = sim.blocked;
   sim.blocked = !!blocker;
   if (sim.blocked){
     sim.blockT += dt;
-    if (!wasBlocked) ev.push({ type:'block', obs: blocker });
+    if (blocker.speed < sim.speed - 8 && sim.time - sim.lastBlockT > 1.4){
+      sim.lastBlockT = sim.time;
+      ev.push({ type:'block', obs: blocker });
+    }
   } else {
     sim.blockT = 0;
   }
 
   /* --- speed --- */
-  const goal = sim.blocked ? Math.max(35, blocker.speed - 5) : sim.maxSpeed;
-  const rate = sim.blocked ? 380 : 55;
+  const goal = sim.blocked
+    ? Math.max(35, Math.min(blocker.speed - 5, sim.maxSpeed))
+    : sim.maxSpeed;
+  const rate = (goal < sim.speed) ? 380 : 55;
   if (goal > sim.speed) sim.speed = Math.min(goal, sim.speed + rate * dt);
   else sim.speed = Math.max(goal, sim.speed - rate * dt);
   sim.speed = clamp(sim.speed, 35, sim.maxSpeed);
@@ -1160,11 +1163,14 @@ function drawGantry(ctx, sim){
   if (y < -260 || y > sim.worldH + 260) return;
   ctx.save();
   // poles
-  ctx.fillStyle = 'rgba(80,88,96,0.95)';
-  ctx.fillRect(ROAD_L - 10, y, 8, 150);
-  ctx.fillRect(ROAD_R + 2, y, 8, 150);
+  ctx.fillStyle = 'rgba(120,128,140,0.9)';
+  ctx.fillRect(ROAD_L - 10, y, 7, 150);
+  ctx.fillRect(ROAD_R + 3, y, 7, 150);
   // beam
-  ctx.fillRect(ROAD_L - 10, y, ROAD_W + 20, 9);
+  ctx.fillStyle = 'rgba(160,168,180,0.9)';
+  ctx.fillRect(ROAD_L - 10, y, ROAD_W + 20, 6);
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillRect(ROAD_L - 10, y, ROAD_W + 20, 2);
   // sign
   const w = 360, hgt = 108;
   const cx = WORLD_W / 2;
