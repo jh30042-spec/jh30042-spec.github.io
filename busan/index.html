@@ -669,7 +669,7 @@ function update(sim, dt){
     if (sim.spawnTimer <= 0){
       spawnObstacle(sim);
       // 화면상 차량 밀도가 속도와 무관하게 일정하도록 '거리 간격'으로 스폰
-      const spacing = 320 + sim.rng() * 300;
+      const spacing = 260 + sim.rng() * 260;
       sim.spawnTimer = Math.max(0.28, spacing / (sim.speed * SPD_SCALE));
     }
   }
