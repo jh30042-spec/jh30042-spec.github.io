@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v4.6">
+<meta name="busan-build" content="v4.7">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -344,6 +344,9 @@
   #linkDone{flex:0 0 auto;border:none;border-radius:calc(var(--u)*1.6);background:rgba(255,255,255,.14);
     color:#e8f3ff;font-family:inherit;font-size:calc(var(--u)*2.4);font-weight:800;
     padding:calc(var(--u)*1.2) calc(var(--u)*1.8);cursor:pointer}
+  #linkCopy{flex:0 0 auto;border:none;border-radius:calc(var(--u)*1.6);background:linear-gradient(180deg,#7ce0ff,#39a9ff);
+    color:#04121f;font-family:inherit;font-size:calc(var(--u)*2.4);font-weight:900;
+    padding:calc(var(--u)*1.2) calc(var(--u)*1.8);cursor:pointer}
 
   /* ---------- flash ---------- */
   #flash{position:absolute;inset:0;z-index:45;pointer-events:none;background:#fff;opacity:0}
@@ -446,7 +449,8 @@
     <button id="retryBtn" class="cta alt">다시 달리기 🔁</button>
     <div id="linkBox" class="hidden">
       <input id="linkInput" type="text" readonly aria-label="도전장 링크">
-      <button id="linkDone">닫기</button>
+      <button id="linkCopy">복사</button>
+      <button id="linkDone" aria-label="닫기">✕</button>
     </div>
     <div class="row2">
       <button id="shareBtn" class="cta ghost">도전장 링크 보내기 🔗</button>
@@ -3647,35 +3651,29 @@ if (typeof document !== 'undefined'){
       const url = challengeUrl(location.href, rec);
       const cname = carById(rec.car).name;
       const text = '🔥 나 ' + fmtKm(rec.km) + 'km에서 멈췄다 (' + cname + ' · ' + rec.spot + '). 이 기록 이길 수 있어? 서울→부산 무한 질주';
-      let result = 'none';
+      /* 링크는 먼저 보여준다 (공유/복사가 막혀도 손으로 쓸 수 있게) */
+      showLinkBox(url);
+      let shared = false;
       if (navigator.share){
         try {
-          const p = navigator.share({ title: '🚗 서울→부산 도전장', text: text, url: url });
-          const winner = await Promise.race([
-            Promise.resolve(p).then(function(){ return 'shared'; }),
-            new Promise(function(r){ setTimeout(function(){ r('timeout'); }, 2000); })
-          ]);
-          result = winner;
-          if (result === 'timeout' && p && p.catch) p.catch(function(){});
+          await navigator.share({ title: '🚗 서울→부산 도전장', text: text, url: url });
+          shared = true;
         } catch(err){
           if (err && err.name === 'AbortError') return;
         }
       }
-      if (result !== 'shared'){
-        try {
-          await navigator.clipboard.writeText(text + '\n' + url);
-          result = 'copied';
-        } catch(err2){ result = 'manual'; }
-      }
-      if (result === 'shared'){
+      if (shared){
+        hideLinkBox();
         toast('도전장 공유 완료 · 친구가 깰 수 있을까?');
-      } else if (result === 'copied'){
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text + '\n' + url);
+        toast('도전장 링크 복사됨 · 친구에게 붙여넣어 보내');
         shareBtn.textContent = '도전장 복사됨! 🔗';
-        toast('도전장 링크가 복사됐어 · 친구에게 붙여넣어 보내');
         setTimeout(function(){ shareBtn.textContent = '도전장 링크 보내기 🔗'; }, 1900);
-      } else {
-        showLinkBox(url);
-        toast('링크를 길게 눌러 복사해줘');
+      } catch(err2){
+        toast('아래 링크를 길게 눌러 복사해줘');
       }
     });
 
@@ -3685,13 +3683,26 @@ if (typeof document !== 'undefined'){
       if (!box || !inp) return;
       inp.value = url;
       box.classList.remove('hidden');
-      try { inp.focus(); inp.select(); } catch(e){}
+    }
+    function hideLinkBox(){
+      const box = document.getElementById('linkBox');
+      if (box) box.classList.add('hidden');
     }
     (function(){
       const done = document.getElementById('linkDone');
-      if (done) done.addEventListener('click', function(){
-        const box = document.getElementById('linkBox');
-        if (box) box.classList.add('hidden');
+      if (done) done.addEventListener('click', hideLinkBox);
+      const cp = document.getElementById('linkCopy');
+      const inp = document.getElementById('linkInput');
+      if (cp && inp) cp.addEventListener('click', async function(){
+        try {
+          await navigator.clipboard.writeText(inp.value);
+          toast('도전장 링크 복사됨');
+          cp.textContent = '복사됨';
+          setTimeout(function(){ cp.textContent = '복사'; }, 1600);
+        } catch(e){
+          try { inp.focus(); inp.select(); } catch(e2){}
+          toast('길게 눌러 복사해줘');
+        }
       });
     })();
 
