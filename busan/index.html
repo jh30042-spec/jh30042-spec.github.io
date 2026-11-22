@@ -2764,22 +2764,47 @@ function drawPlayer(ctx, sim, now){
 }
 
 /* 이름표 */
-function nameTag(ctx, x, y, text, color, alpha){
+/* 박스와 글자를 같은 왼쪽 기준(bx)에서 계산한다.
+   textAlign:'center'는 이모지가 섞인 문자열에서 브라우저(iOS 사파리)마다
+   중심 계산이 어긋나 글자가 박스 밖으로 밀려났으므로, 왼쪽 정렬로 고정하고
+   박스 폭만 재서 가운데에 놓는다. */
+/* 앞머리 아이콘(이모지) 판별 — 한글·영문 글자는 아이콘으로 보지 않는다 */
+function isTagIcon(c){
+  return (c >= 0x1F000 && c <= 0x1FAFF) || (c >= 0x2600 && c <= 0x27BF) ||
+         (c >= 0x2190 && c <= 0x21FF) || (c >= 0x2B00 && c <= 0x2BFF) ||
+         c === 0xFE0F || c === 0xFE0E || c === 0x200D || c === 0x20E3;
+}
+function nameTag(ctx, x, y, text, color, alpha, maxW){
   const label = String(text || '').slice(0, NICK_MAX);
   if (!label) return;
+  const W = (maxW === undefined || !isFinite(maxW)) ? WORLD_W : maxW;
+  const padX = 10, boxH = 26, rad = 8;
   ctx.save();
   ctx.globalAlpha = alpha === undefined ? 0.9 : alpha;
   ctx.font = '900 20px system-ui,sans-serif';
-  ctx.textAlign = 'center';
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  const tw = ctx.measureText(label).width + 18;
+  /* 앞쪽 이모지와 나머지 글자를 따로 재서, 이모지 폭 측정이 좁게 나오는
+     플랫폼에서도 박스가 글자를 담을 만큼 넉넉하게 잡는다. */
+  let hi = 0;
+  while (hi < label.length && isTagIcon(label.charCodeAt(hi))) hi++;
+  const head = label.slice(0, hi);
+  const body = label.slice(hi);
+  const wHead = head ? Math.max(ctx.measureText(head).width, 26) : 0;
+  const wBody = ctx.measureText(body).width;
+  let tw = Math.ceil(Math.max(ctx.measureText(label).width, wHead + wBody)) + padX * 2;
+  tw = Math.min(tw, W - 8);
+  /* 1차로·8차로처럼 화면 끝에 붙은 차의 이름표도 잘리지 않게 안쪽으로 당긴다 */
+  let bx = x - tw / 2;
+  bx = clamp(bx, 4, Math.max(4, W - 4 - tw));
+  const by = y - boxH / 2;
   ctx.fillStyle = 'rgba(6,10,18,0.72)';
-  rr(ctx, x - tw/2, y - 13, tw, 26, 8); ctx.fill();
+  rr(ctx, bx, by, tw, boxH, rad); ctx.fill();
   ctx.strokeStyle = 'rgba(255,255,255,0.22)';
   ctx.lineWidth = 1.5;
-  rr(ctx, x - tw/2, y - 13, tw, 26, 8); ctx.stroke();
+  rr(ctx, bx, by, tw, boxH, rad); ctx.stroke();
   ctx.fillStyle = color || '#eaf4ff';
-  ctx.fillText(label, x, y + 1);
+  ctx.fillText(label, bx + padX, y + 1);
   ctx.restore();
 }
 
@@ -3335,6 +3360,7 @@ const API = {
   fetchWithTimeout: fetchWithTimeout, createServerRank: createServerRank,
   loadPostMark: loadPostMark, savePostMark: savePostMark,
   drawSim: drawSim, drawVehicle: drawVehicle, drawGhosts: drawGhosts, drawRivalMarkers: drawRivalMarkers,
+  nameTag: nameTag,
   laneCenter: laneCenter, playerX: playerX, playerY: playerY,
   newGame: newGame, start: start, update: update, steer: steer, setLane: setLane,
   spawnWave: spawnWave, freeInBand: freeInBand, addObstacle: addObstacle, addCone: addCone,
