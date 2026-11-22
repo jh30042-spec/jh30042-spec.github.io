@@ -634,15 +634,18 @@ function update(sim, dt){
     const o = sim.obstacles[i];
     if (o.dead || o.type === 'cone') continue;
     const dy = py - o.y;
-    if (dy < 30 || dy > 560) continue;
+    if (dy < 30 || dy > 640) continue;
     const latGap = Math.abs(o.x - px) - (o.w + PLAYER.w) / 2 * 0.55;
     if (latGap > 0) continue;
     if (!blocker || o.y > blocker.y) blocker = o;
   }
   sim.blocked = !!blocker;
-  if (sim.blocked){
+  let goal = sim.maxSpeed;
+  if (blocker){
     sim.blockT += dt;
-    if (blocker.speed < sim.speed - 8 && sim.time - sim.lastBlockT > 1.4){
+    const gap = (py - blocker.y) - (blocker.h + PLAYER.h) / 2;   // 범퍼 사이 간격
+    goal = Math.max(35, Math.min(sim.maxSpeed, blocker.speed + Math.max(0, gap - 160) * 0.55));
+    if (gap < 250 && blocker.speed < sim.speed - 8 && sim.time - sim.lastBlockT > 1.4){
       sim.lastBlockT = sim.time;
       ev.push({ type:'block', obs: blocker });
     }
@@ -651,9 +654,6 @@ function update(sim, dt){
   }
 
   /* --- speed --- */
-  const goal = sim.blocked
-    ? Math.max(35, Math.min(blocker.speed - 5, sim.maxSpeed))
-    : sim.maxSpeed;
   const rate = (goal < sim.speed) ? 380 : 55;
   if (goal > sim.speed) sim.speed = Math.min(goal, sim.speed + rate * dt);
   else sim.speed = Math.max(goal, sim.speed - rate * dt);
