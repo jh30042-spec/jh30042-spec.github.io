@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v4.5">
+<meta name="busan-build" content="v4.6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -333,6 +333,18 @@
   .lbRow.me .nm{color:#7dffc0}
   .lbRow.me .km{color:#fff}
 
+  /* 대전장 링크 수동 복사 */
+  #linkBox{display:flex;gap:calc(var(--u)*1);align-items:center;margin-top:calc(var(--u)*1);
+    padding:calc(var(--u)*1.2);border-radius:calc(var(--u)*2);background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14)}
+  #linkBox.hidden{display:none}
+  #linkInput{flex:1;min-width:0;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.16);
+    border-radius:calc(var(--u)*1.2);color:#cfe4ff;font-family:ui-monospace,Menlo,monospace;
+    font-size:calc(var(--u)*2.2);padding:calc(var(--u)*1.1);-webkit-user-select:text;user-select:text;outline:none}
+  #linkDone{flex:0 0 auto;border:none;border-radius:calc(var(--u)*1.6);background:rgba(255,255,255,.14);
+    color:#e8f3ff;font-family:inherit;font-size:calc(var(--u)*2.4);font-weight:800;
+    padding:calc(var(--u)*1.2) calc(var(--u)*1.8);cursor:pointer}
+
   /* ---------- flash ---------- */
   #flash{position:absolute;inset:0;z-index:45;pointer-events:none;background:#fff;opacity:0}
   #flash.go{animation:flashGo .42s ease-out}
@@ -432,6 +444,10 @@
       <div id="lbList"></div>
     </div>
     <button id="retryBtn" class="cta alt">다시 달리기 🔁</button>
+    <div id="linkBox" class="hidden">
+      <input id="linkInput" type="text" readonly aria-label="도전장 링크">
+      <button id="linkDone">닫기</button>
+    </div>
     <div class="row2">
       <button id="shareBtn" class="cta ghost">도전장 링크 보내기 🔗</button>
       <button id="menuBtn2" class="cta ghost">타이틀</button>
@@ -3371,6 +3387,8 @@ if (typeof document !== 'undefined'){
       overEl.classList.add('hidden');
       recordEl.classList.remove('show');
       comboEl.classList.remove('on');
+      const lbx = document.getElementById('linkBox');
+      if (lbx) lbx.classList.add('hidden');
       hud.classList.add('on');
       backBtn.classList.add('on');
       Sfx.unlock();
@@ -3629,30 +3647,53 @@ if (typeof document !== 'undefined'){
       const url = challengeUrl(location.href, rec);
       const cname = carById(rec.car).name;
       const text = '🔥 나 ' + fmtKm(rec.km) + 'km에서 멈췄다 (' + cname + ' · ' + rec.spot + '). 이 기록 이길 수 있어? 서울→부산 무한 질주';
-      let done = false;
-      try {
-        if (navigator.share){
-          await navigator.share({ title: '🚗 서울→부산 도전장', text: text, url: url });
-          done = true;
+      let result = 'none';
+      if (navigator.share){
+        try {
+          const p = navigator.share({ title: '🚗 서울→부산 도전장', text: text, url: url });
+          const winner = await Promise.race([
+            Promise.resolve(p).then(function(){ return 'shared'; }),
+            new Promise(function(r){ setTimeout(function(){ r('timeout'); }, 2000); })
+          ]);
+          result = winner;
+          if (result === 'timeout' && p && p.catch) p.catch(function(){});
+        } catch(err){
+          if (err && err.name === 'AbortError') return;
         }
-      } catch(err){
-        if (err && err.name === 'AbortError'){ return; }
       }
-      if (!done){
+      if (result !== 'shared'){
         try {
           await navigator.clipboard.writeText(text + '\n' + url);
-          done = true;
-        } catch(err2){}
+          result = 'copied';
+        } catch(err2){ result = 'manual'; }
       }
-      if (done){
+      if (result === 'shared'){
+        toast('도전장 공유 완료 · 친구가 깰 수 있을까?');
+      } else if (result === 'copied'){
         shareBtn.textContent = '도전장 복사됨! 🔗';
-        toast('도전장 링크가 준비됐어 · 친구에게 보내봐');
+        toast('도전장 링크가 복사됐어 · 친구에게 붙여넣어 보내');
         setTimeout(function(){ shareBtn.textContent = '도전장 링크 보내기 🔗'; }, 1900);
       } else {
-        toast('링크 복사 실패 — 길게 눌러 복사해줘');
-        shareBtn.textContent = url.length > 120 ? '도전장 링크 생성됨' : '도전장 링크 보내기 🔗';
+        showLinkBox(url);
+        toast('링크를 길게 눌러 복사해줘');
       }
     });
+
+    function showLinkBox(url){
+      const box = document.getElementById('linkBox');
+      const inp = document.getElementById('linkInput');
+      if (!box || !inp) return;
+      inp.value = url;
+      box.classList.remove('hidden');
+      try { inp.focus(); inp.select(); } catch(e){}
+    }
+    (function(){
+      const done = document.getElementById('linkDone');
+      if (done) done.addEventListener('click', function(){
+        const box = document.getElementById('linkBox');
+        if (box) box.classList.add('hidden');
+      });
+    })();
 
     window.addEventListener('resize', layout);
     window.addEventListener('orientationchange', function(){ setTimeout(layout, 120); });
