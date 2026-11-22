@@ -3468,20 +3468,32 @@ function drawCar(ctx, o){
   ctx.fillRect(x - w/2 + 4, y - h/2 + 3, 9, 4);
   ctx.fillRect(x + w/2 - 13, y - h/2 + 3, 9, 4);
 
-  /* v6.2: 칼치기 당한 차의 상향등 번쩍 (0.62초 동안 3회) */
+  /* v6.2: 칼치기 당한 차의 상향등 번짝 (0.62초 동안 3회) */
   if (angryFlashOn(o)){
     const fy = y - h/2 + 3;
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const gg = ctx.createRadialGradient(x, fy - 6, 0, x, fy - 6, 96);
-    gg.addColorStop(0, 'rgba(255,255,236,0.62)');
-    gg.addColorStop(0.45, 'rgba(255,255,226,0.20)');
-    gg.addColorStop(1, 'rgba(255,255,226,0)');
+    /* 상향등 불빛 기둥 — 멀리서도 번짝임이 보이게 */
+    const beam = ctx.createLinearGradient(0, fy, 0, fy - 170);
+    beam.addColorStop(0, 'rgba(255,255,226,0.52)');
+    beam.addColorStop(0.55, 'rgba(255,255,226,0.18)');
+    beam.addColorStop(1, 'rgba(255,255,226,0)');
+    ctx.fillStyle = beam;
+    ctx.beginPath();
+    ctx.moveTo(x - w * 0.42, fy);
+    ctx.lineTo(x + w * 0.42, fy);
+    ctx.lineTo(x + w * 0.90, fy - 170);
+    ctx.lineTo(x - w * 0.90, fy - 170);
+    ctx.closePath(); ctx.fill();
+    const gg = ctx.createRadialGradient(x, fy - 6, 0, x, fy - 6, 110);
+    gg.addColorStop(0, 'rgba(255,255,240,0.85)');
+    gg.addColorStop(0.4, 'rgba(255,255,228,0.28)');
+    gg.addColorStop(1, 'rgba(255,255,228,0)');
     ctx.fillStyle = gg;
-    ctx.beginPath(); ctx.arc(x, fy - 6, 96, 0, 7); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,242,0.96)';
-    ctx.fillRect(x - w*0.42, fy - 1, w*0.28, 6);
-    ctx.fillRect(x + w*0.14, fy - 1, w*0.28, 6);
+    ctx.beginPath(); ctx.arc(x, fy - 6, 110, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,250,1)';
+    ctx.fillRect(x - w*0.44, fy - 2, w*0.30, 7);
+    ctx.fillRect(x + w*0.14, fy - 2, w*0.30, 7);
     ctx.restore();
   }
 
