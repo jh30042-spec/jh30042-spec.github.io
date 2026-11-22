@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v4.4">
+<meta name="busan-build" content="v4.5">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2432,6 +2432,7 @@ function drawGhosts(ctx, sim){
     const y = py - (g.km - sim.dist) * UNITS_PER_KM;
     if (y < -320 || y > sim.worldH + 320) continue;
     if (sim.dist > g.stopKm + 0.10) continue;
+    if (g.stopped) continue;            // 멈춘 순간부터는 잔해·푯말로 대신 보여준다
     const x = laneCenter(g.lanePos);
     ctx.save();
     ctx.globalAlpha = g.stopped ? 0.4 : 0.55;
