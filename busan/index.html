@@ -318,7 +318,7 @@
   .carSpec{font-size:calc(var(--u)*2.2);font-weight:900;color:#ffd479;line-height:1.3;margin-top:calc(var(--u)*.55);
     white-space:normal;letter-spacing:-.01em}
   .dots{display:flex;flex-wrap:wrap;gap:calc(var(--u)*.9);flex:1;min-width:0}
-  .dots i{width:calc(var(--u)*1.5);height:calc(var(--u)*1.5);border-radius:50%;background:rgba(255,255,255,.24);cursor:pointer;
+  .dots i{width:calc(var(--u)*1.8);height:calc(var(--u)*1.8);border-radius:50%;background:rgba(255,255,255,.24);cursor:pointer;
     flex:0 0 auto}
   .dots i.on{background:#63d2ff;box-shadow:0 0 calc(var(--u)*1.2) rgba(99,210,255,.85);transform:scale(1.18)}
   .carMeta{display:flex;align-items:center;gap:calc(var(--u)*1.2);margin-top:calc(var(--u)*1)}
@@ -6192,7 +6192,7 @@ if (typeof document !== 'undefined'){
       carCtx.save();
       carCtx.translate(W/2, H*0.53);
       /* 차종별 미리보기 실루엣 (스쿠터는 좁고, 리무진·푸드트럭은 넓다) */
-      const PREV = { scooter: [34, 100], porter: [57, 110], foodtruck: [58, 108], limo: [57, 114], armored: [60, 112] };
+      const PREV = { scooter: [34, 100], porter: [52, 110], foodtruck: [58, 108], limo: [57, 114], armored: [60, 112] };
       const pv = PREV[c.id] || [54, 110];
       drawVehicle(carCtx, {
         car: c, w: pv[0] * 1.9, h: pv[1] * 1.9, t: t,
