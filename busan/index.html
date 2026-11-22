@@ -3885,6 +3885,7 @@ if (typeof document !== 'undefined'){
       oSpd.textContent = Math.round(sim.topSpeed);
       oCombo.textContent = 'x' + sim.maxCombo;
 
+      overCtx = { st: st };
       const lb = renderLeaderboard(sim);
       applyOverBest(lb);
 
