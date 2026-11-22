@@ -4159,26 +4159,30 @@ function drawCameras(ctx, sim){
     ctx.beginPath(); ctx.arc(0, 0, 44, 0, 7); ctx.fill();
     /* 경고판 본체 */
     ctx.fillStyle = 'rgba(38,8,12,0.94)';
-    rrPath(ctx, -44, -58, 88, 116, 14); ctx.fill();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = 'rgba(255,59,71,' + (0.70 + 0.30 * pulse).toFixed(3) + ')';
-    if (ctx.setLineDash) ctx.setLineDash([10, 7]);
-    rrPath(ctx, -44, -58, 88, 116, 14); ctx.stroke();
+    rrPath(ctx, -44, -63, 88, 126, 14); ctx.fill();
+    /* 바깥 실선 빨간 테 + 안쪽 점선 테 (한눈에 '피해야 하는 것'으로) */
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(255,59,71,' + (0.78 + 0.22 * pulse).toFixed(3) + ')';
+    rrPath(ctx, -44, -63, 88, 126, 14); ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([9, 7]);
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = 'rgba(255,170,160,' + (0.35 + 0.45 * pulse).toFixed(3) + ')';
+    rrPath(ctx, -38, -57, 76, 114, 11); ctx.stroke();
     if (ctx.setLineDash) ctx.setLineDash([]);
     /* 카메라 아이콘 */
-    ctx.font = '700 30px system-ui,sans-serif';
+    ctx.font = '700 34px system-ui,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('📸', 0, -26);
+    ctx.fillText('📸', 0, -29);
     /* 80 제한 표지 (흰 원 + 빨간 테 + 숫자) */
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath(); ctx.arc(0, 20, 22, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 22, 24, 0, 7); ctx.fill();
     ctx.strokeStyle = '#ff2a34';
-    ctx.lineWidth = 6;
-    ctx.beginPath(); ctx.arc(0, 20, 19, 0, 7); ctx.stroke();
+    ctx.lineWidth = 6.5;
+    ctx.beginPath(); ctx.arc(0, 22, 20.5, 0, 7); ctx.stroke();
     ctx.fillStyle = '#1a0508';
-    ctx.font = '900 22px system-ui,sans-serif';
-    ctx.fillText('80', 0, 21);
+    ctx.font = '900 24px system-ui,sans-serif';
+    ctx.fillText('80', 0, 23);
     ctx.restore();
   }
 }
