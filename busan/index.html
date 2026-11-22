@@ -42,8 +42,8 @@
   /* ---------- HUD ---------- */
   #hud{
     position:absolute;left:0;right:0;top:0;z-index:20;
-    padding:calc(var(--u)*2.6) calc(var(--u)*3) calc(var(--u)*2);
-    padding-top:max(calc(var(--u)*2.6), env(safe-area-inset-top));
+    padding:calc(var(--u)*3.6) calc(var(--u)*3) calc(var(--u)*2);
+    padding-top:max(calc(var(--u)*3.6), calc(env(safe-area-inset-top) + var(--u)*1.6));
     background:linear-gradient(to bottom,rgba(5,8,16,.82),rgba(5,8,16,.42) 62%,rgba(5,8,16,0));
     pointer-events:none;opacity:0;transition:opacity .25s;
   }
@@ -82,7 +82,7 @@
   #mute{
     position:absolute;z-index:40;border:none;color:#fff;cursor:pointer;
     right:calc(var(--u)*2.6);top:calc(var(--u)*2.6);
-    top:max(calc(var(--u)*2.6), env(safe-area-inset-top));
+    top:max(calc(var(--u)*2.6), calc(env(safe-area-inset-top) + var(--u)*.6));
     width:calc(var(--u)*8.4);height:calc(var(--u)*8.4);border-radius:50%;
     font-size:calc(var(--u)*4);line-height:1;display:flex;align-items:center;justify-content:center;
     background:rgba(255,255,255,.13);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
@@ -271,8 +271,9 @@ function laneCenter(i){ return ROAD_L + (i + 0.5) * LANE_W; }
 const SPD_SCALE = 4.2;                  // world units per (km/h) per second
 const KM_DIV = 40;                      // km per second = speed / 40
 const GOAL_KM = 400;
-const PLAYER = { w: 60, h: 116 };
+const PLAYER = { w: 54, h: 110 };
 const PLAYER_Y_OFF = 300;               // above the bottom edge
+const NEAR_MISS = 34;                   // 칼치기 판정 시각 간격 (world units)
 
 const MILESTONES = [
   { km:0,   name:'서울', sub:'출발',       emoji:'🏙️' },
@@ -421,17 +422,18 @@ function spawnObstacle(sim){
   }
 
   if (type === 'truck' || type === 'bus'){
-    const pref = free.filter(function(i){ return i <= 1; });
-    const pool = pref.length ? pref : free;
+    let pool = free.filter(function(i){ return i === 0; });
+    if (!pool.length) pool = free.filter(function(i){ return i <= 1; });
+    if (!pool.length) pool = free;
     const lane = pool[Math.floor(rng() * pool.length)];
     const isBus = type === 'bus';
     return addObstacle(sim, {
       type: type,
       lane: lane,
       x: laneCenter(lane),
-      y: -220,
-      w: isBus ? 78 : 74,
-      h: isBus ? 216 : 200,
+      y: -240,
+      w: isBus ? 70 : 68,
+      h: isBus ? 212 : 198,
       speed: isBus ? 64 + rng() * 20 : 60 + rng() * 18,
       color: isBus ? '#2b6fd6' : (rng() < 0.5 ? '#eceff5' : '#d7dbe4')
     });
@@ -457,7 +459,7 @@ function spawnObstacle(sim){
     lane: lane,
     x: laneCenter(lane),
     y: -200 - rng() * 60,
-    w: 56, h: 106,
+    w: 50, h: 104,
     speed: 72 + rng() * 54,
     color: CAR_COLORS[Math.floor(rng() * CAR_COLORS.length)],
     cutter: cutter,
@@ -623,7 +625,7 @@ function update(sim, dt){
     const o = sim.obstacles[i];
     if (o.dead || o.type === 'cone') continue;
     const dy = py - o.y;
-    if (dy < 30 || dy > 780) continue;
+    if (dy < 30 || dy > 900) continue;
     const latGap = Math.abs(o.x - px) - (o.w + PLAYER.w) / 2 * 0.55;
     if (latGap > 0) continue;
     if (o.speed > sim.speed - 12) continue;
@@ -640,7 +642,7 @@ function update(sim, dt){
 
   /* --- speed --- */
   const goal = sim.blocked ? Math.max(35, blocker.speed - 5) : sim.maxSpeed;
-  const rate = sim.blocked ? 300 : 30;
+  const rate = sim.blocked ? 380 : 30;
   if (goal > sim.speed) sim.speed = Math.min(goal, sim.speed + rate * dt);
   else sim.speed = Math.max(goal, sim.speed - rate * dt);
   sim.speed = clamp(sim.speed, 35, sim.maxSpeed);
@@ -714,7 +716,7 @@ function update(sim, dt){
 
     if (!o.passed && o.y - o.h / 2 > py + PLAYER.h / 2){
       o.passed = true;
-      if (o.minGap < 26){
+      if (o.minGap < NEAR_MISS){
         sim.kalchi++;
         sim.bonus += 50;
         ev.push({ type:'kalchi', x: o.x, y: py - 40, obs: o });
@@ -784,16 +786,16 @@ function shade(hex, amt){
 function drawGround(ctx, sim){
   const H = sim.worldH, W = WORLD_W;
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, '#14301d');
-  g.addColorStop(0.5, '#1b3d25');
-  g.addColorStop(1, '#22492b');
+  g.addColorStop(0, '#2c5f3b');
+  g.addColorStop(0.4, '#35744a');
+  g.addColorStop(1, '#3d8454');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
 
   // ground motion bands
   const period = 190;
   const off = (sim.scroll * 0.9) % period;
-  ctx.fillStyle = 'rgba(0,0,0,0.11)';
+  ctx.fillStyle = 'rgba(0,0,0,0.10)';
   for (let y = -period + off; y < H + period; y += period){
     ctx.fillRect(0, y, W, period * 0.48);
   }
@@ -803,61 +805,79 @@ function drawRoad(ctx, sim){
   const H = sim.worldH;
   // asphalt
   const g = ctx.createLinearGradient(0, 0, WORLD_W, 0);
-  g.addColorStop(0, '#3c3b45');
-  g.addColorStop(0.5, '#56555f');
-  g.addColorStop(1, '#3c3b45');
+  g.addColorStop(0, '#4b4a54');
+  g.addColorStop(0.22, '#5f5e69');
+  g.addColorStop(0.5, '#6a6975');
+  g.addColorStop(0.78, '#5f5e69');
+  g.addColorStop(1, '#4b4a54');
   ctx.fillStyle = g;
   ctx.fillRect(ROAD_L, 0, ROAD_W, H);
 
-  // bus lane tint (lane 7)
-  ctx.fillStyle = 'rgba(40,86,180,0.22)';
+  // alternating lane bands (makes the 8 lanes readable at a glance)
+  for (let i=0;i<LANES;i++){
+    if (i % 2 === 0) continue;
+    ctx.fillStyle = i === 7 ? 'rgba(60,120,220,0.20)' : 'rgba(255,255,255,0.035)';
+    ctx.fillRect(laneCenter(i) - LANE_W/2, 0, LANE_W, H);
+  }
+  // bus lane tint on top
+  ctx.fillStyle = 'rgba(45,100,200,0.16)';
   ctx.fillRect(laneCenter(7) - LANE_W/2, 0, LANE_W, H);
 
   // lane dashes
-  ctx.fillStyle = 'rgba(255,255,255,0.72)';
-  const dash = 74, gap = 62, per = dash + gap;
+  const dash = 78, gap = 58, per = dash + gap;
   const off = sim.scroll % per;
   for (let l=1;l<LANES;l++){
-    const x = ROAD_L + l * LANE_W - 2.5;
     if (l === 7) continue;
+    const x = ROAD_L + l * LANE_W - 3;
+    ctx.fillStyle = 'rgba(255,255,255,0.80)';
     for (let y = -per + off; y < H + per; y += per){
-      ctx.fillRect(x, y, 5, dash);
+      ctx.fillRect(x, y, 6, dash);
     }
   }
   // bus lane boundary dotted blue
-  ctx.fillStyle = 'rgba(120,180,255,0.75)';
+  ctx.fillStyle = 'rgba(150,200,255,0.85)';
   for (let y = -per + off; y < H + per; y += per){
-    ctx.fillRect(laneCenter(7) - LANE_W/2 - 2, y, 4, dash * 1.1);
+    ctx.fillRect(laneCenter(7) - LANE_W/2 - 2, y, 5, dash * 1.1);
   }
 
   // edge lines
-  ctx.fillStyle = 'rgba(255,255,255,0.9)';
-  ctx.fillRect(ROAD_L + 3, 0, 6, H);
-  ctx.fillRect(ROAD_R - 9, 0, 6, H);
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.fillRect(ROAD_L + 4, 0, 7, H);
+  ctx.fillRect(ROAD_R - 11, 0, 7, H);
 
   // rumble strips
   const rp = 44;
   const roff = sim.scroll % rp;
-  ctx.fillStyle = 'rgba(255,180,60,0.28)';
+  ctx.fillStyle = 'rgba(255,180,60,0.34)';
   for (let y = -rp + roff; y < H + rp; y += rp){
-    ctx.fillRect(ROAD_L, y, 6, rp * 0.5);
-    ctx.fillRect(ROAD_R - 6, y, 6, rp * 0.5);
+    ctx.fillRect(ROAD_L, y, 5, rp * 0.5);
+    ctx.fillRect(ROAD_R - 5, y, 5, rp * 0.5);
   }
 
   // road stencils
   const sp = 1100;
   const soff = sim.scroll % sp;
   ctx.save();
-  ctx.globalAlpha = 0.17;
+  ctx.globalAlpha = 0.20;
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = '900 30px system-ui,sans-serif';
+  ctx.font = '900 26px system-ui,sans-serif';
   for (let y = -sp + soff; y < H + sp; y += sp){
     ctx.fillText('1차로', laneCenter(0), y + 40);
     ctx.fillText('버스전용', laneCenter(7), y + 60);
   }
   ctx.restore();
+}
+
+function drawHaze(ctx, sim){
+  const H = sim.worldH;
+  const g = ctx.createLinearGradient(0, 0, 0, H * 0.42);
+  g.addColorStop(0, 'rgba(198,224,255,0.30)');
+  g.addColorStop(0.55, 'rgba(198,224,255,0.07)');
+  g.addColorStop(1, 'rgba(198,224,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, WORLD_W, H * 0.42);
 }
 
 function drawScenery(ctx, sim){
@@ -951,53 +971,58 @@ function drawCar(ctx, o){
   ctx.fill();
 
   if (isTruck){
-    // cargo box
-    ctx.fillStyle = 'rgba(255,255,255,0.86)';
-    rr(ctx, x - w/2 + 3, y - h/2 + 3, w - 6, h * 0.66, 4);
+    // cargo box (rear)
+    ctx.fillStyle = 'rgba(248,249,252,0.94)';
+    rr(ctx, x - w/2 + 3, y - h/2 + h*0.30, w - 6, h*0.66, 4);
     ctx.fill();
-    ctx.fillStyle = 'rgba(0,0,0,0.14)';
-    for (let i=1;i<5;i++){
-      ctx.fillRect(x - w/2 + 5, y - h/2 + 6 + i * (h*0.66-8)/5, w - 10, 2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.10)';
+    ctx.lineWidth = 2;
+    for (let i=1;i<6;i++){
+      const yy = y - h/2 + h*0.30 + i * (h*0.66)/6;
+      ctx.beginPath(); ctx.moveTo(x - w/2 + 5, yy); ctx.lineTo(x + w/2 - 5, yy); ctx.stroke();
     }
-    // cab
-    ctx.fillStyle = shade(o.color, -14);
-    rr(ctx, x - w/2 + 2, y + h*0.2, w - 4, h*0.3, 6);
+    // cab (front)
+    ctx.fillStyle = shade(o.color, -18);
+    rr(ctx, x - w/2 + 1, y - h/2 + 2, w - 2, h*0.27, 7);
     ctx.fill();
-    ctx.fillStyle = 'rgba(20,30,45,0.85)';
-    rr(ctx, x - w/2 + 7, y + h*0.22, w - 14, h*0.1, 3);
+    ctx.fillStyle = 'rgba(22,32,48,0.9)';
+    rr(ctx, x - w/2 + 7, y - h/2 + h*0.08, w - 14, h*0.11, 4);
     ctx.fill();
   } else if (isBus){
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    rr(ctx, x - w/2 + 5, y - h/2 + 8, w - 10, h*0.2, 4);
+    // windshield
+    ctx.fillStyle = 'rgba(18,28,44,0.9)';
+    rr(ctx, x - w/2 + 6, y - h/2 + 6, w - 12, h*0.07, 4);
     ctx.fill();
-    ctx.fillStyle = 'rgba(15,25,40,0.9)';
+    // side windows
+    ctx.fillStyle = 'rgba(15,25,40,0.85)';
     for (let i=0;i<6;i++){
-      rr(ctx, x - w/2 + 8, y - h/2 + 40 + i * 26, w - 16, 16, 3);
+      rr(ctx, x - w/2 + 7, y - h/2 + 26 + i * 27, w - 14, 15, 3);
       ctx.fill();
     }
-    ctx.fillStyle = '#ffd166';
-    ctx.fillRect(x - w/2 + 6, y + h/2 - 10, 10, 5);
-    ctx.fillRect(x + w/2 - 16, y + h/2 - 10, 10, 5);
+    // stripe
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(x - w/2 + 3, y - h/2 + 20, 3, h - 40);
+    ctx.fillRect(x + w/2 - 6, y - h/2 + 20, 3, h - 40);
   } else {
     // windshield / roof
     ctx.fillStyle = 'rgba(18,26,40,0.9)';
-    rr(ctx, x - w/2 + 7, y - h/2 + 10, w - 14, h*0.2, 5);
+    rr(ctx, x - w/2 + 6, y - h/2 + 10, w - 12, h*0.2, 5);
     ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.16)';
-    rr(ctx, x - w/2 + 8, y - h/2 + h*0.36, w - 16, h*0.3, 5);
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    rr(ctx, x - w/2 + 7, y - h/2 + h*0.36, w - 14, h*0.3, 5);
     ctx.fill();
     ctx.fillStyle = 'rgba(18,26,40,0.86)';
-    rr(ctx, x - w/2 + 8, y + h*0.22, w - 16, h*0.16, 4);
+    rr(ctx, x - w/2 + 7, y + h*0.22, w - 14, h*0.16, 4);
     ctx.fill();
-    // taillights
-    ctx.fillStyle = '#ff4444';
-    ctx.fillRect(x - w/2 + 4, y + h/2 - 9, 11, 5);
-    ctx.fillRect(x + w/2 - 15, y + h/2 - 9, 11, 5);
-    // headlights
-    ctx.fillStyle = 'rgba(255,246,200,0.75)';
-    ctx.fillRect(x - w/2 + 5, y - h/2 + 3, 10, 4);
-    ctx.fillRect(x + w/2 - 15, y - h/2 + 3, 10, 4);
   }
+
+  // taillights + headlights (all vehicles)
+  ctx.fillStyle = '#ff4444';
+  ctx.fillRect(x - w/2 + 4, y + h/2 - 9, 10, 5);
+  ctx.fillRect(x + w/2 - 14, y + h/2 - 9, 10, 5);
+  ctx.fillStyle = 'rgba(255,246,200,0.8)';
+  ctx.fillRect(x - w/2 + 4, y - h/2 + 3, 9, 4);
+  ctx.fillRect(x + w/2 - 13, y - h/2 + 3, 9, 4);
 
   // blinker
   if (o.blinker && (o.cutState === 'warn' || o.cutState === 'cut')){
@@ -1029,11 +1054,11 @@ function drawPlayer(ctx, sim, now){
   const w = PLAYER.w, h = PLAYER.h;
 
   // under glow
-  const gl = ctx.createRadialGradient(0, 18, 4, 0, 18, w * 1.5);
-  gl.addColorStop(0, 'rgba(90,190,255,0.34)');
-  gl.addColorStop(1, 'rgba(90,190,255,0)');
+  const gl = ctx.createRadialGradient(0, 12, 4, 0, 12, w * 1.05);
+  gl.addColorStop(0, 'rgba(120,200,255,0.20)');
+  gl.addColorStop(1, 'rgba(120,200,255,0)');
   ctx.fillStyle = gl;
-  ctx.beginPath(); ctx.arc(0, 18, w * 1.5, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(0, 12, w * 1.05, 0, 7); ctx.fill();
 
   // shadow
   ctx.fillStyle = 'rgba(0,0,0,0.38)';
@@ -1160,16 +1185,16 @@ function drawPops(ctx, sim){
 
 function drawStreaks(ctx, sim){
   const sp = sim.speed;
-  if (sp < 150) return;
-  const a = Math.min(0.34, (sp - 150) / 420);
+  if (sp < 165) return;
+  const a = Math.min(0.16, (sp - 165) / 900);
   const H = sim.worldH;
   ctx.strokeStyle = 'rgba(255,255,255,' + a + ')';
-  ctx.lineWidth = 2;
-  for (let i=0;i<16;i++){
+  ctx.lineWidth = 1.5;
+  for (let i=0;i<12;i++){
     const seed = (i * 97) % 100;
-    const x = ROAD_L + 8 + (seed / 100) * (ROAD_W - 16);
-    const len = 60 + ((i * 53) % 120);
-    const y = ((sim.scroll * 1.6 + i * 137) % (H + 300)) - 150;
+    const x = ROAD_L + 10 + (seed / 100) * (ROAD_W - 20);
+    const len = 150 + ((i * 53) % 190);
+    const y = ((sim.scroll * 1.5 + i * 231) % (H + 400)) - 200;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x, y + len);
@@ -1205,7 +1230,7 @@ function drawTitleTraffic(ctx, sim, now){
     const cs = cars[i];
     const span = H + 400;
     const y = ((cs.off * span + sim.scroll * cs.sp) % span) - 200;
-    drawCar(ctx, { type:'car', x: laneCenter(cs.lane), y: y, w: 56, h: 106, color: cs.c, cutter:false });
+    drawCar(ctx, { type:'car', x: laneCenter(cs.lane), y: y, w: 50, h: 104, color: cs.c, cutter:false });
   }
 }
 
@@ -1219,6 +1244,7 @@ function drawSim(ctx, sim, now){
   drawGround(ctx, sim);
   drawRoad(ctx, sim);
   drawScenery(ctx, sim);
+  drawHaze(ctx, sim);
 
   if (sim.state === 'title') drawTitleTraffic(ctx, sim, now);
 
