@@ -125,7 +125,7 @@
 
   /* ---------- top right buttons ---------- */
   /* 우측 버튼은 도로(8차로)를 가리지 않게 갓길 쪽으로 붙인다 */
-  #mute,#back{
+  #mute,#back,#pauseBtn{
     position:absolute;z-index:40;border:none;color:#fff;cursor:pointer;
     top:max(calc(var(--u)*2.4), calc(env(safe-area-inset-top) + var(--u)*.6));
     width:calc(var(--u)*7.2);height:calc(var(--u)*7.2);border-radius:50%;
@@ -135,10 +135,15 @@
     box-shadow:0 2px 10px rgba(0,0,0,.35);touch-action:manipulation;
   }
   #mute{opacity:.92}
-  #back{top:max(calc(var(--u)*10.2), calc(env(safe-area-inset-top) + var(--u)*8.4));
+  /* ⏸ 일시정지는 사운드 바로 아래 · ☰ 는 그 아래로 (갓길 쪽 세로 정렬, HUD 비껴가게) */
+  #pauseBtn{top:max(calc(var(--u)*10.2), calc(env(safe-area-inset-top) + var(--u)*8.4));
+    font-size:calc(var(--u)*3.5);opacity:0;pointer-events:none;transition:opacity .2s,background .2s,color .2s}
+  #pauseBtn.on{opacity:.95;pointer-events:auto}
+  #pauseBtn.paused{background:rgba(255,206,90,.94);color:#2a1800}
+  #back{top:max(calc(var(--u)*18.0), calc(env(safe-area-inset-top) + var(--u)*16.2));
     font-size:calc(var(--u)*3.0);opacity:0;pointer-events:none;transition:opacity .2s}
   #back.on{opacity:.92;pointer-events:auto}
-  #mute:active,#back:active{transform:scale(.92)}
+  #mute:active,#back:active,#pauseBtn:active{transform:scale(.92)}
 
   /* ---------- combo ---------- */
   #combo{
@@ -458,6 +463,25 @@
   #oSrv{margin:0 0 calc(var(--u)*.2);padding:0 calc(var(--u)*.4) calc(var(--u)*.7)}
   @keyframes srvPulse{from{opacity:.3}to{opacity:1}}
 
+  /* ---------- ⏸ 일시정지 오버레이 ---------- */
+  #pauseOv{
+    position:absolute;inset:0;z-index:58;display:flex;align-items:center;justify-content:center;
+    padding:calc(var(--u)*6) calc(var(--u)*5);
+    background:rgba(4,7,13,.84);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+    transition:opacity .18s;
+  }
+  #pauseOv.hidden{opacity:0;pointer-events:none;visibility:hidden;transition:opacity .18s,visibility .18s}
+  .pauseCard{width:100%;max-width:calc(var(--u)*80);display:flex;flex-direction:column;gap:calc(var(--u)*1.5);
+    padding:calc(var(--u)*4.2) calc(var(--u)*3.2) calc(var(--u)*3.0);border-radius:calc(var(--u)*4.4);
+    background:rgba(11,17,29,.97);text-align:center;
+    box-shadow:0 0 0 1px rgba(255,255,255,.11),0 calc(var(--u)*2) calc(var(--u)*8) rgba(0,0,0,.55)}
+  .pauseCard .pTop{font-size:calc(var(--u)*5.4);font-weight:900;letter-spacing:-.03em;color:#fff;line-height:1.1}
+  .pauseCard .pTag{font-size:calc(var(--u)*2.4);font-weight:800;color:#9fd0ff;margin-top:calc(var(--u)*-.6)}
+  .pauseCard .pStat{font-size:calc(var(--u)*2.7);font-weight:800;color:#ffd479;margin-bottom:calc(var(--u)*.8);
+    font-variant-numeric:tabular-nums;line-height:1.2}
+  .pauseCard .pStat b{color:#fff;font-size:calc(var(--u)*3.6);font-weight:900}
+  .pauseCard .cta{margin:0}
+
   /* ---------- flash ---------- */
   #flash{position:absolute;inset:0;z-index:45;pointer-events:none;background:#fff;opacity:0}
   #flash.go{animation:flashGo .42s ease-out}
@@ -523,6 +547,7 @@
   </div>
 
   <button id="back" aria-label="타이틀로">☰</button>
+  <button id="pauseBtn" aria-label="일시정지">⏸</button>
   <button id="mute" aria-label="소리 켜기/끄기">🔊</button>
   <div id="combo"></div>
   <div id="banner"><div class="b1"></div><div class="b2"></div></div>
@@ -532,6 +557,18 @@
   <div id="camZone"><span class="ctz-t">📸 80km/h 단속</span><span class="ctz-bar"><i class="ctz-fill"></i></span></div>
   <div id="flash"></div>
   <div id="toast"></div>
+
+  <!-- ⏸ 일시정지 오버레이 -->
+  <div id="pauseOv" class="hidden">
+    <div class="pauseCard">
+      <div class="pTop">⏸ 일시정지</div>
+      <div class="pTag" id="pRegion">경부선 · 서울→부산</div>
+      <div class="pStat"><b id="pKm">0.0</b>km · <b id="pScore">0</b>점</div>
+      <button id="pResume" class="cta">▶ 계속 달리기</button>
+      <button id="pRestart" class="cta alt">🔄 다시 시작</button>
+      <button id="pTitle" class="cta ghost">🏠 타이틀로</button>
+    </div>
+  </div>
 
   <div id="title" class="overlay">
     <div id="chBanner" class="hidden"><b></b><span></span></div>
@@ -1955,6 +1992,7 @@ function newGame(opts){
     /* v6.2: 전국 일주 권역 상태 (0~3) + 전환 페이드 */
     region: 0, regionPrev: 0, regionT: 1, lapN: 1,
     angryHornT: -99,
+    paused: false,
 
     blocked: false, blockT: 0,
     danger: 0, dangerMax: 0,
@@ -1993,13 +2031,14 @@ function start(sim){
 }
 
 function steer(sim, dir){
-  if (sim.state !== 'playing') return false;
+  if (sim.state !== 'playing' || sim.paused) return false;
   const t = clamp(Math.round(sim.targetLane) + dir, 0, LANES - 1);
   if (t === sim.targetLane) return false;
   sim.targetLane = t;
   return true;
 }
 function setLane(sim, lane){
+  if (sim.paused) return false;
   if (lane < 0 || lane > LANES - 1) return false;
   if (lane === sim.targetLane) return false;
   sim.targetLane = lane;
@@ -2469,6 +2508,9 @@ function update(sim, dt){
     updatePops(sim, dt); updateImpacts(sim, dt);
     return ev;
   }
+
+  /* --- 일시정지: 시간·거리·스폰·타이머·오디오가 모두 멈춘다 --- */
+  if (sim.paused) return ev;
 
   /* --- 타격감: 칼치기 직후 0.05초 히트스탑(슬로우) --- */
   if (sim.hitstop > 0){
@@ -5719,6 +5761,14 @@ if (typeof document !== 'undefined'){
     const shareBtn = document.getElementById('shareBtn');
     const muteBtn = document.getElementById('mute');
     const backBtn = document.getElementById('back');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const pauseOv = document.getElementById('pauseOv');
+    const pRegionEl = document.getElementById('pRegion');
+    const pKmEl = document.getElementById('pKm');
+    const pScoreEl = document.getElementById('pScore');
+    const pResumeBtn = document.getElementById('pResume');
+    const pRestartBtn = document.getElementById('pRestart');
+    const pTitleBtn = document.getElementById('pTitle');
     const comboEl = document.getElementById('combo');
     const bannerEl = document.getElementById('banner');
     const banner1 = bannerEl.querySelector('.b1');
@@ -6275,6 +6325,8 @@ if (typeof document !== 'undefined'){
       Sfx.unlock();
       Sfx.engineStart();
       Sfx.bgmStart(bgmTrackIdFor(sim.leg));
+      if (pauseBtn) pauseBtn.classList.add('on');
+      if (pauseOv) pauseOv.classList.add('hidden');
       hintEl.innerHTML = '<b>←</b> 왼쪽 탭 · <b>→</b> 오른쪽 탭 · 내 차 탭 = <b>빵빵</b>';
       hintEl.classList.add('on');
       setTimeout(function(){ hintEl.classList.remove('on'); }, 3600);
@@ -6287,6 +6339,9 @@ if (typeof document !== 'undefined'){
     function goTitle(){
       if (overTimer){ clearTimeout(overTimer); overTimer = null; }
       overCtx = null;
+      sim.paused = false;
+      if (pauseOv) pauseOv.classList.add('hidden');
+      if (pauseBtn){ pauseBtn.classList.remove('on', 'paused'); pauseBtn.textContent = '⏸'; }
       Sfx.engineStop();
       Sfx.bgmStop();
       hud.classList.remove('on');
@@ -6422,6 +6477,8 @@ if (typeof document !== 'undefined'){
     function onCrash(e){
       hud.classList.remove('on');
       backBtn.classList.remove('on');
+      if (pauseBtn){ pauseBtn.classList.remove('on', 'paused'); pauseBtn.textContent = '⏸'; }
+      if (pauseOv) pauseOv.classList.add('hidden');
       comboEl.classList.remove('on');
       if (camZoneEl) camZoneEl.classList.remove('on');
 
@@ -6525,7 +6582,7 @@ if (typeof document !== 'undefined'){
       if (!ptr) return;
       const dt = performance.now() - ptr.t;
       const dx = clientX - ptr.startX;
-      if (!ptr.moved && dt < 400 && Math.abs(dx) < 22 && sim.state === 'playing'){
+      if (!ptr.moved && dt < 400 && Math.abs(dx) < 22 && sim.state === 'playing' && !sim.paused){
         const wx = worldXFromClient(clientX);
         const cx = playerX(sim);
         const half = PLAYER.w * 0.75;
@@ -6569,14 +6626,22 @@ if (typeof document !== 'undefined'){
         if (sim.state === 'playing' && steer(sim, 1)) Sfx.tick();
         e.preventDefault();
       } else if (k === ' ' || k === 'ArrowUp' || k === 'w' || k === 'W'){
-        if (sim.state === 'playing'){ sim.horn = 1; Sfx.horn(profile.car); }
+        if (sim.state === 'playing' && !sim.paused){ sim.horn = 1; Sfx.horn(profile.car); }
         e.preventDefault();
       } else if (k === 'r' || k === 'R'){
         beginRun();
       } else if (k === 'm' || k === 'M'){
         toggleMute();
+      } else if (k === 'p' || k === 'P'){
+        if (sim.state === 'playing') setPaused(!sim.paused);
+        e.preventDefault();
       } else if (k === 'Escape'){
-        goTitle();
+        if (sim.state === 'playing'){
+          setPaused(!sim.paused);
+        } else {
+          goTitle();
+        }
+        e.preventDefault();
       } else if (k === 'Enter'){
         if (sim.state === 'title') beginRun();
         else if (sim.state === 'crash') beginRun();
@@ -6588,6 +6653,44 @@ if (typeof document !== 'undefined'){
       muteBtn.textContent = Sfx.isMuted() ? '🔇' : '🔊';
     }
     muteBtn.addEventListener('click', function(e){ e.stopPropagation(); toggleMute(); });
+
+    /* ---------- ⏸ 일시정지 / 계속 달리기 ---------- */
+    function setPaused(on){
+      if (!sim || sim.state !== 'playing') return false;
+      const v = !!on;
+      if (v === !!sim.paused) return v;
+      sim.paused = v;
+      if (pauseOv) pauseOv.classList.toggle('hidden', !v);
+      if (pauseBtn){
+        pauseBtn.textContent = v ? '▶' : '⏸';
+        pauseBtn.classList.toggle('paused', v);
+        pauseBtn.setAttribute('aria-label', v ? '계속 달리기' : '일시정지');
+      }
+      if (v){
+        /* 시간·거리·타이머는 update()가 멈추고, 엔진음·BGM도 즉시 끊는다 */
+        Sfx.engineStop();
+        Sfx.bgmStop();
+        if (pRegionEl) pRegionEl.textContent = legTitle(sim.leg);
+        if (pKmEl) pKmEl.textContent = fmtKm(sim.dist);
+        if (pScoreEl) pScoreEl.textContent = fmtNum(sim.score || finalScore(sim));
+        Haptics.buzz(10);
+      } else {
+        Sfx.unlock();
+        Sfx.engineStart();
+        Sfx.engineSet(sim.speed);
+        Sfx.bgmStart(bgmTrackIdFor(sim.leg));
+      }
+      return v;
+    }
+    if (pauseBtn) pauseBtn.addEventListener('click', function(e){ e.stopPropagation(); setPaused(!sim.paused); });
+    if (pResumeBtn) pResumeBtn.addEventListener('click', function(e){ e.stopPropagation(); setPaused(false); });
+    if (pRestartBtn) pRestartBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      if (sim) sim.paused = false;
+      if (pauseOv) pauseOv.classList.add('hidden');
+      beginRun();
+    });
+    if (pTitleBtn) pTitleBtn.addEventListener('click', function(e){ e.stopPropagation(); goTitle(); });
     /* ---------- 보상형 광고 1회 이어달리기 ---------- */
     function updateReviveButton(){
       if (!reviveBtn) return;
@@ -6765,7 +6868,6 @@ if (typeof document !== 'undefined'){
     /* ---------- loop ---------- */
     let lastT = 0;
     let lastHudT = 0;
-    let paused = false;
 
     function loop(t){
       if (!lastT) lastT = t;
@@ -6780,7 +6882,7 @@ if (typeof document !== 'undefined'){
       }
       if (sim.horn > 0) sim.horn = Math.max(0, sim.horn - dt * 1.6);
 
-      const ev = paused ? [] : update(sim, dt);
+      const ev = update(sim, dt);
       if (ev.length) handleEvents(ev);
 
       ctx.setTransform(view.sx, 0, 0, view.sy, 0, 0);
@@ -6791,7 +6893,7 @@ if (typeof document !== 'undefined'){
         lastHudT = 0;
         if (sim.state === 'playing') updateHUD();
       }
-      if (sim.state === 'playing') Sfx.engineSet(sim.speed);
+      if (sim.state === 'playing' && !sim.paused) Sfx.engineSet(sim.speed);
 
       requestAnimationFrame(loop);
     }
@@ -6840,7 +6942,13 @@ if (typeof document !== 'undefined'){
           Sfx.setCar(profile.car);
         },
         profile: function(){ return profile; },
-        pause: function(v){ paused = !!v; return paused; },
+        pause: function(v){
+          if (!sim || sim.state !== 'playing') return false;
+          sim.paused = !!v;
+          return sim.paused;
+        },
+        setPaused: setPaused,
+        isPaused: function(){ return !!(sim && sim.paused); },
         setDist: function(km){
           if (sim.state !== 'playing') return false;
           sim.dist = Math.max(0, Number(km) || 0);
