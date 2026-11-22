@@ -462,7 +462,7 @@ function spawnObstacle(sim){
     x: laneCenter(lane),
     y: -200 - rng() * 60,
     w: 50, h: 104,
-    speed: 72 + rng() * 54,
+    speed: 78 + rng() * 62,
     color: CAR_COLORS[Math.floor(rng() * CAR_COLORS.length)],
     cutter: cutter,
     cutLane: cutLane,
@@ -644,7 +644,7 @@ function update(sim, dt){
 
   /* --- speed --- */
   const goal = sim.blocked ? Math.max(35, blocker.speed - 5) : sim.maxSpeed;
-  const rate = sim.blocked ? 380 : 30;
+  const rate = sim.blocked ? 380 : 55;
   if (goal > sim.speed) sim.speed = Math.min(goal, sim.speed + rate * dt);
   else sim.speed = Math.max(goal, sim.speed - rate * dt);
   sim.speed = clamp(sim.speed, 35, sim.maxSpeed);
