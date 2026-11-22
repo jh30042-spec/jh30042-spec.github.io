@@ -196,7 +196,8 @@
   .overlay.hidden{opacity:0;pointer-events:none;visibility:hidden;transition:opacity .28s,visibility .28s}
 
   #title{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch}
+    -webkit-overflow-scrolling:touch;
+    background:linear-gradient(to bottom,rgba(6,9,18,.90) 0%,rgba(7,10,19,.95) 42%,#070b14 100%)}
   #title > *{flex:0 0 auto}
   #over{overflow-y:auto;overscroll-behavior:contain}
   #over > *{flex:0 0 auto}
@@ -237,12 +238,12 @@
     letter-spacing:-.01em;-webkit-user-select:text;user-select:text;outline:none}
   #nickInput:focus{border-color:#63d2ff;box-shadow:0 0 calc(var(--u)*2) rgba(99,210,255,.45)}
   #nickInput::placeholder{color:#8194ad;font-weight:700}
-  .carRow{display:flex;align-items:center;gap:calc(var(--u)*1);margin-top:calc(var(--u)*1.5)}
+  .carRow{display:flex;align-items:center;gap:calc(var(--u)*1.4);margin-top:calc(var(--u)*1.5)}
   .carRow .arrow{flex:0 0 auto;width:calc(var(--u)*7.2);height:calc(var(--u)*7.2);border-radius:50%;border:none;
     background:rgba(255,255,255,.12);color:#dff1ff;font-size:calc(var(--u)*3);font-weight:900;cursor:pointer;
     font-family:inherit;display:flex;align-items:center;justify-content:center}
   .carRow .arrow:active{transform:scale(.9)}
-  #carCv{flex:0 0 auto;width:calc(var(--u)*15);height:calc(var(--u)*23);display:block;
+  #carCv{flex:0 0 auto;width:calc(var(--u)*16);height:calc(var(--u)*24);display:block;
     filter:drop-shadow(0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(0,0,0,.55))}
   .carInfo{flex:1;min-width:0}
   .carName{font-size:calc(var(--u)*3.2);font-weight:900;letter-spacing:-.03em;color:#fff;
@@ -3139,7 +3140,7 @@ if (typeof document !== 'undefined'){
         html.push('<div class="rRow' + (r.me ? ' me' : '') + '">' +
           '<span class="rk">' + r.rank + '</span>' +
           '<span class="em">' + carById(r.car).emoji + '</span>' +
-          '<span class="nm">' + escapeHtml(r.nick) + (r.me ? ' (나)' : '') + '</span>' +
+          '<span class="nm">' + escapeHtml(r.nick) + (r.me && r.nick !== '나' ? ' (나)' : '') + '</span>' +
           '<span class="km">' + fmtKm(r.km) + 'km</span></div>');
       }
       if (!rows.length) html.push('<div class="rRow"><span class="nm"> 라이벌 없음</span></div>');
@@ -3235,7 +3236,7 @@ if (typeof document !== 'undefined'){
         html.push('<div class="lbRow' + (r.me ? ' me' : '') + '">' +
           '<span class="rk">' + r.rank + '</span>' +
           '<span class="em">' + carById(r.car).emoji + '</span>' +
-          '<span class="nm">' + escapeHtml(r.nick) + (r.me ? ' · 나' : '') + '</span>' +
+          '<span class="nm">' + escapeHtml(r.nick) + (r.me && r.nick !== '나' ? ' · 나' : '') + '</span>' +
           '<span class="km">' + fmtKm(r.km) + 'km</span>' +
           '<span class="sp">' + escapeHtml(r.spot || '') + '</span></div>');
       }
