@@ -802,8 +802,8 @@ const CARS = [
     tag:'적십자 표식 · 회전 사이렌등',
     ability:'한 판 1회 기사회생 실드 (첫 충돌에서 부활)',
     spec:{ shield:1, accel:1.02 }, eng:0.95, horn:'wail' },
-  { id:'supercar', name:'불랙 수퍼카', emoji:'🚘', color:'#1b1d26', short:'수퍼카',
-    tag:'불랙 카본 · 네온 언더글로우',
+  { id:'supercar', name:'블랙 수퍼카', emoji:'🚘', color:'#1b1d26', short:'수퍼카',
+    tag:'블랙 카본 · 네온 언더글로우',
     ability:'최상위 가속·최고속도 · 칼치기 콤보 1.5배 유지',
     spec:{ top:1.12, accel:1.35, lane:1.10, combo:1.50 }, eng:1.10, horn:'hyper' },
   { id:'armored', name:'덤프트럭 장갑차', emoji:'🚛', color:'#55613f', short:'장갑차',
@@ -3526,11 +3526,11 @@ function drawRivalMarkers(ctx, sim){
 
     /* 1) 갓길로 빠진 잔해 차량 (작게, 비스듬히) — 차선 위를 지나지 않는다 */
     ctx.save();
-    ctx.globalAlpha = fade * 0.9;
-    ctx.translate(side < 0 ? signX + signW * 0.5 : signX - signW * 0.5, y);
+    ctx.globalAlpha = fade * 0.85;
+    ctx.translate(cx, y - signH / 2 - 34);
     ctx.rotate(side * 0.42);
     drawVehicle(ctx, {
-      car: r.car, w: PLAYER.w * 0.52, h: PLAYER.h * 0.52,
+      car: r.car, w: PLAYER.w * 0.46, h: PLAYER.h * 0.46,
       t: (sim.time || 0) + i, boost: 0, brake: true, smoke: false
     });
     ctx.restore();
@@ -3548,15 +3548,16 @@ function drawRivalMarkers(ctx, sim){
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    const inner = signW - 7;
     ctx.fillStyle = '#ffe0d8';
-    ctx.font = '900 14px system-ui,sans-serif';
-    ctx.fillText('💀 ' + shortName(r.nick, 4), cx, y - 17);
+    ctx.font = '900 13px system-ui,sans-serif';
+    ctx.fillText('💀 ' + shortName(r.nick, 4), cx, y - 18, inner);
     ctx.fillStyle = '#ffd479';
-    ctx.font = '900 17px system-ui,sans-serif';
-    ctx.fillText(r.km.toFixed(1) + 'km', cx, y + 3);
-    ctx.fillStyle = 'rgba(190,208,230,0.85)';
+    ctx.font = '900 16px system-ui,sans-serif';
+    ctx.fillText(r.km.toFixed(1) + 'km', cx, y + 2, inner);
+    ctx.fillStyle = 'rgba(190,208,230,0.88)';
     ctx.font = '700 10px system-ui,sans-serif';
-    ctx.fillText('여기서 멈춤', cx, y + 21);
+    ctx.fillText('여기서 멈춤', cx, y + 21, inner);
     ctx.restore();
 
     /* 3) 지금 내가 지나가는 중이면 강조 */
@@ -3730,20 +3731,22 @@ function drawItems(ctx, sim){
     const y = it.y + bob;
     ctx.save();
     ctx.translate(it.x, y);
-    const g = ctx.createRadialGradient(0, 0, 2, 0, 0, 52);
-    g.addColorStop(0, 'rgba(' + rgb + ',' + (0.42 * pulse).toFixed(3) + ')');
-    g.addColorStop(0.55, 'rgba(' + rgb + ',' + (0.15 * pulse).toFixed(3) + ')');
+    const g = ctx.createRadialGradient(0, 0, 2, 0, 0, 78);
+    g.addColorStop(0, 'rgba(' + rgb + ',' + (0.55 * pulse).toFixed(3) + ')');
+    g.addColorStop(0.45, 'rgba(' + rgb + ',' + (0.26 * pulse).toFixed(3) + ')');
     g.addColorStop(1, 'rgba(' + rgb + ',0)');
     ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(0, 0, 52, 0, 7); ctx.fill();
-    ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.75 * pulse).toFixed(3) + ')';
-    ctx.lineWidth = 2.5;
-    if (ctx.setLineDash) ctx.setLineDash([6, 6]);
-    ctx.beginPath(); ctx.arc(0, 0, 25, 0, 7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, 78, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(' + rgb + ',' + (0.30 * pulse).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(0, 0, 33, 0, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.95 * pulse).toFixed(3) + ')';
+    ctx.lineWidth = 3;
+    if (ctx.setLineDash) ctx.setLineDash([7, 6]);
+    ctx.beginPath(); ctx.arc(0, 0, 35, 0, 7); ctx.stroke();
     if (ctx.setLineDash) ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(10,16,28,0.74)';
-    ctx.beginPath(); ctx.arc(0, 0, 19, 0, 7); ctx.fill();
-    ctx.font = '700 23px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(8,14,26,0.55)';
+    ctx.beginPath(); ctx.arc(0, 0, 24, 0, 7); ctx.fill();
+    ctx.font = '700 30px system-ui,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(def.emoji, 0, 1);
@@ -3791,9 +3794,9 @@ function drawWeather(ctx, sim){
   const rain = sim.wx === 'rain';
   ctx.save();
   if (rain){
-    ctx.strokeStyle = 'rgba(175,208,255,' + (0.34 * k).toFixed(3) + ')';
-    ctx.lineWidth = 1.6;
-    for (let i=0;i<46;i++){
+    ctx.strokeStyle = 'rgba(186,216,255,' + (0.44 * k).toFixed(3) + ')';
+    ctx.lineWidth = 2.0;
+    for (let i=0;i<74;i++){
       const seed = i * 137.5;
       const x = ((seed * 7.3 + sim.scroll * 0.6) % (W + 120)) - 60;
       const y = ((seed * 11.7 + sim.scroll * 2.1 + (sim.time || 0) * 900) % (H + 160)) - 80;
@@ -3802,19 +3805,19 @@ function drawWeather(ctx, sim){
       ctx.lineTo(x - 8, y + 44);
       ctx.stroke();
     }
-    ctx.fillStyle = 'rgba(38,66,116,' + (0.12 * k).toFixed(3) + ')';
+    ctx.fillStyle = 'rgba(38,66,116,' + (0.17 * k).toFixed(3) + ')';
     ctx.fillRect(0, 0, W, H);
   } else {
-    ctx.fillStyle = 'rgba(238,246,255,' + (0.85 * k).toFixed(3) + ')';
-    for (let i=0;i<52;i++){
+    ctx.fillStyle = 'rgba(242,249,255,' + (0.92 * k).toFixed(3) + ')';
+    for (let i=0;i<78;i++){
       const seed = i * 97.3;
       const x = ((seed * 5.1 + Math.sin((sim.time || 0) * 0.7 + i) * 24 + sim.scroll * 0.2) % (W + 80)) - 40;
       const y = ((seed * 13.9 + sim.scroll * 0.9 + (sim.time || 0) * 150) % (H + 120)) - 60;
       ctx.beginPath();
-      ctx.arc(x, y, 1.6 + (i % 3), 0, 7);
+      ctx.arc(x, y, 2.0 + (i % 4) * 0.9, 0, 7);
       ctx.fill();
     }
-    ctx.fillStyle = 'rgba(222,236,255,' + (0.14 * k).toFixed(3) + ')';
+    ctx.fillStyle = 'rgba(222,236,255,' + (0.17 * k).toFixed(3) + ')';
     ctx.fillRect(0, 0, W, H);
   }
   ctx.restore();
