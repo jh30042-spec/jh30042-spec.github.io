@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>기록 초기화 검증 (임시)</title>
+<style>
+  html,body{margin:0;padding:0;background:#0b0d12}
+  iframe{display:block;width:390px;height:680px;border:0;margin:0 auto}
+</style>
+<script>
+/* 임시 검증 페이지 — 이번 업데이트 이전 폰에 남아 있던 옛 최고 기록(에포크 없음)을 심고 게임을 390×680으로 띄운다 */
+(function(){
+  var legacy = { bestKm:724.7, bestScore:99999, bestSpeed:398, bestCombo:12, runs:31,
+    totalKm:5210.4, updated:1700000000000, bestSpot:'부산 앞', bestCar:'sport', bestNick:'옛기록' };
+  try {
+    localStorage.setItem('busan8_endless_v1', JSON.stringify(legacy));
+    localStorage.setItem('busan8_profile_v1', JSON.stringify({ nick:'검증테스터', car:'sport', ts: Date.now() }));
+  } catch(e){}
+})();
+</script>
+</head>
+<body>
+<iframe id="game" src="./" title="서울→부산"></iframe>
+</body>
+</html>
