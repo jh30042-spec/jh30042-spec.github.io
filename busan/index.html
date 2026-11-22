@@ -8,10 +8,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="서울→부산">
-<meta name="description" content="서울에서 부산까지, 죽을 때까지 끝없이 달리는 병맛 무한 하드코어 질주. 갈수록 빨라지고 막힌다. 스치면 끝.">
+<meta name="description" content="서울에서 부산까지, 친구들과 순위 경쟁하며 죽을 때까지 끝없이 달리는 병맛 무한 하드코어 질주. 갈수록 빨라지고 막힌다. 스치면 끝.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="🚗 서울→부산 무한 하드코어 질주">
-<meta property="og:description" content="끝없이 달려 기록을 세워라. 갈수록 빨라지고, 갈수록 막힌다. 스치면 데이고, 데이면 끝.">
+<meta property="og:description" content="끝없이 달려 기록을 세워라. 친구 기록을 추월하고, 어디서 멈췄는지 확인하라. 스치면 데이고, 데이면 끝.">
 <meta property="og:url" content="https://jh30042-spec.github.io/busan/">
 <meta property="og:site_name" content="종혁의 미니게임">
 <meta property="og:locale" content="ko_KR">
@@ -86,12 +86,26 @@
 
   .bar{margin-top:calc(var(--u)*1.3);position:relative;height:calc(var(--u)*2.1)}
   .barBg{position:absolute;inset:0;border-radius:99px;background:rgba(255,255,255,.13);
-    box-shadow:inset 0 1px 2px rgba(0,0,0,.5);overflow:hidden}
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.5);overflow:visible}
+  .barBg .track{position:absolute;inset:0;border-radius:99px;overflow:hidden}
   #barFill{position:absolute;left:0;top:0;bottom:0;width:0%;border-radius:99px;
     background:linear-gradient(90deg,#2f7bff,#63d2ff);transition:width .08s linear}
   .barBg .tick{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.35)}
   #barDot{position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);
     font-size:calc(var(--u)*3.2);filter:drop-shadow(0 1px 3px rgba(0,0,0,.7));transition:left .08s linear}
+  #barPins{position:absolute;inset:0;pointer-events:none}
+  #barPins .pin{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:calc(var(--u)*2.3);line-height:1;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.85))}
+  #barPins .pin.passed{opacity:.42}
+  #barPins .pin.me{font-size:calc(var(--u)*2.8)}
+
+  /* 다음 목표 (라이벌) */
+  .targetLine{margin-top:calc(var(--u)*1.3);font-size:calc(var(--u)*2.5);font-weight:900;color:#ffe08a;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 6px rgba(0,0,0,.85);
+    padding-right:calc(var(--u)*12.5);font-variant-numeric:tabular-nums}
+  .targetLine b{color:#fff}
+  .targetLine em{font-style:normal;color:#7dffc0}
+  .targetLine .rk{color:#9fd0ff}
 
   /* ---------- top right buttons ---------- */
   #mute,#back{
@@ -110,7 +124,7 @@
 
   /* ---------- combo ---------- */
   #combo{
-    position:absolute;right:calc(var(--u)*3.2);top:calc(var(--u)*24.5);z-index:24;pointer-events:none;
+    position:absolute;right:calc(var(--u)*3.2);top:calc(var(--u)*28);z-index:24;pointer-events:none;
     font-size:calc(var(--u)*3.2);font-weight:900;color:#ffd479;opacity:0;white-space:nowrap;
     transition:opacity .18s,transform .1s;transform-origin:100% 50%;
     text-shadow:0 2px 12px rgba(255,140,0,.75),0 0 22px rgba(255,200,80,.55);
@@ -128,6 +142,7 @@
   #banner .b2{font-size:calc(var(--u)*3);font-weight:700;color:#ffe08a;margin-top:calc(var(--u)*.8);
     text-shadow:0 2px 10px rgba(0,0,0,.8)}
   #banner.show{animation:bannerPop 1.9s ease-out forwards}
+  #banner.long .b1{font-size:calc(var(--u)*4.9)}
   @keyframes bannerPop{
     0%{opacity:0;transform:translateY(calc(var(--u)*3)) scale(.92)}
     12%{opacity:1;transform:translateY(0) scale(1)}
@@ -165,7 +180,7 @@
     position:absolute;left:50%;bottom:calc(var(--u)*26);transform:translateX(-50%);z-index:60;
     background:rgba(10,16,28,.94);border:1px solid rgba(255,255,255,.16);border-radius:99px;
     padding:calc(var(--u)*2) calc(var(--u)*4);font-size:calc(var(--u)*3.1);font-weight:800;
-    opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;
+    opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;max-width:92%;
     box-shadow:0 6px 24px rgba(0,0,0,.5)
   }
   #toast.on{opacity:1}
@@ -180,40 +195,92 @@
   }
   .overlay.hidden{opacity:0;pointer-events:none;visibility:hidden;transition:opacity .28s,visibility .28s}
 
-  #title{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain}
+  #title{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch}
   #title > *{flex:0 0 auto}
   #over{overflow-y:auto;overscroll-behavior:contain}
   #over > *{flex:0 0 auto}
-  #title::before{content:'';display:block;flex:1 1 0;min-height:0}
-  #title .tEmoji{font-size:calc(var(--u)*4.8);line-height:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,.6))}
+  #title .tEmoji{font-size:calc(var(--u)*4.4);line-height:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,.6))}
   #title h1{
-    margin:calc(var(--u)*1.0) 0 calc(var(--u)*.3);font-size:calc(var(--u)*7.2);font-weight:900;
+    margin:calc(var(--u)*.9) 0 calc(var(--u)*.3);font-size:calc(var(--u)*6.4);font-weight:900;
     line-height:1.02;letter-spacing:-.055em;
     background:linear-gradient(180deg,#fff 30%,#8fc6ff);-webkit-background-clip:text;background-clip:text;color:transparent;
     filter:drop-shadow(0 4px 20px rgba(60,140,255,.45))
   }
-  #title h1 em{font-style:normal;display:block;font-size:calc(var(--u)*3.6);letter-spacing:.02em;
-    margin-top:calc(var(--u)*1.1);-webkit-text-fill-color:#ffd479;color:#ffd479}
-  .tBest{font-size:calc(var(--u)*2.8);font-weight:800;color:#ffd479;margin:calc(var(--u)*1.1) 0 calc(var(--u)*.4);
+  #title h1 em{font-style:normal;display:block;font-size:calc(var(--u)*3.4);letter-spacing:.02em;
+    margin-top:calc(var(--u)*1.0);-webkit-text-fill-color:#ffd479;color:#ffd479}
+  .tBest{font-size:calc(var(--u)*2.7);font-weight:800;color:#ffd479;margin:calc(var(--u)*1.3) 0 calc(var(--u)*.3);
     line-height:1.35;font-variant-numeric:tabular-nums}
   .tBest b{font-weight:900;color:#fff}
   .tBest span{color:#9fb4d0;font-weight:700}
-  .tSub{font-size:calc(var(--u)*2.4);font-weight:700;color:#8fa5c2;margin-bottom:calc(var(--u)*2.2);line-height:1.4}
-  .tKeys{margin-top:calc(var(--u)*1.4);font-size:calc(var(--u)*2.4);color:#8fa5c2;line-height:1.55;font-weight:600}
+  .tSub{font-size:calc(var(--u)*2.3);font-weight:700;color:#8fa5c2;margin-bottom:calc(var(--u)*1.2);line-height:1.4}
+  .tKeys{margin-top:calc(var(--u)*1.2);font-size:calc(var(--u)*2.3);color:#8fa5c2;line-height:1.55;font-weight:600}
   .tKeys b{color:#d9ecff}
+
+  /* 도전장 배너 */
+  #chBanner{margin:calc(var(--u)*.4) 0 calc(var(--u)*1.6);padding:calc(var(--u)*1.7) calc(var(--u)*2.2);
+    border-radius:calc(var(--u)*2.6);display:flex;flex-direction:column;gap:calc(var(--u)*.3);
+    background:linear-gradient(135deg,rgba(255,86,50,.95),rgba(255,172,40,.95));color:#1c0b00;
+    box-shadow:0 calc(var(--u)*1) calc(var(--u)*3.4) rgba(255,90,0,.35)}
+  #chBanner b{font-size:calc(var(--u)*3.4);font-weight:900;letter-spacing:-.02em;line-height:1.25}
+  #chBanner span{font-size:calc(var(--u)*2.5);font-weight:800;opacity:.92;line-height:1.35}
+  #chBanner.hidden{display:none}
+
+  /* 내 프로필 */
+  .prof{margin:calc(var(--u)*1.5) 0 calc(var(--u)*1.5);padding:calc(var(--u)*2) calc(var(--u)*2.2);
+    border-radius:calc(var(--u)*3);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10)}
+  .nickRow{display:flex;align-items:center;gap:calc(var(--u)*1.3)}
+  .nickRow label{font-size:calc(var(--u)*2.4);font-weight:900;color:#9fd0ff;white-space:nowrap;letter-spacing:.02em}
+  #nickInput{flex:1;min-width:0;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18);
+    border-radius:calc(var(--u)*1.8);color:#fff;font-family:inherit;
+    font-size:max(calc(var(--u)*3.1),16px);font-weight:900;padding:calc(var(--u)*1.3) calc(var(--u)*1.7);
+    letter-spacing:-.01em;-webkit-user-select:text;user-select:text;outline:none}
+  #nickInput:focus{border-color:#63d2ff;box-shadow:0 0 calc(var(--u)*2) rgba(99,210,255,.45)}
+  #nickInput::placeholder{color:#8194ad;font-weight:700}
+  .carRow{display:flex;align-items:center;gap:calc(var(--u)*1);margin-top:calc(var(--u)*1.5)}
+  .carRow .arrow{flex:0 0 auto;width:calc(var(--u)*7.2);height:calc(var(--u)*7.2);border-radius:50%;border:none;
+    background:rgba(255,255,255,.12);color:#dff1ff;font-size:calc(var(--u)*3);font-weight:900;cursor:pointer;
+    font-family:inherit;display:flex;align-items:center;justify-content:center}
+  .carRow .arrow:active{transform:scale(.9)}
+  #carCv{flex:0 0 auto;width:calc(var(--u)*15);height:calc(var(--u)*23);display:block;
+    filter:drop-shadow(0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(0,0,0,.55))}
+  .carInfo{flex:1;min-width:0}
+  .carName{font-size:calc(var(--u)*3.2);font-weight:900;letter-spacing:-.03em;color:#fff;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .carTag{font-size:calc(var(--u)*2.2);font-weight:700;color:#9fb4d0;line-height:1.3;margin-top:calc(var(--u)*.3)}
+  .dots{display:flex;gap:calc(var(--u)*1);margin-top:calc(var(--u)*1)}
+  .dots i{width:calc(var(--u)*1.7);height:calc(var(--u)*1.7);border-radius:50%;background:rgba(255,255,255,.24);cursor:pointer}
+  .dots i.on{background:#63d2ff;box-shadow:0 0 calc(var(--u)*1.2) rgba(99,210,255,.85)}
+
+  /* 타이틀 라이벌 순위 */
+  .rivals{margin-top:calc(var(--u)*.4);padding:calc(var(--u)*1.5) calc(var(--u)*1.8);
+    border-radius:calc(var(--u)*2.6);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+  .rHead{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*1);
+    font-size:calc(var(--u)*2.4);font-weight:900;color:#ffd479;margin-bottom:calc(var(--u)*.8)}
+  .rHead span{color:#8fa5c2;font-weight:800;font-size:calc(var(--u)*2)}
+  #rivalReset{border:none;background:rgba(255,255,255,.1);color:#cfe0f5;font-family:inherit;
+    font-size:calc(var(--u)*2);font-weight:800;padding:calc(var(--u)*.7) calc(var(--u)*1.4);border-radius:99px;cursor:pointer}
+  .rRow{display:flex;align-items:center;gap:calc(var(--u)*1);font-size:calc(var(--u)*2.35);font-weight:800;
+    padding:calc(var(--u)*.5) 0;border-top:1px solid rgba(255,255,255,.05)}
+  .rRow .rk{width:calc(var(--u)*3.2);color:#8fa5c2;font-weight:900;font-size:calc(var(--u)*2.1)}
+  .rRow .em{width:calc(var(--u)*3.6);font-size:calc(var(--u)*2.5)}
+  .rRow .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rRow .km{color:#ffd479;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .rRow.me{background:rgba(125,255,192,.12);border-radius:calc(var(--u)*1.4);padding-left:calc(var(--u)*.6);padding-right:calc(var(--u)*.6)}
+  .rRow.me .nm{color:#7dffc0}
 
   .cta{
     width:100%;border:none;cursor:pointer;border-radius:calc(var(--u)*4);white-space:nowrap;
-    padding:calc(var(--u)*3.4) calc(var(--u)*3);font-size:calc(var(--u)*4.5);font-weight:900;letter-spacing:-.02em;flex:0 0 auto;
+    padding:calc(var(--u)*3.2) calc(var(--u)*3);font-size:calc(var(--u)*4.4);font-weight:900;letter-spacing:-.02em;flex:0 0 auto;
     color:#04121f;background:linear-gradient(180deg,#7ce0ff,#39a9ff);
     box-shadow:0 calc(var(--u)*1.4) 0 rgba(0,60,110,.6),0 calc(var(--u)*1.6) calc(var(--u)*4) rgba(60,170,255,.45);
     touch-action:manipulation;font-family:inherit;
   }
   .cta:active{transform:translateY(calc(var(--u)*.8));box-shadow:0 calc(var(--u)*.6) 0 rgba(0,60,110,.6)}
-  .cta.alt{background:linear-gradient(180deg,#ffd479,#ffb020);box-shadow:0 calc(var(--u)*1.4) 0 rgba(120,70,0,.55),0 calc(var(--u)*1.6) calc(var(--u)*4) rgba(255,180,50,.4)}
+  .cta.alt{background:linear-gradient(180deg,#ffd479,#ffb020);box-shadow:calc(var(--u)*0) calc(var(--u)*1.4) 0 rgba(120,70,0,.55),0 calc(var(--u)*1.6) calc(var(--u)*4) rgba(255,180,50,.4)}
   .cta.ghost{
-    background:rgba(255,255,255,.1);color:#e8f3ff;box-shadow:none;font-size:calc(var(--u)*3.2);
-    padding:calc(var(--u)*2.8) calc(var(--u)*1.6);margin-top:calc(var(--u)*1.5);border-radius:calc(var(--u)*3)
+    background:rgba(255,255,255,.1);color:#e8f3ff;box-shadow:none;font-size:calc(var(--u)*3.0);
+    padding:calc(var(--u)*2.7) calc(var(--u)*1.4);margin-top:calc(var(--u)*1.5);border-radius:calc(var(--u)*3)
   }
 
   /* ---------- end screen ---------- */
@@ -221,22 +288,43 @@
     align-self:center;font-size:calc(var(--u)*3);font-weight:800;letter-spacing:.12em;
     color:#ffb0a0;margin-bottom:calc(var(--u)*1.2)
   }
-  #over .oBig{font-size:calc(var(--u)*9.4);line-height:1;text-align:center;margin-bottom:calc(var(--u)*1.2);
+  #over .oBig{font-size:calc(var(--u)*8.6);line-height:1;text-align:center;margin-bottom:calc(var(--u)*1.0);
     filter:drop-shadow(0 6px 22px rgba(0,0,0,.7))}
   #over h2{
-    margin:0 0 calc(var(--u)*.8);font-size:calc(var(--u)*4.9);font-weight:900;line-height:1.28;letter-spacing:-.03em;text-align:center
+    margin:0 0 calc(var(--u)*.7);font-size:calc(var(--u)*4.6);font-weight:900;line-height:1.28;letter-spacing:-.03em;text-align:center
   }
-  #over .osub{text-align:center;font-size:calc(var(--u)*2.9);color:#9fb4d0;font-weight:700;margin-bottom:calc(var(--u)*2.4)}
-  .oStats{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.0);margin-bottom:calc(var(--u)*1.8)}
-  .oStats div{background:rgba(255,255,255,.07);border-radius:calc(var(--u)*2.2);padding:calc(var(--u)*1.7) calc(var(--u)*.3);text-align:center}
-  .oStats b{display:block;font-size:calc(var(--u)*3.8);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.045em;white-space:nowrap}
-  .oStats span{display:block;font-size:calc(var(--u)*2.1);color:#93a9c6;font-weight:700;margin-top:calc(var(--u)*.4);white-space:nowrap}
-  .oBest{text-align:center;font-size:calc(var(--u)*2.9);font-weight:800;color:#ffd479;margin-bottom:calc(var(--u)*2.0);line-height:1.4}
-  .oBest span{color:#9fb4d0;font-weight:700;font-size:calc(var(--u)*2.5)}
+  #over .osub{text-align:center;font-size:calc(var(--u)*2.8);color:#9fb4d0;font-weight:700;margin-bottom:calc(var(--u)*2.2)}
+  .oStats{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.0);margin-bottom:calc(var(--u)*1.6)}
+  .oStats div{background:rgba(255,255,255,.07);border-radius:calc(var(--u)*2.2);padding:calc(var(--u)*1.6) calc(var(--u)*.3);text-align:center}
+  .oStats b{display:block;font-size:calc(var(--u)*3.7);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.045em;white-space:nowrap}
+  .oStats span{display:block;font-size:calc(var(--u)*2.0);color:#93a9c6;font-weight:700;margin-top:calc(var(--u)*.4);white-space:nowrap}
+  .oBest{text-align:center;font-size:calc(var(--u)*2.8);font-weight:800;color:#ffd479;margin-bottom:calc(var(--u)*1.6);line-height:1.4}
+  .oBest span{color:#9fb4d0;font-weight:700;font-size:calc(var(--u)*2.4)}
   .oBest em{font-style:normal;color:#7dffc0}
   .row2{display:flex;gap:calc(var(--u)*1.2);align-items:stretch}
-  .row2 .cta.ghost{flex:1 1 0;margin-top:calc(var(--u)*1.5);font-size:calc(var(--u)*2.9);
-    padding-left:calc(var(--u)*.6);padding-right:calc(var(--u)*.6)}
+  .row2 .cta.ghost{flex:1 1 0;margin-top:calc(var(--u)*1.5);font-size:calc(var(--u)*2.8);
+    padding-left:calc(var(--u)*.6);padding-right:calc(var(--u)*.6);white-space:normal;line-height:1.25}
+
+  /* 순위표 */
+  .lb{margin:0 0 calc(var(--u)*1.2);border-radius:calc(var(--u)*2.6);background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.09);overflow:hidden}
+  .lbHead{display:flex;justify-content:space-between;align-items:baseline;gap:calc(var(--u)*1);
+    padding:calc(var(--u)*1.3) calc(var(--u)*1.8);font-size:calc(var(--u)*2.5);font-weight:900;color:#ffd479;
+    background:rgba(255,255,255,.05)}
+  .lbHead span{color:#9fb4d0;font-weight:800;font-size:calc(var(--u)*2.1);text-align:right}
+  .lbHead em{font-style:normal;color:#7dffc0}
+  .lbRow{display:grid;grid-template-columns:calc(var(--u)*4.2) calc(var(--u)*4.4) 1fr auto;align-items:center;
+    gap:calc(var(--u)*.9);padding:calc(var(--u)*1.0) calc(var(--u)*1.8);
+    font-size:calc(var(--u)*2.3);font-weight:800;border-top:1px solid rgba(255,255,255,.05)}
+  .lbRow .rk{color:#8fa5c2;font-weight:900;text-align:center;font-size:calc(var(--u)*2.1)}
+  .lbRow .em{font-size:calc(var(--u)*2.4)}
+  .lbRow .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lbRow .km{color:#ffd479;font-variant-numeric:tabular-nums;font-weight:900;white-space:nowrap}
+  .lbRow .sp{grid-column:2 / span 3;grid-row:2;font-size:calc(var(--u)*1.95);font-weight:700;color:#8799b4;
+    margin-top:calc(var(--u)*.1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lbRow.me{background:rgba(125,255,192,.13);box-shadow:inset 0 0 0 1px rgba(125,255,192,.35)}
+  .lbRow.me .nm{color:#7dffc0}
+  .lbRow.me .km{color:#fff}
 
   /* ---------- flash ---------- */
   #flash{position:absolute;inset:0;z-index:45;pointer-events:none;background:#fff;opacity:0}
@@ -271,9 +359,13 @@
       <div class="dBg"><div id="dangerFill"></div></div>
     </div>
     <div class="bar">
-      <div class="barBg"><div id="barFill"></div><div id="barTicks"></div></div>
+      <div class="barBg">
+        <div class="track"><div id="barFill"></div><div id="barTicks"></div></div>
+        <div id="barPins"></div>
+      </div>
       <div id="barDot">🚗</div>
     </div>
+    <div class="targetLine" id="targetLine">다음 목표: —</div>
   </div>
 
   <button id="back" aria-label="타이틀로">☰</button>
@@ -286,11 +378,33 @@
   <div id="toast"></div>
 
   <div id="title" class="overlay">
+    <div id="chBanner" class="hidden"><b></b><span></span></div>
     <div class="tEmoji">🚗💨</div>
     <h1>서울 → 부산<em>무한 하드코어 질주</em></h1>
+    <div class="prof">
+      <div class="nickRow">
+        <label for="nickInput">닉네임</label>
+        <input id="nickInput" type="text" maxlength="14" placeholder="무명질주자" autocomplete="off"
+               autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="내 닉네임">
+      </div>
+      <div class="carRow">
+        <button class="arrow" id="carPrev" aria-label="이전 차">◀</button>
+        <canvas id="carCv" width="180" height="276" aria-label="내 차 미리보기"></canvas>
+        <div class="carInfo">
+          <div class="carName" id="carName">빨간 스포츠카</div>
+          <div class="carTag" id="carTag">레이싱 스트라이프 · 듀얼 배기 불꽃</div>
+          <div class="dots" id="carDots"></div>
+        </div>
+        <button class="arrow" id="carNext" aria-label="다음 차">▶</button>
+      </div>
+    </div>
+    <button id="startBtn" class="cta">무한 질주 출발 🏁</button>
     <div class="tBest" id="tBest">아직 기록 없음 <span>· 첫 주행이 곧 기록</span></div>
     <div class="tSub" id="tSub">갈수록 빨라진다 · 갈수록 막힌다 · 스치면 끝</div>
-    <button id="startBtn" class="cta">무한 질주 출발 🏁</button>
+    <div class="rivals">
+      <div class="rHead">🏁 라이벌 순위 <button id="rivalReset">라이벌 초기화</button></div>
+      <div id="rivalList"></div>
+    </div>
     <div class="tKeys"><b>좌우 탭</b> · 스와이프 · <b>← →</b> · 내 차 탭 = <b>빵빵!</b> 📣</div>
   </div>
 
@@ -306,9 +420,13 @@
       <div><b id="oCombo">x0</b><span>최대 콤보</span></div>
     </div>
     <div class="oBest" id="oBest"></div>
+    <div class="lb">
+      <div class="lbHead">🏆 순위표 <span id="lbMe">내 순위 —</span></div>
+      <div id="lbList"></div>
+    </div>
     <button id="retryBtn" class="cta alt">다시 달리기 🔁</button>
     <div class="row2">
-      <button id="shareBtn" class="cta ghost">기록 공유하기</button>
+      <button id="shareBtn" class="cta ghost">도전장 링크 보내기 🔗</button>
       <button id="menuBtn2" class="cta ghost">타이틀</button>
     </div>
   </div>
@@ -469,7 +587,8 @@ function defaultStore(){
   return MemStore;
 }
 function blankRecords(){
-  return { bestKm:0, bestScore:0, bestSpeed:0, bestCombo:0, runs:0, totalKm:0, updated:0 };
+  return { bestKm:0, bestScore:0, bestSpeed:0, bestCombo:0, runs:0, totalKm:0, updated:0,
+           bestSpot:'', bestCar:'', bestNick:'' };
 }
 function loadRecords(store){
   const st = store || defaultStore();
@@ -485,6 +604,9 @@ function loadRecords(store){
       r.runs = Math.max(0, Number(o.runs) || 0);
       r.totalKm = Math.max(0, Number(o.totalKm) || 0);
       r.updated = Number(o.updated) || 0;
+      r.bestSpot = typeof o.bestSpot === 'string' ? o.bestSpot.slice(0, 48) : '';
+      r.bestCar = o.bestCar ? carById(o.bestCar).id : '';
+      r.bestNick = normalizeNick(o.bestNick);
       return r;
     }
     /* 예전 5단계 저장에서 최고 거리만 이어받기 */
@@ -507,15 +629,325 @@ function saveRecords(r, store){
 }
 function commitRun(sim, store){
   const r = Object.assign(blankRecords(), sim.rec || {});
-  r.bestKm = Math.max(r.bestKm || 0, sim.dist);
+  const prevBest = r.bestKm || 0;
+  r.bestKm = Math.max(prevBest, sim.dist);
   r.bestScore = Math.max(r.bestScore || 0, finalScore(sim));
   r.bestSpeed = Math.max(r.bestSpeed || 0, Math.round(sim.topSpeed));
   r.bestCombo = Math.max(r.bestCombo || 0, sim.maxCombo);
   r.runs = (r.runs || 0) + 1;
   r.totalKm = (r.totalKm || 0) + sim.dist;
+  if (sim.dist >= prevBest - 0.001 && sim.dist > 0){
+    r.bestSpot = sim.stopSpot || describeStop(sim.dist, sim.crashCause) || r.bestSpot || '';
+    r.bestCar = sim.car || r.bestCar || 'sport';
+    r.bestNick = normalizeNick(sim.nick) || r.bestNick || '';
+  }
   saveRecords(r, store);
   sim.rec = r;
   return r;
+}
+
+/* =========================================================
+   nickname · car · rivals (친구 경쟁)
+   ========================================================= */
+const PROFILE_KEY = 'busan8_profile_v1';
+const RIVALS_KEY = 'busan8_rivals_v1';
+const CHALLENGE_PARAM = 'c';
+const NICK_MAX = 14;
+const UNITS_PER_KM = SPD_SCALE * KM_DIV;     // 1km = 390 world units (거리↔화면 환산)
+
+/* 차종: id · 이름 · 이모지 · 차체색 · 설명 · 엔진 배율 · 경적 성격 */
+const CARS = [
+  { id:'sport',   name:'빨간 스포츠카', emoji:'🏎️', color:'#ff3b47', short:'스포츠카',
+    tag:'레이싱 스트라이프 · 듀얼 배기 불꽃', eng:0.90, horn:'high' },
+  { id:'taxi',    name:'노란 총알택시', emoji:'🚕', color:'#ffd12e', short:'택시',
+    tag:'빈차 갓등 · 칼치기 본능', eng:1.02, horn:'double' },
+  { id:'porter',  name:'파란 1톤 포터', emoji:'🚚', color:'#2f7bff', short:'포터',
+    tag:'만재 적재함 · 우직한 존재감', eng:0.70, horn:'low' },
+  { id:'police',  name:'경광등 경찰차', emoji:'🚓', color:'#eef3fb', short:'경찰차',
+    tag:'빨강/파랑 점멸 · 사이렌 경적', eng:1.06, horn:'siren' },
+  { id:'tractor', name:'병맛 경운기', emoji:'🚜', color:'#57b34a', short:'경운기',
+    tag:'왕바퀴 · 연기 두 통 · 논두렁 감성', eng:0.62, horn:'rattle' }
+];
+const NICK_POOL = ['무명질주자','칼치기장인','8차로고수','빈차아저씨','과속스캔들','갓길의신',
+  '핸들잡은곰','부산행만렙','콘돌파전문','고속도로원숭이','속도광','새벽반장'];
+
+function carById(id){
+  for (let i=0;i<CARS.length;i++) if (CARS[i].id === id) return CARS[i];
+  return CARS[0];
+}
+function carIndex(id){
+  for (let i=0;i<CARS.length;i++) if (CARS[i].id === id) return i;
+  return 0;
+}
+function randomNick(rng){
+  const r = rng ? rng() : Math.random();
+  return NICK_POOL[Math.min(NICK_POOL.length - 1, Math.floor(r * NICK_POOL.length))];
+}
+function normalizeNick(n){
+  return String(n === undefined || n === null ? '' : n).replace(/\s+/g, ' ').trim().slice(0, NICK_MAX);
+}
+
+function blankProfile(){ return { nick:'', car:'sport', ts:0 }; }
+function loadProfile(store){
+  const st = store || defaultStore();
+  const p = blankProfile();
+  try {
+    const raw = st.getItem(PROFILE_KEY);
+    if (raw){
+      const o = JSON.parse(raw);
+      p.nick = normalizeNick(o.nick);
+      p.car = carById(o.car).id;
+      p.ts = Number(o.ts) || 0;
+    }
+  } catch(e){}
+  return p;
+}
+function saveProfile(p, store){
+  const st = store || defaultStore();
+  try {
+    const o = { nick: normalizeNick(p.nick), car: carById(p.car).id, ts: Date.now() };
+    st.setItem(PROFILE_KEY, JSON.stringify(o));
+    return o;
+  } catch(e){ return null; }
+}
+
+/* --- 기본 라벨: 어디서 멈췄는지 --- */
+function describeStop(km, cause){
+  const K = Math.max(0, Number(km) || 0);
+  const legIdx = Math.floor(K / LEG_KM);
+  const rel = K - legIdx * LEG_KM;
+  const route = legRoute(legIdx);
+  let last = null;
+  for (let i=0;i<route.length;i++){ if (route[i].km <= rel + 0.001) last = route[i]; }
+  const tag = ENDING_TAGS[cause] || '참변';
+  if (!last) return (legIdx % 2 === 0 ? '서울 출발 ' : '부산 출발 ') + tag;
+  return last.name + ' 앞 ' + tag;
+}
+
+/* --- 기본 라이벌 (처음부터 경쟁감) --- */
+function defaultRivals(){
+  return [
+    { nick:'김부장', car:'taxi',    km:118.4, score:2380, spot:'천안 병목', d:true },
+    { nick:'박대리', car:'porter',  km:242.0, score:5120, spot:'대전 칼치기', d:true },
+    { nick:'이과장', car:'police',  km:389.5, score:8940, spot:'부산 10km 전 가드레일', d:true },
+    { nick:'최기사', car:'tractor', km:61.2,  score:1190, spot:'수원 톨게이트 경운기 참변', d:true }
+  ];
+}
+function sanitizeRival(r){
+  if (!r || typeof r !== 'object') return null;
+  const nick = normalizeNick(r.nick);
+  if (!nick) return null;
+  const km = Number(r.km);
+  if (!isFinite(km) || km < 0) return null;
+  return {
+    nick: nick,
+    car: carById(r.car).id,
+    km: Math.round(clamp(km, 0, 99999) * 10) / 10,
+    score: Math.max(0, Math.round(Number(r.score) || 0)),
+    spot: String(r.spot === undefined || r.spot === null ? '' : r.spot).slice(0, 48),
+    d: !!r.d,
+    ts: Number(r.ts) || 0
+  };
+}
+function loadRivals(store){
+  const st = store || defaultStore();
+  try {
+    const raw = st.getItem(RIVALS_KEY);
+    if (raw){
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)){
+        const out = [];
+        for (let i=0;i<arr.length;i++){
+          const r = sanitizeRival(arr[i]);
+          if (r) out.push(r);
+        }
+        return out;
+      }
+    }
+  } catch(e){}
+  return defaultRivals();
+}
+function saveRivals(list, store){
+  const st = store || defaultStore();
+  try {
+    st.setItem(RIVALS_KEY, JSON.stringify(list.map(function(r){ return sanitizeRival(r) || { nick:'?', car:'sport', km:0 }; })));
+    return true;
+  } catch(e){ return false; }
+}
+/* 같은 닉네임은 더 높은 기록만 남긴다 */
+function mergeRival(list, r){
+  const entry = sanitizeRival(r);
+  const src = list ? list.slice() : [];
+  if (!entry) return { list: src, action: 'invalid' };
+  let idx = -1;
+  for (let i=0;i<src.length;i++){
+    if (normalizeNick(src[i].nick).toLowerCase() === entry.nick.toLowerCase()){ idx = i; break; }
+  }
+  if (idx < 0){ src.push(entry); return { list: src, action: 'added', entry: entry }; }
+  const old = sanitizeRival(src[idx]) || entry;
+  if (entry.km > old.km + 0.05 || (Math.abs(entry.km - old.km) <= 0.05 && entry.score > old.score)){
+    src[idx] = Object.assign({}, entry, { d: old.d, ts: entry.ts || Date.now() });
+    return { list: src, action: 'updated', entry: src[idx] };
+  }
+  return { list: src, action: 'kept', entry: old };
+}
+function addRivalToList(list, r){ return mergeRival(list, r).list; }
+function registerRival(r, store){
+  const res = mergeRival(loadRivals(store), r);
+  if (res.action === 'added' || res.action === 'updated') saveRivals(res.list, store);
+  return res;
+}
+function resetRivals(store){
+  const list = defaultRivals();
+  saveRivals(list, store);
+  return list;
+}
+
+/* --- 도전장 링크: URL-safe Base64(UTF-8 JSON) --- */
+function utf8ToB64Url(str){
+  const s = String(str);
+  if (typeof Buffer !== 'undefined' && Buffer && typeof Buffer.from === 'function'){
+    return Buffer.from(s, 'utf8').toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  const bytes = new TextEncoder().encode(s);
+  let bin = '';
+  for (let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64UrlToUtf8(code){
+  const s = String(code || '').replace(/-/g, '+').replace(/_/g, '/');
+  if (!s) return '';
+  if (typeof Buffer !== 'undefined' && Buffer && typeof Buffer.from === 'function'){
+    return Buffer.from(s, 'base64').toString('utf8');
+  }
+  const bin = atob(s);
+  const bytes = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function challengeRecord(o){
+  return {
+    nick: normalizeNick(o && o.nick) || '무명질주자',
+    car: carById(o && o.car).id,
+    km: Math.round(clamp(Number(o && o.km) || 0, 0, 99999) * 10) / 10,
+    score: Math.max(0, Math.round(Number(o && o.score) || 0)),
+    spot: String((o && o.spot) || '').slice(0, 48),
+    ts: Number(o && o.ts) || 0
+  };
+}
+function encodeChallenge(o){
+  const c = challengeRecord(o);
+  const payload = { v:1, n:c.nick, c:c.car, k:c.km, s:c.score, p:c.spot };
+  if (c.ts) payload.t = c.ts;
+  return utf8ToB64Url(JSON.stringify(payload));
+}
+function decodeChallenge(code){
+  if (!code) return null;
+  let o = null;
+  try { o = JSON.parse(b64UrlToUtf8(code)); } catch(e){ return null; }
+  if (!o || typeof o !== 'object') return null;
+  const nick = normalizeNick(o.n !== undefined ? o.n : o.nick);
+  if (!nick) return null;
+  const km = Number(o.k !== undefined ? o.k : o.km);
+  if (!isFinite(km) || km <= 0) return null;
+  const c = challengeRecord({ nick: nick, car: o.c || o.car, km: km, score: o.s || o.score, spot: o.p || o.spot, ts: o.t || o.ts });
+  c.spot = c.spot || describeStop(c.km, 'car');
+  return c;
+}
+function challengeUrl(base, o){
+  const b = String(base || '').split('#')[0].split('?')[0];
+  return b + '?' + CHALLENGE_PARAM + '=' + encodeChallenge(o);
+}
+function parseChallengeFromSearch(search){
+  const s = String(search || '');
+  const m = s.match(new RegExp('[?&](?:' + CHALLENGE_PARAM + '|r)=([^&]+)'));
+  if (!m) return null;
+  let raw = m[1];
+  try { raw = decodeURIComponent(raw); } catch(e){}
+  return decodeChallenge(raw);
+}
+
+/* --- 순위표 --- */
+function buildLeaderboard(profile, records, rivals){
+  const p = profile || blankProfile();
+  const r = records || blankRecords();
+  const rows = [];
+  const list = rivals || [];
+  for (let i=0;i<list.length;i++){
+    const s = sanitizeRival(list[i]);
+    if (!s) continue;
+    rows.push({ nick:s.nick, car:s.car, km:s.km, score:s.score, spot:s.spot, me:false, d:s.d });
+  }
+  const mine = normalizeNick(p.nick) || '나';
+  const myKm = Math.max(0, Number(r.bestKm) || 0);
+  let myRow = null;
+  if (myKm > 0 || r.runs > 0){
+    myRow = {
+      nick: mine, car: carById(p.car).id,
+      km: Math.round(myKm * 10) / 10,
+      score: Math.max(0, Math.round(Number(r.bestScore) || 0)),
+      spot: r.bestSpot || '', me: true, d:false
+    };
+    rows.push(myRow);
+  }
+  rows.sort(function(a, b){
+    if (b.km !== a.km) return b.km - a.km;
+    if (b.score !== a.score) return b.score - a.score;
+    return a.nick < b.nick ? -1 : (a.nick > b.nick ? 1 : 0);
+  });
+  for (let i=0;i<rows.length;i++) rows[i].rank = i + 1;
+  return { rows: rows, mine: myRow, total: rows.length };
+}
+function entryForRun(sim){
+  return {
+    nick: normalizeNick(sim.nick) || '나',
+    car: carById(sim.car).id,
+    km: Math.round(sim.dist * 10) / 10,
+    score: finalScore(sim),
+    spot: sim.stopSpot || describeStop(sim.dist, sim.crashCause),
+    me: true
+  };
+}
+function rankOfRun(sim, rivals){
+  const list = rivals || sim.rivals || [];
+  let ahead = 0;
+  for (let i=0;i<list.length;i++) if (list[i].km > sim.dist + 0.05) ahead++;
+  return { rank: ahead + 1, total: list.length + 1, ahead: ahead };
+}
+function nextTarget(sim){
+  const list = sim.rivals || [];
+  let best = null;
+  for (let i=0;i<list.length;i++){
+    const r = list[i];
+    if (r.passed || r.km <= sim.dist) continue;
+    if (!best || r.km < best.km) best = r;
+  }
+  return best;
+}
+/* 라이벌이 멈춘 지점의 화면 y (지금 내 위치 기준) */
+function markerY(sim, rival){
+  return playerY(sim) - (rival.km - sim.dist) * UNITS_PER_KM;
+}
+function makeGhosts(rivals){
+  const out = [];
+  const list = rivals || [];
+  for (let i=0;i<list.length;i++){
+    const r = list[i];
+    const gap = 0.90 + i * 0.40;
+    out.push({
+      nick: r.nick, car: carById(r.car).id,
+      stopKm: r.km, km: Math.min(r.km, gap), targetGap: gap,
+      baseLane: (i * 3 + 1) % LANES, lanePos: (i * 3 + 1) % LANES,
+      pace: 0.93 + (i % 3) * 0.035, sway: i * 1.7, t: 0,
+      stopped: false, shown: true
+    });
+  }
+  return out;
+}
+
+/* --- 거친 도로 노면 표시용 --- */
+function legProgressPct(dist){
+  return clamp(((dist - Math.floor(dist / LEG_KM) * LEG_KM) / LEG_KM) * 100, 0, 100);
 }
 
 /* =========================================================
@@ -555,12 +987,26 @@ function newGame(opts){
   const seed = (opts.seed === undefined || opts.seed === null)
     ? ((Date.now() ^ 0x9e3779b9) >>> 0) : (opts.seed >>> 0);
   const rec = opts.records || loadRecords(opts.store);
+  const prof = opts.profile || loadProfile(opts.store);
+  const rivalList = opts.rivals || loadRivals(opts.store);
+  const rivals = [];
+  for (let i=0;i<rivalList.length;i++){
+    const r = sanitizeRival(rivalList[i]);
+    if (r) rivals.push({ nick:r.nick, car:r.car, km:r.km, score:r.score, spot:r.spot, d:r.d, passed:false });
+  }
   const sim = {
     state: 'title',
     mode: 'endless',
     seed: seed,
     rng: mulberry32(seed),
     rec: rec,
+
+    nick: normalizeNick(opts.nick !== undefined ? opts.nick : prof.nick),
+    car: carById(opts.car !== undefined ? opts.car : prof.car).id,
+    rivals: rivals,
+    ghosts: makeGhosts(rivals),
+    skids: [], passing: null, lastRank: rivals.length + 1,
+    braking: false, stopSpot: '',
 
     worldH: opts.worldH || 1422,
     lanePos: 4, targetLane: 4, laneVel: 0,
@@ -916,6 +1362,7 @@ function endRun(sim, cause, info){
   sim.crashT = 0;
   sim.shake = 1;
   sim.crashCause = cause;
+  sim.stopSpot = describeStop(sim.dist, cause);
   sim.score = finalScore(sim);
   sim.endInfo = info || pickEnding(sim, cause);
   sim.endStats = compareRecord(sim);
@@ -1034,6 +1481,7 @@ function update(sim, dt){
   }
 
   /* --- speed --- */
+  const speedBefore = sim.speed;
   sim.rush = Math.max(0, sim.rush - dt);
   const cap = sim.maxSpeed * (1 + 0.12 * Math.min(1, sim.rush / 1.5));
   if (goal > cap) goal = cap;
@@ -1042,10 +1490,60 @@ function update(sim, dt){
   else sim.speed = Math.max(goal, sim.speed - rate * dt);
   sim.speed = clamp(sim.speed, 30, cap * 1.02);
   if (sim.speed > sim.topSpeed) sim.topSpeed = sim.speed;
+  sim.braking = (speedBefore - sim.speed > 1.2) || (!!blocker && blocker.speed < sim.speed * 0.9);
 
   /* --- distance / scroll --- */
   sim.scroll = (sim.scroll || 0) + sim.speed * SPD_SCALE * dt;
   sim.dist += (sim.speed / KM_DIV) * dt;
+
+  /* --- 라이벌 고스트 주행 (앞서 달리는 친구) --- */
+  const ghosts = sim.ghosts || [];
+  for (let i=0;i<ghosts.length;i++){
+    const g = ghosts[i];
+    g.t += dt;
+    if (g.km < g.stopKm - 0.005){
+      const gap = g.km - sim.dist;
+      const err = gap - g.targetGap;          // +면 내 앞에서 너무 멀리 달림
+      let f = 1 - clamp(err * 0.55, -0.28, 0.30);
+      if (gap < 0.26) f = 1.24;
+      const spd = sim.speed * f;
+      g.km = Math.min(g.stopKm, Math.max(sim.dist + 0.2, g.km + (spd / KM_DIV) * dt));
+      if (g.km >= g.stopKm - 0.0005){ g.km = g.stopKm; g.stopped = true; }
+    } else if (!g.stopped){
+      g.stopped = true;
+      g.km = g.stopKm;
+    }
+    const tl = clamp(g.baseLane + Math.round(Math.sin(g.t * 0.62 + g.sway) * 1.4), 0, LANES - 1);
+    g.lanePos += (tl - g.lanePos) * (1 - Math.exp(-dt * 4.5));
+  }
+
+  /* --- 라이벌 추월 판정 --- */
+  for (let i=0;i<sim.rivals.length;i++){
+    const r = sim.rivals[i];
+    if (!r.passed && sim.dist >= r.km){
+      r.passed = true;
+      let ahead = 0;
+      for (let j=0;j<sim.rivals.length;j++){
+        if (!sim.rivals[j].passed && sim.rivals[j].km > sim.dist) ahead++;
+      }
+      sim.lastRank = ahead + 1;
+      ev.push({ type:'overtake', rival:r, rank: ahead + 1, total: sim.rivals.length + 1 });
+    }
+  }
+
+  /* --- 스키드마크 흔적 --- */
+  const disp = sim.speed * SPD_SCALE * dt;
+  for (let i=sim.skids.length-1;i>=0;i--){
+    const s = sim.skids[i];
+    s.y += disp;
+    s.life -= dt;
+    if (s.life <= 0 || s.y > sim.worldH + 80) sim.skids.splice(i,1);
+  }
+  if (Math.abs(sim.laneVel) > 0.5 && sim.speed > 120 && sim.skids.length < 72){
+    const sy = py + PLAYER.h/2 - 8;
+    sim.skids.push({ x: px - PLAYER.w*0.34, y: sy, life: 1.5, max: 1.5 });
+    sim.skids.push({ x: px + PLAYER.w*0.34, y: sy, life: 1.5, max: 1.5 });
+  }
 
   /* --- 콤보 유지 시간 --- */
   if (sim.comboT > 0){
@@ -1526,44 +2024,322 @@ function drawBeam(ctx, sim){
   ctx.restore();
 }
 
+/* =========================================================
+   차량 그래픽 (차종별 디테일)
+   ========================================================= */
+function drawVehicle(ctx, o){
+  const c = (typeof o.car === 'string') ? carById(o.car) : (o.car || CARS[0]);
+  const w = o.w || PLAYER.w, h = o.h || PLAYER.h, t = o.t || 0;
+  const kind = c.id;
+  const boost = clamp(o.boost || 0, 0, 1);
+  const brake = !!o.brake;
+
+  ctx.fillStyle = 'rgba(0,0,0,0.34)';
+  rr(ctx, -w/2 + 3, -h/2 + 8, w, h, w*0.24); ctx.fill();
+
+  /* ---------------- 경운기 ---------------- */
+  if (kind === 'tractor'){
+    ctx.fillStyle = '#171a1f';
+    rr(ctx, -w*0.68, h*0.02, w*0.26, h*0.34, w*0.12); ctx.fill();
+    rr(ctx, w*0.42, h*0.02, w*0.26, h*0.34, w*0.12); ctx.fill();
+    ctx.fillStyle = '#3b414a';
+    rr(ctx, -w*0.62, h*0.07, w*0.14, h*0.24, w*0.06); ctx.fill();
+    rr(ctx, w*0.48, h*0.07, w*0.14, h*0.24, w*0.06); ctx.fill();
+    ctx.fillStyle = '#21252b';
+    rr(ctx, -w*0.44, -h*0.40, w*0.14, h*0.12, 3); ctx.fill();
+    rr(ctx, w*0.30, -h*0.40, w*0.14, h*0.12, 3); ctx.fill();
+
+    const g = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+    g.addColorStop(0, '#24601f'); g.addColorStop(0.45, '#6acb59'); g.addColorStop(1, '#24601f');
+    ctx.fillStyle = g;
+    rr(ctx, -w*0.34, -h*0.46, w*0.68, h*0.80, w*0.16); ctx.fill();
+
+    ctx.fillStyle = '#efe6c8';
+    rr(ctx, -w*0.25, -h*0.45, w*0.50, h*0.15, 3); ctx.fill();
+    ctx.fillStyle = '#4c525c';
+    rr(ctx, -w*0.18, -h*0.41, w*0.36, h*0.07, 2); ctx.fill();
+
+    ctx.fillStyle = '#9aa1ab';
+    ctx.fillRect(-w*0.30, -h*0.44, w*0.06, h*0.18);
+
+    ctx.fillStyle = '#23282f';
+    rr(ctx, -w*0.20, h*0.16, w*0.40, h*0.16, 4); ctx.fill();
+    ctx.strokeStyle = '#d9d3bd'; ctx.lineWidth = Math.max(2, w*0.05);
+    ctx.beginPath(); ctx.arc(0, h*0.08, w*0.16, Math.PI*0.15, Math.PI*0.85); ctx.stroke();
+
+    ctx.fillStyle = '#d9b45a';
+    rr(ctx, -w*0.26, h*0.36, w*0.52, h*0.10, 3); ctx.fill();
+    ctx.strokeStyle = 'rgba(120,86,20,0.7)'; ctx.lineWidth = 1.5;
+    for (let i=1;i<4;i++){
+      const xx = -w*0.26 + i * (w*0.52)/4;
+      ctx.beginPath(); ctx.moveTo(xx, h*0.36); ctx.lineTo(xx, h*0.46); ctx.stroke();
+    }
+
+    if (o.smoke !== false){
+      ctx.save();
+      for (let i=0;i<3;i++){
+        const ph = (t * 0.9 + i * 0.33) % 1;
+        ctx.fillStyle = 'rgba(214,218,224,' + (0.30 * (1 - ph)) + ')';
+        ctx.beginPath();
+        ctx.arc(-w*0.27 + Math.sin(t*2 + i) * 4, -h*0.46 - ph * h*0.55, w*0.09 + ph * w*0.16, 0, 7);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    ctx.fillStyle = 'rgba(255,246,205,0.95)';
+    ctx.fillRect(-w*0.30, -h*0.47, w*0.16, 4);
+    ctx.fillRect(w*0.14, -h*0.47, w*0.16, 4);
+    ctx.fillStyle = brake ? '#ff2a2a' : '#c8202a';
+    ctx.fillRect(-w*0.30, h*0.45, w*0.16, 5);
+    ctx.fillRect(w*0.14, h*0.45, w*0.16, 5);
+    return;
+  }
+
+  /* ---------------- 1톤 포터 ---------------- */
+  if (kind === 'porter'){
+    const bg = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+    bg.addColorStop(0, '#bcc6d4'); bg.addColorStop(0.5, '#f2f5fa'); bg.addColorStop(1, '#bcc6d4');
+    ctx.fillStyle = bg;
+    rr(ctx, -w*0.50, -h*0.14, w*0.99, h*0.62, 4); ctx.fill();
+    ctx.strokeStyle = 'rgba(90,104,124,0.45)'; ctx.lineWidth = 2;
+    for (let i=1;i<6;i++){
+      const yy = -h*0.14 + i * (h*0.62)/6;
+      ctx.beginPath(); ctx.moveTo(-w*0.46, yy); ctx.lineTo(w*0.46, yy); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(60,74,96,0.32)';
+    rr(ctx, -w*0.44, -h*0.10, w*0.87, h*0.05, 2); ctx.fill();
+
+    const cg = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+    cg.addColorStop(0, '#1a4bab'); cg.addColorStop(0.42, '#3b8bff'); cg.addColorStop(1, '#1a4bab');
+    ctx.fillStyle = cg;
+    rr(ctx, -w*0.46, -h*0.50, w*0.92, h*0.40, w*0.14); ctx.fill();
+    ctx.fillStyle = 'rgba(12,24,44,0.92)';
+    rr(ctx, -w*0.34, -h*0.46, w*0.68, h*0.13, 4); ctx.fill();
+
+    ctx.fillStyle = '#2b5fb8';
+    ctx.fillRect(-w*0.58, -h*0.40, w*0.12, h*0.05);
+    ctx.fillRect(w*0.46, -h*0.40, w*0.12, h*0.05);
+
+    ctx.fillStyle = 'rgba(20,24,30,0.85)';
+    ctx.fillRect(-w*0.54, -h*0.22, w*0.06, h*0.12);
+    ctx.fillRect(w*0.48, -h*0.22, w*0.06, h*0.12);
+    ctx.fillRect(-w*0.54, h*0.30, w*0.06, h*0.12);
+    ctx.fillRect(w*0.48, h*0.30, w*0.06, h*0.12);
+
+    ctx.fillStyle = 'rgba(255,250,225,0.95)';
+    ctx.fillRect(-w*0.42, -h*0.50, w*0.18, 5);
+    ctx.fillRect(w*0.24, -h*0.50, w*0.18, 5);
+    ctx.fillStyle = brake ? '#ff2a2a' : '#cf2233';
+    ctx.fillRect(-w*0.46, h*0.44, w*0.16, 6);
+    ctx.fillRect(w*0.30, h*0.44, w*0.16, 6);
+    return;
+  }
+
+  /* ---------------- 경찰차 ---------------- */
+  if (kind === 'police'){
+    const bg = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+    bg.addColorStop(0, '#c9d2e0'); bg.addColorStop(0.42, '#ffffff'); bg.addColorStop(1, '#c9d2e0');
+    ctx.fillStyle = bg;
+    rr(ctx, -w*0.48, -h*0.50, w*0.96, h, w*0.20); ctx.fill();
+
+    ctx.fillStyle = '#1f4bd8';
+    ctx.fillRect(-w*0.48, -h*0.19, w*0.96, h*0.12);
+    ctx.fillRect(-w*0.48, h*0.30, w*0.96, h*0.08);
+
+    ctx.fillStyle = 'rgba(12,22,40,0.92)';
+    rr(ctx, -w*0.34, -h*0.35, w*0.68, h*0.14, 4); ctx.fill();
+    rr(ctx, -w*0.32, h*0.12, w*0.64, h*0.11, 4); ctx.fill();
+
+    ctx.fillStyle = '#1f4bd8';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 ' + Math.max(7, Math.round(w*0.15)) + 'px system-ui,sans-serif';
+    ctx.fillText('POLICE', 0, -h*0.42);
+
+    /* 경광등 (빨강/파랑 교대 점멸) */
+    ctx.fillStyle = '#232a35';
+    rr(ctx, -w*0.40, -h*0.10, w*0.80, h*0.10, 4); ctx.fill();
+    const ph = (t * 3.0) % 1;
+    const redOn = ph < 0.5;
+    ctx.fillStyle = redOn ? '#ff3344' : '#5d1018';
+    rr(ctx, -w*0.37, -h*0.085, w*0.35, h*0.075, 3); ctx.fill();
+    ctx.fillStyle = redOn ? '#101f66' : '#4b74ff';
+    rr(ctx, w*0.02, -h*0.085, w*0.35, h*0.075, 3); ctx.fill();
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const gx = redOn ? -w*0.195 : w*0.195;
+    const lg = ctx.createRadialGradient(gx, -h*0.05, 1, gx, -h*0.05, w*0.85);
+    const col = redOn ? '255,60,70' : '90,130,255';
+    const pulse = 0.30 + 0.26 * Math.abs(Math.sin(t * 9));
+    lg.addColorStop(0, 'rgba(' + col + ',' + pulse + ')');
+    lg.addColorStop(1, 'rgba(' + col + ',0)');
+    ctx.fillStyle = lg;
+    ctx.beginPath(); ctx.arc(gx, -h*0.05, w*0.85, 0, 7); ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle = 'rgba(255,250,225,0.95)';
+    ctx.fillRect(-w*0.42, -h*0.50, w*0.18, 5);
+    ctx.fillRect(w*0.24, -h*0.50, w*0.18, 5);
+    ctx.fillStyle = brake ? '#ff2a2a' : '#d01f2b';
+    ctx.fillRect(-w*0.46, h*0.45, w*0.18, 6);
+    ctx.fillRect(w*0.28, h*0.45, w*0.18, 6);
+    return;
+  }
+
+  /* ---------------- 택시 ---------------- */
+  if (kind === 'taxi'){
+    const g = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+    g.addColorStop(0, '#b58900'); g.addColorStop(0.40, '#ffd93b'); g.addColorStop(0.70, '#f5c400'); g.addColorStop(1, '#a87d00');
+    ctx.fillStyle = g;
+    rr(ctx, -w*0.48, -h*0.50, w*0.96, h, w*0.20); ctx.fill();
+
+    /* 체커 스트라이프 (택시 감성) */
+    const cw = Math.max(3, w*0.075);
+    for (let i=0;i<2;i++){
+      const x0 = i === 0 ? -w*0.48 : w*0.48 - cw;
+      for (let j=0;j<7;j++){
+        ctx.fillStyle = (j % 2 === 0) ? 'rgba(20,20,24,0.85)' : 'rgba(255,255,255,0.85)';
+        ctx.fillRect(x0, -h*0.22 + j*cw, cw, cw);
+      }
+    }
+
+    /* 창문 */
+    ctx.fillStyle = 'rgba(10,18,32,0.92)';
+    rr(ctx, -w*0.35, -h*0.36, w*0.70, h*0.15, 5); ctx.fill();
+    rr(ctx, -w*0.33, h*0.13, w*0.66, h*0.11, 4); ctx.fill();
+
+    /* 루프 갓등 '빈차' */
+    ctx.fillStyle = 'rgba(255,255,255,0.97)';
+    rr(ctx, -w*0.24, -h*0.13, w*0.48, h*0.16, 4); ctx.fill();
+    ctx.strokeStyle = 'rgba(220,120,0,0.9)'; ctx.lineWidth = 1.5;
+    rr(ctx, -w*0.24, -h*0.13, w*0.48, h*0.16, 4); ctx.stroke();
+    ctx.fillStyle = '#e06b00';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 ' + Math.max(7, Math.round(w*0.17)) + 'px system-ui,sans-serif';
+    ctx.fillText('빈차', 0, -h*0.048);
+
+    ctx.fillStyle = '#c79a00';
+    ctx.fillRect(-w*0.58, -h*0.30, w*0.12, h*0.05);
+    ctx.fillRect(w*0.46, -h*0.30, w*0.12, h*0.05);
+
+    /* 사이드 'TAXI' */
+    ctx.fillStyle = 'rgba(30,30,36,0.75)';
+    ctx.font = '900 ' + Math.max(6, Math.round(w*0.12)) + 'px system-ui,sans-serif';
+    ctx.fillText('TAXI', 0, h*0.30);
+
+    ctx.fillStyle = 'rgba(255,250,225,0.98)';
+    rr(ctx, -w*0.44, -h*0.50, w*0.20, h*0.045, 2); ctx.fill();
+    rr(ctx, w*0.24, -h*0.50, w*0.20, h*0.045, 2); ctx.fill();
+    ctx.fillStyle = brake ? '#ff2a2a' : '#d41f2e';
+    rr(ctx, -w*0.47, h*0.45, w*0.20, h*0.05, 2); ctx.fill();
+    rr(ctx, w*0.27, h*0.45, w*0.20, h*0.05, 2); ctx.fill();
+    return;
+  }
+
+  /* ---------------- 빨간 스포츠카 (기본) ---------------- */
+  const g = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+  g.addColorStop(0, '#8c0b16'); g.addColorStop(0.40, '#ff4a52'); g.addColorStop(0.72, '#e11f2e'); g.addColorStop(1, '#8c0b16');
+  ctx.fillStyle = g;
+  rr(ctx, -w*0.48, -h*0.50, w*0.96, h, w*0.22); ctx.fill();
+
+  /* 노즈 테이퍼 */
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  ctx.beginPath();
+  ctx.moveTo(-w*0.30, -h*0.50 + 2);
+  ctx.lineTo(w*0.30, -h*0.50 + 2);
+  ctx.lineTo(w*0.20, -h*0.26);
+  ctx.lineTo(-w*0.20, -h*0.26);
+  ctx.closePath(); ctx.fill();
+
+  /* 레이싱 스트라이프 */
+  ctx.fillStyle = 'rgba(255,255,255,0.92)';
+  ctx.fillRect(-w*0.15, -h*0.50 + 5, w*0.09, h*0.80);
+  ctx.fillRect(w*0.06, -h*0.50 + 5, w*0.09, h*0.80);
+
+  /* 창문 */
+  ctx.fillStyle = 'rgba(10,18,32,0.92)';
+  rr(ctx, -w*0.35, -h*0.32, w*0.70, h*0.16, 5); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.14)';
+  rr(ctx, -w*0.30, -h*0.08, w*0.60, h*0.24, 5); ctx.fill();
+  ctx.fillStyle = 'rgba(10,18,32,0.86)';
+  rr(ctx, -w*0.29, h*0.16, w*0.58, h*0.11, 4); ctx.fill();
+
+  /* 리어 스포일러 */
+  ctx.fillStyle = '#20242c';
+  rr(ctx, -w*0.47, h*0.26, w*0.94, h*0.045, 2); ctx.fill();
+  ctx.fillStyle = '#2b3039';
+  ctx.fillRect(-w*0.34, h*0.22, w*0.05, h*0.05);
+  ctx.fillRect(w*0.29, h*0.22, w*0.05, h*0.05);
+
+  /* 사이드미러 */
+  ctx.fillStyle = '#c81724';
+  ctx.fillRect(-w*0.58, -h*0.28, w*0.12, h*0.045);
+  ctx.fillRect(w*0.46, -h*0.28, w*0.12, h*0.045);
+
+  /* 등화 */
+  ctx.fillStyle = 'rgba(255,252,228,0.98)';
+  rr(ctx, -w*0.42, -h*0.50 + 3, w*0.26, h*0.045, 2); ctx.fill();
+  rr(ctx, w*0.16, -h*0.50 + 3, w*0.26, h*0.045, 2); ctx.fill();
+  ctx.fillStyle = brake ? '#ff2222' : '#d81b26';
+  rr(ctx, -w*0.46, h*0.46, w*0.28, h*0.05, 2); ctx.fill();
+  rr(ctx, w*0.18, h*0.46, w*0.28, h*0.05, 2); ctx.fill();
+  if (brake){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const tg = ctx.createRadialGradient(0, h*0.5, 2, 0, h*0.5, w*0.95);
+    tg.addColorStop(0, 'rgba(255,50,40,0.36)');
+    tg.addColorStop(1, 'rgba(255,50,40,0)');
+    ctx.fillStyle = tg;
+    ctx.beginPath(); ctx.arc(0, h*0.5, w*0.95, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+
+  /* 듀얼 배기 불꽃 */
+  if (boost > 0.04){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i=0;i<2;i++){
+      const sx = (i === 0 ? -1 : 1) * w*0.24;
+      const fl = (0.62 + 0.38 * Math.sin(t * 42 + i * 2.1)) * boost;
+      const fg = ctx.createLinearGradient(0, h/2, 0, h/2 + 90 * fl);
+      fg.addColorStop(0, 'rgba(255,246,190,' + (0.9 * boost) + ')');
+      fg.addColorStop(0.35, 'rgba(255,150,60,' + (0.62 * boost) + ')');
+      fg.addColorStop(1, 'rgba(255,60,20,0)');
+      ctx.fillStyle = fg;
+      ctx.beginPath();
+      ctx.moveTo(sx - w*0.10, h/2 - 3);
+      ctx.lineTo(sx + w*0.10, h/2 - 3);
+      ctx.lineTo(sx, h/2 + 90 * fl);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+  ctx.fillStyle = '#111418';
+  ctx.fillRect(-w*0.30, h/2 - 4, w*0.12, 5);
+  ctx.fillRect(w*0.18, h/2 - 4, w*0.12, 5);
+}
+
+/* ---------- 내 차 ---------- */
 function drawPlayer(ctx, sim, now){
   const x = playerX(sim), y = playerY(sim);
   const tilt = clamp(-(sim.laneVel || 0) * 0.16, -0.34, 0.34);
+  const car = carById(sim.car);
 
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(tilt);
   const w = PLAYER.w, h = PLAYER.h;
 
-  /* 칼치기 부스트 화염 */
-  if (sim.rush > 0.05 && sim.state === 'playing'){
-    const f = Math.min(1, sim.rush);
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    const fg = ctx.createLinearGradient(0, h/2, 0, h/2 + 130 * f);
-    fg.addColorStop(0, 'rgba(255,220,120,' + (0.55 * f) + ')');
-    fg.addColorStop(0.4, 'rgba(255,140,60,' + (0.32 * f) + ')');
-    fg.addColorStop(1, 'rgba(255,80,40,0)');
-    ctx.fillStyle = fg;
-    ctx.beginPath();
-    ctx.moveTo(-w*0.34, h/2 - 6);
-    ctx.lineTo(w*0.34, h/2 - 6);
-    ctx.lineTo(w*0.12, h/2 + 130 * f);
-    ctx.lineTo(-w*0.12, h/2 + 130 * f);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-
+  /* 차체 아래 네온 */
   const gl = ctx.createRadialGradient(0, 12, 4, 0, 12, w * 1.05);
   gl.addColorStop(0, 'rgba(120,200,255,0.20)');
   gl.addColorStop(1, 'rgba(120,200,255,0)');
   ctx.fillStyle = gl;
   ctx.beginPath(); ctx.arc(0, 12, w * 1.05, 0, 7); ctx.fill();
 
-  ctx.fillStyle = 'rgba(0,0,0,0.38)';
-  rr(ctx, -w/2 + 3, -h/2 + 8, w, h, w*0.22); ctx.fill();
-
+  /* 전조등 번짐 */
   const hg = ctx.createLinearGradient(0, -h/2, 0, -h/2 - 150);
   hg.addColorStop(0, 'rgba(255,248,220,0.16)');
   hg.addColorStop(1, 'rgba(255,248,220,0)');
@@ -1576,37 +2352,17 @@ function drawPlayer(ctx, sim, now){
   ctx.closePath();
   ctx.fill();
 
-  const g = ctx.createLinearGradient(-w/2, 0, w/2, 0);
-  g.addColorStop(0, '#a3121f');
-  g.addColorStop(0.45, '#ff3b47');
-  g.addColorStop(1, '#a3121f');
-  ctx.fillStyle = g;
-  rr(ctx, -w/2, -h/2, w, h, w*0.2); ctx.fill();
+  drawVehicle(ctx, {
+    car: car, w: w, h: h, t: now,
+    boost: sim.state === 'playing' ? Math.min(1, sim.rush) : 0,
+    brake: !!sim.braking,
+    smoke: car.id === 'tractor'
+  });
 
-  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-  ctx.lineWidth = 1.6;
-  rr(ctx, -w/2 + 1, -h/2 + 1, w - 2, h - 2, w*0.2); ctx.stroke();
-
-  ctx.fillStyle = 'rgba(12,22,38,0.92)';
-  rr(ctx, -w/2 + 7, -h/2 + 12, w - 14, h*0.19, 5); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.92)';
-  ctx.fillRect(-7, -h*0.30, 5, h*0.50);
-  ctx.fillRect(2, -h*0.30, 5, h*0.50);
-  ctx.fillStyle = 'rgba(255,255,255,0.28)';
-  rr(ctx, -w/2 + 9, -h*0.02, w - 18, h*0.22, 4); ctx.fill();
-  ctx.fillStyle = 'rgba(12,22,38,0.9)';
-  rr(ctx, -w/2 + 8, h*0.2, w - 16, h*0.15, 4); ctx.fill();
-  ctx.fillStyle = '#ff2b2b';
-  ctx.fillRect(-w/2 + 4, h/2 - 10, 12, 6);
-  ctx.fillRect(w/2 - 16, h/2 - 10, 12, 6);
-  ctx.fillStyle = 'rgba(255,255,255,0.8)';
-  ctx.fillRect(-w/2 + 5, h/2 - 9, 4, 4);
-  ctx.fillRect(w/2 - 9, h/2 - 9, 4, 4);
-  ctx.fillStyle = 'rgba(255,250,220,0.95)';
-  ctx.fillRect(-w/2 + 5, -h/2 + 4, 11, 5);
-  ctx.fillRect(w/2 - 16, -h/2 + 4, 11, 5);
+  /* 차종 장식: 경찰차 사이렌 반짝임은 drawVehicle 안에서 */
   ctx.restore();
 
+  /* 뒷바퀴 연기 (고속) */
   if (sim.state === 'playing' && sim.speed > 150){
     const life = (now * 3) % 1;
     ctx.fillStyle = 'rgba(220,235,255,' + (0.22 * (1 - life)) + ')';
@@ -1618,14 +2374,213 @@ function drawPlayer(ctx, sim, now){
     ctx.fill();
   }
 
+  /* 내 닉네임 */
+  if (sim.state === 'playing' && sim.nick){
+    nameTag(ctx, x, y - h/2 - 20, sim.nick, '#7dffc0', 0.72);
+  }
+
   if (sim.horn > 0){
     ctx.save();
     ctx.globalAlpha = Math.min(1, sim.horn * 2);
     ctx.fillStyle = '#ffe066';
     ctx.font = '900 26px system-ui,sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('빵빵!', x, y - h/2 - 16 - (1 - sim.horn) * 18);
+    ctx.fillText('빵빵!', x, y - h/2 - 40 - (1 - sim.horn) * 18);
     ctx.restore();
+  }
+}
+
+/* 이름표 */
+function nameTag(ctx, x, y, text, color, alpha){
+  const label = String(text || '').slice(0, NICK_MAX);
+  if (!label) return;
+  ctx.save();
+  ctx.globalAlpha = alpha === undefined ? 0.9 : alpha;
+  ctx.font = '900 20px system-ui,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const tw = ctx.measureText(label).width + 18;
+  ctx.fillStyle = 'rgba(6,10,18,0.72)';
+  rr(ctx, x - tw/2, y - 13, tw, 26, 8); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+  ctx.lineWidth = 1.5;
+  rr(ctx, x - tw/2, y - 13, tw, 26, 8); ctx.stroke();
+  ctx.fillStyle = color || '#eaf4ff';
+  ctx.fillText(label, x, y + 1);
+  ctx.restore();
+}
+
+/* ---------- 라이벌 고스트 ---------- */
+function drawGhosts(ctx, sim){
+  const list = sim.ghosts || [];
+  const py = playerY(sim);
+  for (let i=0;i<list.length;i++){
+    const g = list[i];
+    const y = py - (g.km - sim.dist) * UNITS_PER_KM;
+    if (y < -320 || y > sim.worldH + 320) continue;
+    if (sim.dist > g.stopKm + 0.10) continue;
+    const x = laneCenter(g.lanePos);
+    ctx.save();
+    ctx.globalAlpha = g.stopped ? 0.4 : 0.55;
+    ctx.translate(x, y);
+    drawVehicle(ctx, {
+      car: g.car, w: PLAYER.w, h: PLAYER.h, t: (sim.time || 0) + i,
+      boost: 0, brake: false, smoke: false
+    });
+    /* 고스트 테두리 */
+    ctx.strokeStyle = g.stopped ? 'rgba(255,120,110,0.7)' : 'rgba(140,220,255,0.65)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash && ctx.setLineDash([7, 6]);
+    rr(ctx, -PLAYER.w/2, -PLAYER.h/2, PLAYER.w, PLAYER.h, PLAYER.w*0.22);
+    ctx.stroke();
+    ctx.setLineDash && ctx.setLineDash([]);
+    ctx.restore();
+    nameTag(ctx, x, y - PLAYER.h/2 - 16,
+      carById(g.car).emoji + ' ' + g.nick, g.stopped ? '#ffb0a0' : '#bcdcff', 0.62);
+    if (g.stopped){
+      /* 멈춘 고스트 연기 */
+      for (let k=0;k<2;k++){
+        const ph = ((sim.time || 0) * 0.7 + k * 0.5) % 1;
+        ctx.fillStyle = 'rgba(200,205,212,' + (0.20 * (1 - ph)) + ')';
+        ctx.beginPath();
+        ctx.arc(x + Math.sin(ph * 6 + k) * 10, y - 20 - ph * 60, 8 + ph * 20, 0, 7);
+        ctx.fill();
+      }
+    }
+  }
+}
+
+/* ---------- 라이벌이 멈춘 지점 (잔해 + 푯말) ---------- */
+function drawRivalMarkers(ctx, sim){
+  const list = sim.rivals || [];
+  const H = sim.worldH;
+  for (let i=0;i<list.length;i++){
+    const r = list[i];
+    const y = markerY(sim, r);
+    if (y < -260 || y > H + 160) continue;
+    const fade = clamp(1 - Math.max(0, (sim.dist - r.km)) * 0.9, 0.35, 1);
+    const wx = ROAD_L + 60;
+
+    ctx.save();
+    ctx.globalAlpha = fade;
+    /* 잔해 차량 (비스듬히) */
+    ctx.translate(wx, y);
+    ctx.rotate(0.24);
+    drawVehicle(ctx, {
+      car: r.car, w: PLAYER.w * 0.92, h: PLAYER.h * 0.92,
+      t: (sim.time || 0) + i, boost: 0, brake: true, smoke: false
+    });
+    ctx.fillStyle = 'rgba(14,16,20,0.45)';
+    rr(ctx, -PLAYER.w*0.44, -PLAYER.h*0.44, PLAYER.w*0.88, PLAYER.h*0.88, PLAYER.w*0.2);
+    ctx.fill();
+    ctx.restore();
+
+    /* 연기 */
+    ctx.save();
+    ctx.globalAlpha = 0.8 * fade;
+    for (let k=0;k<3;k++){
+      const ph = ((sim.time || 0) * 0.55 + k * 0.34) % 1;
+      ctx.fillStyle = 'rgba(176,182,190,' + (0.24 * (1 - ph)) + ')';
+      ctx.beginPath();
+      ctx.arc(wx + Math.sin(ph * 5 + k) * 12, y - 10 - ph * 120, 10 + ph * 30, 0, 7);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    /* 푯말 */
+    const sw = 264, sh = 62;
+    const sx = ROAD_L + 104;
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.fillStyle = 'rgba(8,12,20,0.88)';
+    rr(ctx, sx, y - sh/2, sw, sh, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+    ctx.lineWidth = 2;
+    rr(ctx, sx, y - sh/2, sw, sh, 8); ctx.stroke();
+    ctx.fillStyle = '#ffd479';
+    ctx.font = '900 23px system-ui,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('💀 ' + r.nick + ' ' + r.km.toFixed(1) + 'km', sx + 12, y - 12);
+    ctx.fillStyle = '#cfe0f5';
+    ctx.font = '700 18px system-ui,sans-serif';
+    ctx.fillText((r.spot || '여기서') + ' · 여기서 멈춤', sx + 12, y + 14);
+    ctx.restore();
+
+    /* 지금 내가 지나가는 중이면 강조 */
+    if (sim.state === 'playing' && Math.abs(sim.dist - r.km) < 0.35){
+      ctx.save();
+      ctx.globalAlpha = 0.5 + 0.3 * Math.sin((sim.time || 0) * 12);
+      ctx.strokeStyle = '#ff8b7a';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(wx, y, 70, 0, 7); ctx.stroke();
+      ctx.restore();
+    }
+  }
+}
+
+/* ---------- 스키드마크 ---------- */
+function drawSkids(ctx, sim){
+  const list = sim.skids || [];
+  for (let i=0;i<list.length;i++){
+    const s = list[i];
+    const a = clamp(s.life / (s.max || 1.5), 0, 1) * 0.34;
+    ctx.fillStyle = 'rgba(18,18,22,' + a + ')';
+    ctx.fillRect(s.x - 4, s.y - 26, 8, 40);
+  }
+}
+
+/* ---------- 노면 화살표 ---------- */
+function drawRoadArrows(ctx, sim){
+  const per = 520;
+  const off = (sim.scroll * 1.0) % per;
+  const lanes = [1, 3, 5];
+  for (let li=0; li<lanes.length; li++){
+    const lx = laneCenter(lanes[li]);
+    for (let y = -per + off; y < sim.worldH + per; y += per){
+      ctx.fillStyle = 'rgba(255,255,255,0.16)';
+      ctx.beginPath();
+      ctx.moveTo(lx, y);
+      ctx.lineTo(lx - 16, y + 28);
+      ctx.lineTo(lx - 7, y + 28);
+      ctx.lineTo(lx - 7, y + 54);
+      ctx.lineTo(lx + 7, y + 54);
+      ctx.lineTo(lx + 7, y + 28);
+      ctx.lineTo(lx + 16, y + 28);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+}
+
+/* ---------- 갓길 이정표 ---------- */
+function drawRoadSigns(ctx, sim){
+  const per = 940;
+  const off = (sim.scroll * 1.0) % per;
+  const py = playerY(sim);
+  for (let y = -per + off; y < sim.worldH + per; y += per){
+    if (y < -160 || y > sim.worldH + 160) continue;
+    const distAt = sim.dist + (py - y) / UNITS_PER_KM;
+    const legIdx = Math.floor(distAt / LEG_KM);
+    const remain = (legIdx + 1) * LEG_KM - distAt;
+    const target = (legIdx % 2 === 0) ? '부산' : '서울';
+    const px = ROAD_R - 8;
+    /* 기둥 */
+    ctx.fillStyle = 'rgba(120,128,140,0.9)';
+    ctx.fillRect(px - 3, y - 10, 6, 120);
+    /* 판 */
+    const sw = 104, sh = 38;
+    const sx = px - 12 - sw;
+    ctx.fillStyle = 'rgba(22,112,64,0.95)';
+    rr(ctx, sx, y - 14, sw, sh, 5); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+    ctx.lineWidth = 2;
+    rr(ctx, sx, y - 14, sw, sh, 5); ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 19px system-ui,sans-serif';
+    ctx.fillText(target + ' ' + Math.max(0, Math.round(remain)) + 'km', sx + sw/2, y + 5);
   }
 }
 
@@ -1771,10 +2726,18 @@ function drawSim(ctx, sim, now){
   }
   drawGround(ctx, sim);
   drawRoad(ctx, sim);
+  drawRoadArrows(ctx, sim);
   drawScenery(ctx, sim);
+  drawRoadSigns(ctx, sim);
   drawHaze(ctx, sim);
+  drawSkids(ctx, sim);
 
   if (sim.state === 'title') drawTitleTraffic(ctx, sim, now);
+
+  if (sim.state !== 'title'){
+    drawRivalMarkers(ctx, sim);
+    drawGhosts(ctx, sim);
+  }
 
   const list = sim.obstacles.slice().sort(function(a,b){ return a.y - b.y; });
   for (let i=0;i<list.length;i++) drawCar(ctx, list[i]);
@@ -1800,6 +2763,14 @@ function drawSim(ctx, sim, now){
    ========================================================= */
 const Sfx = (function(){
   let actx = null, muted = false, engine = null, engineGain = null, master = null;
+  let carId = 'sport';
+  const CAR_AUDIO = {
+    sport:   { base:54, mult:0.150, wave:'sawtooth', filter:1.8 },
+    taxi:    { base:58, mult:0.140, wave:'sawtooth', filter:1.6 },
+    porter:  { base:38, mult:0.120, wave:'square',   filter:0.9 },
+    police:  { base:60, mult:0.160, wave:'sawtooth', filter:2.0 },
+    tractor: { base:30, mult:0.100, wave:'square',   filter:0.7 }
+  };
 
   function ensure(){
     if (actx) {
@@ -1865,11 +2836,48 @@ const Sfx = (function(){
       muted = !!m;
       if (engineGain && actx) engineGain.gain.setTargetAtTime(muted ? 0 : 0.05, actx.currentTime, 0.05);
     },
-    horn: function(){
-      tone(392, 0.14, 'square', 0.07, null, 0);
-      tone(523, 0.14, 'square', 0.06, null, 0);
-      tone(392, 0.16, 'square', 0.07, null, 0.19);
-      tone(523, 0.16, 'square', 0.06, null, 0.19);
+    /* 차종별 엔진·경적 감성 */
+    setCar: function(id){
+      carId = carById(id).id;
+      const a = CAR_AUDIO[carId] || CAR_AUDIO.sport;
+      if (engine){
+        try {
+          engine.type = a.wave;
+          if (engine._filter) engine._filter.frequency.value = 340 + a.filter * 60;
+        } catch(e){}
+      }
+    },
+    carId: function(){ return carId; },
+    horn: function(id){
+      const kind = (CAR_AUDIO[id] ? id : carId);
+      if (kind === 'police'){
+        tone(720, 0.20, 'sawtooth', 0.068, 560, 0);
+        tone(720, 0.20, 'sawtooth', 0.068, 560, 0.22);
+        tone(720, 0.20, 'sawtooth', 0.068, 560, 0.44);
+        tone(720, 0.20, 'sawtooth', 0.068, 560, 0.66);
+      } else if (kind === 'taxi'){
+        tone(494, 0.09, 'square', 0.075, null, 0);
+        tone(494, 0.10, 'square', 0.075, null, 0.13);
+      } else if (kind === 'porter'){
+        tone(196, 0.26, 'square', 0.085, null, 0);
+        tone(247, 0.26, 'square', 0.07, null, 0.02);
+      } else if (kind === 'tractor'){
+        for (let i=0;i<3;i++){
+          tone(150 + i * 12, 0.10, 'square', 0.075, 120, i * 0.13);
+          noise(0.09, 0.05, 900, 500, 'bandpass');
+        }
+      } else {
+        tone(523, 0.12, 'square', 0.07, null, 0);
+        tone(659, 0.12, 'square', 0.06, null, 0);
+        tone(523, 0.14, 'square', 0.07, null, 0.17);
+        tone(659, 0.14, 'square', 0.06, null, 0.17);
+      }
+    },
+    overtake: function(){
+      tone(880, 0.09, 'triangle', 0.075, null, 0);
+      tone(1175, 0.09, 'triangle', 0.075, null, 0.08);
+      tone(1568, 0.16, 'triangle', 0.07, null, 0.16);
+      noise(0.30, 0.07, 3200, 700, 'bandpass');
     },
     tick: function(){ tone(880, 0.05, 'triangle', 0.035, 1050, 0); },
     whoosh: function(){ noise(0.34, 0.09, 2600, 500, 'bandpass'); },
@@ -1899,12 +2907,13 @@ const Sfx = (function(){
     },
     engineStart: function(){
       const c = ensure(); if (!c || engine) return;
+      const a = CAR_AUDIO[carId] || CAR_AUDIO.sport;
       engine = c.createOscillator();
       engineGain = c.createGain();
       const flt = c.createBiquadFilter();
-      flt.type = 'lowpass'; flt.frequency.value = 420;
-      engine.type = 'sawtooth';
-      engine.frequency.value = 62;
+      flt.type = 'lowpass'; flt.frequency.value = 300 + a.filter * 65;
+      engine.type = a.wave;
+      engine.frequency.value = a.base;
       engineGain.gain.value = muted ? 0 : 0.045;
       engine.connect(flt); flt.connect(engineGain); engineGain.connect(master);
       engine.start();
@@ -1912,8 +2921,9 @@ const Sfx = (function(){
     },
     engineSet: function(speed){
       if (!engine || !actx) return;
-      engine.frequency.setTargetAtTime(50 + speed * 0.12, actx.currentTime, 0.12);
-      if (engine._filter) engine._filter.frequency.setTargetAtTime(300 + speed * 1.6, actx.currentTime, 0.12);
+      const a = CAR_AUDIO[carId] || CAR_AUDIO.sport;
+      engine.frequency.setTargetAtTime(a.base + speed * a.mult, actx.currentTime, 0.12);
+      if (engine._filter) engine._filter.frequency.setTargetAtTime(280 + speed * a.filter, actx.currentTime, 0.12);
     },
     engineStop: function(){
       if (engine){ try { engine.stop(); } catch(e){} engine = null; }
@@ -1931,6 +2941,17 @@ const API = {
   SPD_SCALE: SPD_SCALE, KM_DIV: KM_DIV, HIT: HIT, NEAR_MISS: NEAR_MISS,
   LEG_KM: LEG_KM, START_KMH: START_KMH, TOP_KMH: TOP_KMH, DAY_LEN: DAY_LEN, COMBO_WINDOW: COMBO_WINDOW,
   REC_KEY: REC_KEY, THEMES: THEMES, SKY_KEYS: SKY_KEYS, ROUTE_FWD: ROUTE_FWD, ROUTE_REV: ROUTE_REV,
+  CARS: CARS, NICK_POOL: NICK_POOL, NICK_MAX: NICK_MAX,
+  PROFILE_KEY: PROFILE_KEY, RIVALS_KEY: RIVALS_KEY, CHALLENGE_PARAM: CHALLENGE_PARAM, UNITS_PER_KM: UNITS_PER_KM,
+  carById: carById, carIndex: carIndex, randomNick: randomNick, normalizeNick: normalizeNick,
+  blankProfile: blankProfile, loadProfile: loadProfile, saveProfile: saveProfile,
+  defaultRivals: defaultRivals, loadRivals: loadRivals, saveRivals: saveRivals, sanitizeRival: sanitizeRival,
+  mergeRival: mergeRival, addRivalToList: addRivalToList, registerRival: registerRival, resetRivals: resetRivals,
+  describeStop: describeStop, encodeChallenge: encodeChallenge, decodeChallenge: decodeChallenge,
+  challengeUrl: challengeUrl, parseChallengeFromSearch: parseChallengeFromSearch, challengeRecord: challengeRecord,
+  buildLeaderboard: buildLeaderboard, entryForRun: entryForRun, rankOfRun: rankOfRun, nextTarget: nextTarget,
+  markerY: markerY, makeGhosts: makeGhosts, legProgressPct: legProgressPct,
+  drawSim: drawSim, drawVehicle: drawVehicle, drawGhosts: drawGhosts, drawRivalMarkers: drawRivalMarkers,
   laneCenter: laneCenter, playerX: playerX, playerY: playerY,
   newGame: newGame, start: start, update: update, steer: steer, setLane: setLane,
   spawnWave: spawnWave, freeInBand: freeInBand, addObstacle: addObstacle, addCone: addCone,
@@ -1995,11 +3016,31 @@ if (typeof document !== 'undefined'){
     const oSpd = document.getElementById('oSpd');
     const oCombo = document.getElementById('oCombo');
     const oBest = document.getElementById('oBest');
+    const nickInput = document.getElementById('nickInput');
+    const carPrevBtn = document.getElementById('carPrev');
+    const carNextBtn = document.getElementById('carNext');
+    const carCv = document.getElementById('carCv');
+    const carCtx = carCv ? carCv.getContext('2d') : null;
+    const carNameEl = document.getElementById('carName');
+    const carTagEl = document.getElementById('carTag');
+    const carDotsEl = document.getElementById('carDots');
+    const chBannerEl = document.getElementById('chBanner');
+    const targetLineEl = document.getElementById('targetLine');
+    const barPinsEl = document.getElementById('barPins');
+    const lbListEl = document.getElementById('lbList');
+    const lbMeEl = document.getElementById('lbMe');
+    const rivalListEl = document.getElementById('rivalList');
+    const rivalResetBtn = document.getElementById('rivalReset');
+
+    let profile = loadProfile();
+    if (nickInput) nickInput.value = profile.nick || '';
+    Sfx.setCar(profile.car);
 
     let view = { sx: 1, sy: 1 };
-    let sim = newGame({ worldH: 1422 });
+    let sim = newGame({ worldH: 1422, profile: profile });
     let overTimer = null;
     let lastComboShown = 0;
+    let challenge = null;
 
     function fmtTime(t){
       const m = Math.floor(t / 60), s = Math.floor(t % 60);
@@ -2030,6 +3071,85 @@ if (typeof document !== 'undefined'){
       toastTimer = setTimeout(function(){ toastEl.classList.remove('on'); }, 1900);
     }
 
+    /* ---------- 프로필 · 차 선택 · 미리보기 ---------- */
+    function renderCarUI(){
+      const c = carById(profile.car);
+      if (carNameEl) carNameEl.textContent = c.name;
+      if (carTagEl) carTagEl.textContent = c.tag;
+      if (carDotsEl){
+        const html = [];
+        for (let i=0;i<CARS.length;i++){
+          html.push('<i class="' + (CARS[i].id === c.id ? 'on' : '') + '" data-i="' + i + '" title="' +
+            CARS[i].name + '"></i>');
+        }
+        carDotsEl.innerHTML = html.join('');
+      }
+      if (nickInput && document.activeElement !== nickInput) nickInput.value = profile.nick || '';
+    }
+
+    function drawCarPreview(t){
+      if (!carCtx || !carCv) return;
+      const W = carCv.width, H = carCv.height;
+      carCtx.clearRect(0, 0, W, H);
+      /* 노면 */
+      const rg = carCtx.createLinearGradient(0, 0, 0, H);
+      rg.addColorStop(0, 'rgba(38,44,58,0.0)');
+      rg.addColorStop(0.5, 'rgba(46,54,70,0.55)');
+      rg.addColorStop(1, 'rgba(38,44,58,0.0)');
+      carCtx.fillStyle = rg;
+      rr(carCtx, W*0.10, 0, W*0.80, H, 18); carCtx.fill();
+      carCtx.strokeStyle = 'rgba(255,255,255,0.16)';
+      carCtx.lineWidth = 3;
+      for (let y = -20; y < H + 20; y += 46){
+        carCtx.beginPath(); carCtx.moveTo(W/2, y); carCtx.lineTo(W/2, y + 22); carCtx.stroke();
+      }
+      const c = carById(profile.car);
+      carCtx.save();
+      carCtx.translate(W/2, H*0.53);
+      const pw = c.id === 'porter' ? 56 : 54;
+      drawVehicle(carCtx, {
+        car: c, w: pw * 1.9, h: 110 * 1.9, t: t,
+        boost: (c.id === 'sport' ? 0.30 + 0.16 * Math.sin(t * 6) : 0),
+        brake: false, smoke: c.id === 'tractor'
+      });
+      carCtx.restore();
+    }
+
+    function selectCar(dir){
+      const n = CARS.length;
+      const idx = (carIndex(profile.car) + dir + n) % n;
+      profile.car = CARS[idx].id;
+      profile = saveProfile(profile) || profile;
+      renderCarUI();
+      Sfx.unlock();
+      Sfx.setCar(profile.car);
+      Sfx.horn(profile.car);
+    }
+
+    function unlockAudio(){ Sfx.unlock(); }
+
+    /* ---------- 타이틀: 라이벌 순위 미리보기 ---------- */
+    function renderRivals(){
+      if (!rivalListEl) return;
+      const lb = buildLeaderboard(profile, sim.rec || loadRecords(), loadRivals());
+      const rows = lb.rows.slice(0, 5);
+      const html = [];
+      for (let i=0;i<rows.length;i++){
+        const r = rows[i];
+        html.push('<div class="rRow' + (r.me ? ' me' : '') + '">' +
+          '<span class="rk">' + r.rank + '</span>' +
+          '<span class="em">' + carById(r.car).emoji + '</span>' +
+          '<span class="nm">' + escapeHtml(r.nick) + (r.me ? ' (나)' : '') + '</span>' +
+          '<span class="km">' + fmtKm(r.km) + 'km</span></div>');
+      }
+      if (!rows.length) html.push('<div class="rRow"><span class="nm"> 라이벌 없음</span></div>');
+      rivalListEl.innerHTML = html.join('');
+    }
+    function escapeHtml(s){
+      return String(s === undefined || s === null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function updateTitle(){
       const r = sim.rec || loadRecords();
       if (r.bestKm > 0){
@@ -2041,6 +3161,97 @@ if (typeof document !== 'undefined'){
         tBest.innerHTML = '아직 기록 없음 <span>· 첫 주행이 곧 기록</span>';
         tSub.textContent = '갈수록 빨라진다 · 갈수록 막힌다 · 스치면 끝';
       }
+      renderCarUI();
+      renderRivals();
+    }
+
+    /* ---------- 인게임: 다음 목표 · 순위 핀 ---------- */
+    function updateTargetLine(){
+      if (!targetLineEl) return;
+      const t = nextTarget(sim);
+      const rk = rankOfRun(sim, sim.rivals);
+      if (t){
+        targetLineEl.innerHTML = '다음 목표 <b>' + carById(t.car).emoji + ' ' + escapeHtml(t.nick) + '</b>까지 ' +
+          '<em>' + fmtKm(t.km - sim.dist) + 'km</em> <span class="rk">· ' + rk.rank + '위/' + rk.total + '</span>';
+      } else {
+        targetLineEl.innerHTML = '🏆 라이벌 전원 추월 <span class="rk">· ' + rk.rank + '위/' + rk.total + '</span> · 계속 달려라';
+      }
+    }
+
+    function buildPins(){
+      if (!barPinsEl) return;
+      const html = [];
+      const list = sim.rivals || [];
+      for (let i=0;i<list.length;i++){
+        const r = list[i];
+        if (!(r.km > 0 && r.km <= LEG_KM)) continue;
+        html.push('<span class="pin' + (r.passed ? ' passed' : '') + '" data-nick="' + escapeHtml(r.nick) +
+          '" style="left:' + (r.km / LEG_KM * 100).toFixed(2) + '%" title="' +
+          escapeHtml(r.nick + ' ' + fmtKm(r.km) + 'km') + '">' + carById(r.car).emoji + '</span>');
+      }
+      barPinsEl.innerHTML = html.join('');
+    }
+    function markPinPassed(nick){
+      if (!barPinsEl) return;
+      const pins = barPinsEl.querySelectorAll('.pin');
+      for (let i=0;i<pins.length;i++){
+        if (pins[i].getAttribute('data-nick') === nick) pins[i].classList.add('passed');
+      }
+    }
+
+    /* ---------- 게임오버: 전체 순위표 ---------- */
+    function renderLeaderboard(run){
+      if (!lbListEl) return;
+      const rows = [];
+      const list = run.rivals || [];
+      for (let i=0;i<list.length;i++){
+        const r = list[i];
+        rows.push({ nick: r.nick, car: r.car, km: r.km, score: r.score || 0, spot: r.spot || '', me: false });
+      }
+      rows.push({
+        nick: profile.nick || '나', car: profile.car,
+        km: Math.round(run.dist * 10) / 10, score: run.score,
+        spot: run.stopSpot || describeStop(run.dist, run.crashCause), me: true
+      });
+      rows.sort(function(a, b){
+        if (b.km !== a.km) return b.km - a.km;
+        if (b.score !== a.score) return b.score - a.score;
+        return a.nick < b.nick ? -1 : (a.nick > b.nick ? 1 : 0);
+      });
+      for (let i=0;i<rows.length;i++) rows[i].rank = i + 1;
+      let myRank = 0;
+      for (let i=0;i<rows.length;i++) if (rows[i].me) myRank = rows[i].rank;
+
+      const top = rows.slice(0, 8);
+      let meShown = false;
+      for (let i=0;i<top.length;i++) if (top[i].me) meShown = true;
+      let show = top;
+      if (!meShown){
+        for (let i=0;i<rows.length;i++) if (rows[i].me) show = top.slice(0, 7).concat([rows[i]]);
+      }
+      const html = [];
+      for (let i=0;i<show.length;i++){
+        const r = show[i];
+        html.push('<div class="lbRow' + (r.me ? ' me' : '') + '">' +
+          '<span class="rk">' + r.rank + '</span>' +
+          '<span class="em">' + carById(r.car).emoji + '</span>' +
+          '<span class="nm">' + escapeHtml(r.nick) + (r.me ? ' · 나' : '') + '</span>' +
+          '<span class="km">' + fmtKm(r.km) + 'km</span>' +
+          '<span class="sp">' + escapeHtml(r.spot || '') + '</span></div>');
+      }
+      lbListEl.innerHTML = html.join('');
+
+      let nextTxt = '';
+      let bestAhead = null;
+      for (let i=0;i<rows.length;i++){
+        if (!rows[i].me && rows[i].km > run.dist + 0.05){
+          if (!bestAhead || rows[i].km < bestAhead.km) bestAhead = rows[i];
+        }
+      }
+      if (bestAhead) nextTxt = '다음 목표 ' + escapeHtml(bestAhead.nick) + ' ' + fmtKm(bestAhead.km - run.dist) + 'km';
+      else nextTxt = '라이벌 전원 추월 🏆';
+      if (lbMeEl) lbMeEl.innerHTML = '내 순위 <em>' + myRank + '위</em> / ' + rows.length + '명 · ' + nextTxt;
+      return { rows: rows, myRank: myRank, total: rows.length, next: bestAhead };
     }
 
     function updateHUD(){
@@ -2076,6 +3287,7 @@ if (typeof document !== 'undefined'){
         comboEl.classList.remove('on');
       }
       lastComboShown = sim.combo;
+      updateTargetLine();
     }
 
     function buildTicks(){
@@ -2087,11 +3299,13 @@ if (typeof document !== 'undefined'){
         d.style.left = (L.rel / LEG_KM * 100) + '%';
         barTicks.appendChild(d);
       });
+      buildPins();
     }
 
     function banner(t1, t2){
       banner1.textContent = t1;
       banner2.textContent = t2 || '';
+      if (bannerEl.classList.toggle) bannerEl.classList.toggle('long', String(t1).length > 14);
       bannerEl.classList.remove('show');
       void bannerEl.offsetWidth;
       bannerEl.classList.add('show');
@@ -2127,9 +3341,18 @@ if (typeof document !== 'undefined'){
     /* ---------- flow ---------- */
     function beginRun(){
       if (overTimer){ clearTimeout(overTimer); overTimer = null; }
-      sim = newGame({ worldH: sim.worldH, records: sim.rec });
+      if (!normalizeNick(profile.nick)){
+        profile.nick = randomNick();
+        profile = saveProfile(profile) || profile;
+        if (nickInput) nickInput.value = profile.nick;
+      }
+      sim = newGame({ worldH: sim.worldH, records: sim.rec, profile: profile, rivals: loadRivals() });
+      sim.nick = profile.nick;
+      sim.car = carById(profile.car).id;
       start(sim);
+      Sfx.setCar(profile.car);
       buildTicks();
+      if (barDot) barDot.textContent = carById(profile.car).emoji;
       titleEl.classList.add('hidden');
       overEl.classList.add('hidden');
       recordEl.classList.remove('show');
@@ -2141,7 +3364,8 @@ if (typeof document !== 'undefined'){
       hintEl.innerHTML = '<b>←</b> 왼쪽 탭 · <b>→</b> 오른쪽 탭 · 내 차 탭 = <b>빵빵</b>';
       hintEl.classList.add('on');
       setTimeout(function(){ hintEl.classList.remove('on'); }, 3600);
-      banner('∞ 무한 하드코어 질주', '갈수록 빨라진다 · 스치면 끝');
+      const n = (sim.rivals || []).length;
+      banner('∞ 무한 하드코어 질주', '라이벌 ' + n + '명과 순위 경쟁 · 스치면 끝');
       updateHUD();
     }
 
@@ -2154,7 +3378,7 @@ if (typeof document !== 'undefined'){
       recordEl.classList.remove('show');
       overEl.classList.add('hidden');
       titleEl.classList.remove('hidden');
-      sim = newGame({ worldH: sim.worldH });
+      sim = newGame({ worldH: sim.worldH, profile: profile });
       updateTitle();
     }
 
@@ -2185,6 +3409,12 @@ if (typeof document !== 'undefined'){
           Sfx.record();
           const dir = (e.leg % 2 === 1) ? '부산 → 서울 역주행' : '서울 → 부산';
           banner('🏁 ' + legRound(e.leg - 1) + '회차 완주!', dir + ' · 경부선 무한 루프');
+        } else if (e.type === 'overtake'){
+          Sfx.overtake();
+          banner('⚡ ' + e.rival.nick + '(' + fmtKm(e.rival.km) + 'km) 추월!!',
+            '현재 ' + e.rank + '위/' + e.total + ' · ' + (e.rival.spot || ''));
+          markPinPassed(e.rival.nick);
+          pop('추월!', playerX(sim), playerY(sim) - 120, '#7dffc0', 30);
         } else if (e.type === 'record'){
           if (e.kind === 'speed') toast('⚡ 최고 속도 경신 · ' + Math.round(e.value) + 'km/h');
           else showRecord(e.kind, e.value, e.prev);
@@ -2207,7 +3437,10 @@ if (typeof document !== 'undefined'){
       comboEl.classList.remove('on');
 
       const st = e.stats || compareRecord(sim);
+      sim.score = finalScore(sim);
+      if (!sim.stopSpot) sim.stopSpot = describeStop(sim.dist, sim.crashCause);
       commitRun(sim);                        // localStorage에 최고 기록 저장
+      profile = saveProfile(profile) || profile;
 
       oTag.textContent = sim.endInfo.tag;
       oBig.textContent = e.cause === 'danger' ? '😩' : '💥';
@@ -2228,9 +3461,15 @@ if (typeof document !== 'undefined'){
         line = '최고 ' + fmtKm(st.prevKm) + 'km까지 <span>' + fmtKm(Math.max(0, st.prevKm - sim.dist)) + 'km 남았어</span>';
         if (st.newScore) line += '<br><em>점수는 신기록!</em> <span>+' + fmtNum(st.dScore) + '점</span>';
       }
+      const lb = renderLeaderboard(sim);
+      if (lb && lb.rows.length){
+        if (lb.myRank === 1) line += '<br><em>🥇 라이벌 1위!</em> <span>도전장을 뿌려라</span>';
+        else line += '<br><em>' + lb.myRank + '위</em> <span>· ' + (lb.next ? lb.next.nick + '까지 ' + fmtKm(lb.next.km - sim.dist) + 'km' : '전원 추월') + '</span>';
+      }
       oBest.innerHTML = line;
 
       retryBtn.textContent = '다시 달리기 🔁';
+      shareBtn.textContent = '도전장 링크 보내기 🔗';
       showOver(650);
     }
 
@@ -2275,7 +3514,7 @@ if (typeof document !== 'undefined'){
           if (steer(sim, 1)) Sfx.tick();
         } else {
           sim.horn = 1;
-          Sfx.horn();
+          Sfx.horn(profile.car);
         }
       }
       ptr = null;
@@ -2294,6 +3533,14 @@ if (typeof document !== 'undefined'){
     window.addEventListener('keydown', function(e){
       if (e.repeat) return;
       const k = e.key;
+      if (document.activeElement === nickInput){
+        if (k === 'Enter' || k === 'Escape'){ nickInput.blur(); e.preventDefault(); }
+        return;
+      }
+      if (sim.state === 'title'){
+        if (k === 'ArrowLeft'){ selectCar(-1); e.preventDefault(); return; }
+        if (k === 'ArrowRight'){ selectCar(1); e.preventDefault(); return; }
+      }
       if (k === 'ArrowLeft' || k === 'a' || k === 'A'){
         if (sim.state === 'playing' && steer(sim, -1)) Sfx.tick();
         e.preventDefault();
@@ -2301,7 +3548,7 @@ if (typeof document !== 'undefined'){
         if (sim.state === 'playing' && steer(sim, 1)) Sfx.tick();
         e.preventDefault();
       } else if (k === ' ' || k === 'ArrowUp' || k === 'w' || k === 'W'){
-        if (sim.state === 'playing'){ sim.horn = 1; Sfx.horn(); }
+        if (sim.state === 'playing'){ sim.horn = 1; Sfx.horn(profile.car); }
         e.preventDefault();
       } else if (k === 'r' || k === 'R'){
         beginRun();
@@ -2325,17 +3572,71 @@ if (typeof document !== 'undefined'){
     startBtn.addEventListener('click', beginRun);
     retryBtn.addEventListener('click', beginRun);
     menuBtn2.addEventListener('click', goTitle);
+    if (carPrevBtn) carPrevBtn.addEventListener('click', function(e){ e.stopPropagation(); selectCar(-1); });
+    if (carNextBtn) carNextBtn.addEventListener('click', function(e){ e.stopPropagation(); selectCar(1); });
+    if (carDotsEl) carDotsEl.addEventListener('click', function(e){
+      const t = e.target;
+      if (!t || !t.getAttribute) return;
+      const i = t.getAttribute('data-i');
+      if (i === null) return;
+      profile.car = CARS[Number(i) % CARS.length].id;
+      profile = saveProfile(profile) || profile;
+      renderCarUI();
+      Sfx.unlock(); Sfx.setCar(profile.car); Sfx.horn(profile.car);
+    });
+    if (rivalResetBtn) rivalResetBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      resetRivals();
+      renderRivals();
+      toast('라이벌을 기본 4명으로 초기화');
+      Sfx.tick();
+    });
+    if (nickInput){
+      nickInput.addEventListener('input', function(){
+        profile.nick = normalizeNick(nickInput.value);
+        profile = saveProfile(profile) || profile;
+        renderRivals();
+      });
+      nickInput.addEventListener('change', function(){
+        profile.nick = normalizeNick(nickInput.value);
+        profile = saveProfile(profile) || profile;
+      });
+      nickInput.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ nickInput.blur(); } });
+    }
     shareBtn.addEventListener('click', async function(){
-      const text = '서울→부산 무한 하드코어 · ' + fmtKm(sim.dist) + 'km · ' + fmtNum(sim.score) +
-        '점 · 최고 ' + Math.round(sim.topSpeed) + 'km/h · 칼치기 x' + sim.maxCombo + ' 🔥';
-      const url = location.href;
+      const rec = {
+        nick: normalizeNick(profile.nick) || randomNick(),
+        car: profile.car,
+        km: sim.dist,
+        score: sim.score || finalScore(sim),
+        spot: sim.stopSpot || describeStop(sim.dist, sim.crashCause),
+        ts: Date.now()
+      };
+      const url = challengeUrl(location.href, rec);
+      const cname = carById(rec.car).name;
+      const text = '🔥 나 ' + fmtKm(rec.km) + 'km에서 멈췄다 (' + cname + ' · ' + rec.spot + '). 이 기록 이길 수 있어? 서울→부산 무한 질주';
+      let done = false;
       try {
-        if (navigator.share) await navigator.share({ title: '🚗 서울→부산 무한 하드코어 질주', text: text, url: url });
-        else await navigator.clipboard.writeText(text + ' ' + url);
-        shareBtn.textContent = '복사됨!';
-        setTimeout(function(){ shareBtn.textContent = '기록 공유하기'; }, 1600);
+        if (navigator.share){
+          await navigator.share({ title: '🚗 서울→부산 도전장', text: text, url: url });
+          done = true;
+        }
       } catch(err){
-        shareBtn.textContent = '기록 공유하기';
+        if (err && err.name === 'AbortError'){ return; }
+      }
+      if (!done){
+        try {
+          await navigator.clipboard.writeText(text + '\n' + url);
+          done = true;
+        } catch(err2){}
+      }
+      if (done){
+        shareBtn.textContent = '도전장 복사됨! 🔗';
+        toast('도전장 링크가 준비됐어 · 친구에게 보내봐');
+        setTimeout(function(){ shareBtn.textContent = '도전장 링크 보내기 🔗'; }, 1900);
+      } else {
+        toast('링크 복사 실패 — 길게 눌러 복사해줘');
+        shareBtn.textContent = url.length > 120 ? '도전장 링크 생성됨' : '도전장 링크 보내기 🔗';
       }
     });
 
@@ -2353,7 +3654,10 @@ if (typeof document !== 'undefined'){
       if (dt > 0.1) dt = 0.1;
       if (dt < 0) dt = 0;
 
-      if (sim.state === 'title') sim.scroll = (sim.scroll || 0) + 210 * dt;
+      if (sim.state === 'title'){
+        sim.scroll = (sim.scroll || 0) + 210 * dt;
+        drawCarPreview(t / 1000);
+      }
       if (sim.horn > 0) sim.horn = Math.max(0, sim.horn - dt * 1.6);
 
       const ev = update(sim, dt);
@@ -2384,12 +3688,63 @@ if (typeof document !== 'undefined'){
           const ev = endRun(sim, cause || 'cone');
           if (ev.length) handleEvents(ev);
           return true;
-        }
+        },
+        setNick: function(n){
+          profile.nick = normalizeNick(n);
+          profile = saveProfile(profile) || profile;
+          if (nickInput) nickInput.value = profile.nick;
+          renderRivals();
+        },
+        setCar: function(id){
+          profile.car = carById(id).id;
+          profile = saveProfile(profile) || profile;
+          renderCarUI();
+          Sfx.setCar(profile.car);
+        },
+        profile: function(){ return profile; },
+        setDist: function(km){
+          if (sim.state !== 'playing') return false;
+          sim.dist = Math.max(0, Number(km) || 0);
+          return true;
+        },
+        nextTarget: function(){
+          const t = nextTarget(sim);
+          return t ? { nick: t.nick, km: t.km, remain: t.km - sim.dist } : null;
+        },
+        challenge: function(){ return challenge; }
       };
     } catch(e){}
 
+    /* ---------- 도전장 수신 ---------- */
+    function applyChallenge(ch){
+      if (!ch) return;
+      challenge = ch;
+      registerRival(ch);
+      const carName = carById(ch.car).name;
+      const best = (sim.rec && sim.rec.bestKm) || 0;
+      const beat = best > ch.km + 0.05;
+      if (chBannerEl){
+        chBannerEl.querySelector('b').textContent = '🔥 ' + ch.nick + '의 도전장!';
+        chBannerEl.querySelector('span').textContent =
+          fmtKm(ch.km) + 'km · ' + carName + ' · ' + (ch.spot || '') +
+          (beat ? ' — 이미 이겼다! 한 번 더?' : ' — 깰 수 있을까?');
+        chBannerEl.classList.remove('hidden');
+      }
+      renderRivals();
+      toast('🔥 ' + ch.nick + ' 기록이 라이벌에 추가됐어');
+    }
+
     layout();
     updateTitle();
+    try {
+      const incoming = parseChallengeFromSearch(location.search);
+      if (incoming){
+        applyChallenge(incoming);
+        if (history && history.replaceState){
+          history.replaceState(null, '', location.pathname + location.hash);
+        }
+      }
+    } catch(e){}
     requestAnimationFrame(loop);
     /* 앱이 닫히거나 백그라운드로 가도 도달한 최고 기록은 남긴다 */
     function savePartial(){
