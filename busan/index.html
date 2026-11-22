@@ -37,7 +37,8 @@
   @supports (height:100dvh){
     @media (min-aspect-ratio: 10/16){ #frame{width:calc(100dvh * 0.5625);height:100dvh} }
   }
-  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #carCv{display:block;position:static}
 
   /* ---------- HUD ---------- */
   #hud{
@@ -189,6 +190,7 @@
   .overlay{
     position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:flex-end;
     padding:calc(var(--u)*6) calc(var(--u)*5.4) calc(var(--u)*3.2);
+    padding-top:max(calc(var(--u)*8), calc(env(safe-area-inset-top) + var(--u)*4));
     padding-bottom:max(calc(var(--u)*4.2), calc(env(safe-area-inset-bottom) + var(--u)*1.4));
     background:linear-gradient(to bottom,rgba(6,9,18,0) 0%,rgba(6,9,18,0) 24%,rgba(6,9,18,.45) 38%,rgba(7,10,19,.96) 48%,#070b14 58%,#070b14 100%);
     transition:opacity .28s;
@@ -197,7 +199,7 @@
 
   #title{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
-    background:linear-gradient(to bottom,rgba(6,9,18,.90) 0%,rgba(7,10,19,.95) 42%,#070b14 100%)}
+    background:linear-gradient(to bottom,rgba(6,9,18,.97) 0%,rgba(7,10,19,.97) 30%,#070b14 100%)}
   #title > *{flex:0 0 auto}
   #over{overflow-y:auto;overscroll-behavior:contain}
   #over > *{flex:0 0 auto}
