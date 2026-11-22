@@ -4,16 +4,18 @@
 iframe{display:block;width:390px;height:680px;border:0;overflow:hidden}</style>
 </head><body><iframe id="f" src="./index.html" width="390" height="680" scrolling="no"></iframe>
 <script>
-/* 캡처 전용: 게임 문서의 오버레이 스크롤바를 숨긴다 (게임 동작에는 영향 없음) */
-document.getElementById('f').addEventListener('load', function(){
-  try {
-    var d = this.contentDocument; if (!d) return;
-    var s = d.createElement('style');
-    s.textContent = 'html,body{scrollbar-width:none!important;overflow:hidden!important}' +
-      'html::-webkit-scrollbar,body::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}' +
-      '*::-webkit-scrollbar{width:0!important;height:0!important}';
-    d.head.appendChild(s);
-  } catch(e){}
-});
+/* 캡처 전용: 게임 문서의 스크롤바를 숨긴다 (게임 동작에는 영향 없음) */
+function hideBars(){
+  var d = document.getElementById('f').contentDocument;
+  if (!d || !d.head) return false;
+  if (d.getElementById('_capsb')) return true;
+  var s = d.createElement('style'); s.id = '_capsb';
+  s.textContent = '*{scrollbar-width:none!important}' +
+    '*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;background:transparent!important}';
+  d.head.appendChild(s);
+  return true;
+}
+document.getElementById('f').addEventListener('load', hideBars);
+hideBars(); setTimeout(hideBars, 200); setTimeout(hideBars, 800); setTimeout(hideBars, 2000);
 </script>
 </body></html>
