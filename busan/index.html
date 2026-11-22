@@ -2145,7 +2145,22 @@ function update(sim, dt){
   const laneK = 14 * spec.lane * wxMul(sim, 'lane');
   const k = 1 - Math.exp(-dt * laneK);
   sim.lanePos += (sim.targetLane - sim.lanePos) * k;
-  if (Math.abs(sim.targetLane - sim.lanePos) < 0.004) sim.lanePos = sim.targetLane;
+  /* 비·눈길 관성: 미끄러지듯 목표 차선을 살짝 지나쳤다 돌아온다 (맑을 때는 없음) */
+  const wet = (sim.wxInten || 0) * (sim.wx === 'snow' ? 1 : 0.72);
+  const rem = sim.targetLane - sim.lanePos;
+  if (wet > 0.05 && Math.abs(rem) < 0.55){
+    /* 차선에 다가선 뒤에만 미끄러짐이 생긴다 (접근 자체는 더 무겁다) */
+    sim.laneSpd = (sim.laneSpd || 0) + (rem * 58 * spec.lane) * dt * wet;
+    sim.laneSpd = clamp(sim.laneSpd * Math.exp(-dt * 4.2), -5, 5);
+    sim.lanePos = clamp(sim.lanePos + sim.laneSpd * dt * wet, 0, LANES - 1);
+  } else if (sim.laneSpd){
+    sim.laneSpd *= Math.exp(-dt * 8);
+    if (Math.abs(sim.laneSpd) < 0.02) sim.laneSpd = 0;
+  }
+  if (Math.abs(sim.targetLane - sim.lanePos) < 0.005 && Math.abs(sim.laneSpd || 0) < 0.08){
+    sim.lanePos = sim.targetLane;
+    sim.laneSpd = 0;
+  }
   sim.laneVel = (sim.lanePos - prevLane) / Math.max(dt, 1e-6);
 
   const px = playerX(sim);
@@ -3743,16 +3758,16 @@ function drawItems(ctx, sim){
     g.addColorStop(1, 'rgba(' + rgb + ',0)');
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(0, 0, 78, 0, 7); ctx.fill();
-    ctx.fillStyle = 'rgba(' + rgb + ',' + (0.30 * pulse).toFixed(3) + ')';
+    ctx.fillStyle = 'rgba(' + rgb + ',' + (0.55 * pulse).toFixed(3) + ')';
     ctx.beginPath(); ctx.arc(0, 0, 33, 0, 7); ctx.fill();
     ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.95 * pulse).toFixed(3) + ')';
     ctx.lineWidth = 3;
     if (ctx.setLineDash) ctx.setLineDash([7, 6]);
     ctx.beginPath(); ctx.arc(0, 0, 35, 0, 7); ctx.stroke();
     if (ctx.setLineDash) ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(8,14,26,0.55)';
+    ctx.fillStyle = 'rgba(255,255,255,0.20)';
     ctx.beginPath(); ctx.arc(0, 0, 24, 0, 7); ctx.fill();
-    ctx.font = '700 30px system-ui,sans-serif';
+    ctx.font = '700 32px system-ui,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(def.emoji, 0, 1);
@@ -3783,12 +3798,13 @@ function drawChase(ctx, sim){
   drawVehicle(ctx, { car: 'police', w: PLAYER.w, h: PLAYER.h, t: (sim.time || 0), boost: 0.3, brake: false });
   ctx.restore();
   ctx.save();
-  ctx.globalAlpha = 0.9;
+  ctx.globalAlpha = 0.95;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = '900 12px system-ui,sans-serif';
-  ctx.fillStyle = warned || lunge ? '#ff6b6b' : 'rgba(190,210,240,0.75)';
-  ctx.fillText(warned || lunge ? '🚨 비켜!' : '🚨 경찰 추격', x, y - PLAYER.h/2 - 12);
+  ctx.font = '900 13px system-ui,sans-serif';
+  const ly = lunge ? y - PLAYER.h/2 - 16 : y + PLAYER.h/2 + 16;
+  ctx.fillStyle = warned || lunge ? '#ff6b6b' : 'rgba(190,210,240,0.8)';
+  ctx.fillText(warned || lunge ? '🚨 비켜!' : '🚨 경찰 추격', x, ly);
   ctx.restore();
 }
 
