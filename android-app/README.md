@@ -47,14 +47,33 @@ cp games/seoul-to-busan.html repos/elevator-fart-hold/busan/index.html
 cd repos/elevator-fart-hold/android-app
 npm install
 npm run www                              # www/index.html 생성 (+ 브릿지 확인)
-npx cap add android                      # 최초 1회 (android/ 폴더 생성)
+npx cap add android                      # 최초 1회 (android/ 폴더 생성, git에는 안 올라감)
 node scripts/inject-admob-app-id.js      # AndroidManifest 에 AdMob App ID 주입
 npx capacitor-assets generate --android  # assets/icon.png · splash.png → mipmap/스플래시
 npx cap sync android
 cd android && ./gradlew assembleDebug    # → app/build/outputs/apk/debug/app-debug.apk
 ```
 
-필요 환경: **JDK 17**, Android SDK(platform 34 / build-tools 34.0.0), Node 20.
+필요 환경: **JDK 17**, Android SDK(platform 34 / build-tools 34.0.0), Node 20,
+Capacitor 6.2.3(compileSdk 34 · minSdk 22 · targetSdk 34 · Gradle 8.2.1).
+
+### 이미 확인된 것 (2026-11-22)
+
+- `npm ci` → `npm run www` → `cap add android` → `inject-admob-app-id.js` → `capacitor-assets generate` 까지 실제로 실행해 성공 확인
+  (앱 이름 `서울→부산 무한질주`, 패키지 `com.busanrush.game`, AdMob 플러그인 1개 인식, 아이콘·스플래시 87개 생성).
+- 남은 단계는 `./gradlew assembleDebug` 뿐이며, 이 환경에는 JDK/Android SDK가 아직 없습니다.
+
+### 이 환경(샌드박스)에서만 필요한 두 가지
+
+1. **Capacitor CLI 가 `os.userInfo()` 에서 죽는 문제** — 이 컨테이너에는 uid 1000의 passwd 엔트리가 없어
+   `npx cap …` 이 `uv_os_get_passwd ENOENT` 로 즉시 죽습니다. preload 한 줄로 우회합니다:
+   ```bash
+   node -r /workspace/work/os-shim.js node_modules/@capacitor/cli/bin/capacitor add android
+   node -r /workspace/work/os-shim.js node_modules/@capacitor/assets/bin/capacitor-assets generate --android
+   ```
+   (GitHub Actions 러너나 일반 PC 에서는 필요 없습니다.)
+2. **sharp 네이티브 바이너리** — 아이콘 생성기가 sharp 를 씁니다. 없으면
+   `npm install sharp --platform=linux --arch=x64` 한 번 실행하세요.
 
 ## 자동 빌드(GitHub Actions) 상태
 
