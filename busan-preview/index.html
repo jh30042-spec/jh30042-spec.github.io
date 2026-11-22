@@ -174,7 +174,7 @@
   .overlay{
     position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:flex-end;
     padding:calc(var(--u)*6) calc(var(--u)*5.4) calc(var(--u)*3.2);
-    padding-bottom:max(calc(var(--u)*3.2), env(safe-area-inset-bottom));
+    padding-bottom:max(calc(var(--u)*4.2), calc(env(safe-area-inset-bottom) + var(--u)*1.4));
     background:linear-gradient(to bottom,rgba(6,9,18,0) 0%,rgba(6,9,18,0) 24%,rgba(6,9,18,.45) 38%,rgba(7,10,19,.96) 48%,#070b14 58%,#070b14 100%);
     transition:opacity .28s;
   }
@@ -182,6 +182,8 @@
 
   #title{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain}
   #title > *{flex:0 0 auto}
+  #over{overflow-y:auto;overscroll-behavior:contain}
+  #over > *{flex:0 0 auto}
   #title::before{content:'';display:block;flex:1 1 0;min-height:0}
   #title .tEmoji{font-size:calc(var(--u)*4.8);line-height:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,.6))}
   #title h1{
@@ -1473,9 +1475,9 @@ function drawCarLights(ctx, o, strength){
   ctx.beginPath(); ctx.arc(x - w*0.30, ry, 7 * strength, 0, 7); ctx.fill();
   ctx.beginPath(); ctx.arc(x + w*0.30, ry, 7 * strength, 0, 7); ctx.fill();
   const fy = y - h/2 + 5;
-  ctx.fillStyle = 'rgba(255,246,210,' + (0.22 * strength) + ')';
-  ctx.beginPath(); ctx.arc(x - w*0.32, fy - 6, 26 * strength, 0, 7); ctx.fill();
-  ctx.beginPath(); ctx.arc(x + w*0.32, fy - 6, 26 * strength, 0, 7); ctx.fill();
+  ctx.fillStyle = 'rgba(255,246,210,' + (0.12 * strength) + ')';
+  ctx.beginPath(); ctx.arc(x - w*0.32, fy - 10, 17 * strength, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + w*0.32, fy - 10, 17 * strength, 0, 7); ctx.fill();
   ctx.restore();
 }
 
