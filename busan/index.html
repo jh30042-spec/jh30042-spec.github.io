@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v4.7">
+<meta name="busan-build" content="v5.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -348,6 +348,25 @@
     color:#04121f;font-family:inherit;font-size:calc(var(--u)*2.4);font-weight:900;
     padding:calc(var(--u)*1.2) calc(var(--u)*1.8);cursor:pointer}
 
+  /* ---------- 실시간 서버 랭킹 상태 ---------- */
+  .srvBar{display:flex;align-items:center;gap:calc(var(--u)*1.1);
+    font-size:calc(var(--u)*2.1);font-weight:800;color:#9fb4d0;line-height:1.2;
+    padding:calc(var(--u)*.2) 0 calc(var(--u)*.9)}
+  .srvBar .dot{flex:0 0 auto;width:calc(var(--u)*1.5);height:calc(var(--u)*1.5);border-radius:50%;
+    background:#8194ad;box-shadow:0 0 calc(var(--u)*1) rgba(0,0,0,.6)}
+  .srvBar .txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .srvBar.live .dot{background:#2ee08a;box-shadow:0 0 calc(var(--u)*1.7) rgba(46,224,138,.95)}
+  .srvBar.live .txt{color:#bdf3d5}
+  .srvBar.loading .dot{background:#ffd479;animation:srvPulse .8s infinite alternate}
+  .srvBar.loading .txt{color:#ffd479}
+  .srvBar button{flex:0 0 auto;border:none;border-radius:99px;background:rgba(255,255,255,.12);
+    color:#cfe0f5;font-family:inherit;font-size:calc(var(--u)*2);font-weight:800;
+    padding:calc(var(--u)*.6) calc(var(--u)*1.3);cursor:pointer;touch-action:manipulation}
+  .srvBar button:active{transform:scale(.94)}
+  .srvBar button.busy{opacity:.45}
+  #oSrv{margin:0 0 calc(var(--u)*.2);padding:0 calc(var(--u)*.4) calc(var(--u)*.7)}
+  @keyframes srvPulse{from{opacity:.3}to{opacity:1}}
+
   /* ---------- flash ---------- */
   #flash{position:absolute;inset:0;z-index:45;pointer-events:none;background:#fff;opacity:0}
   #flash.go{animation:flashGo .42s ease-out}
@@ -424,6 +443,7 @@
     <div class="tBest" id="tBest">아직 기록 없음 <span>· 첫 주행이 곧 기록</span></div>
     <div class="tSub" id="tSub">갈수록 빨라진다 · 갈수록 막힌다 · 스치면 끝</div>
     <div class="rivals">
+      <div class="srvBar loading" id="tSrv"><span class="dot"></span><span class="txt">서버 랭킹 불러오는 중…</span><button id="tSrvBtn" aria-label="서버 랭킹 새로고침">↻</button></div>
       <div class="rHead">🏁 라이벌 순위 <button id="rivalReset">라이벌 초기화</button></div>
       <div id="rivalList"></div>
     </div>
@@ -442,6 +462,7 @@
       <div><b id="oCombo">x0</b><span>최대 콤보</span></div>
     </div>
     <div class="oBest" id="oBest"></div>
+    <div class="srvBar loading" id="oSrv"><span class="dot"></span><span class="txt">서버 랭킹 불러오는 중…</span><button id="oSrvBtn" aria-label="서버 랭킹 새로고침">↻</button></div>
     <div class="lb">
       <div class="lbHead">🏆 순위표 <span id="lbMe">내 순위 —</span></div>
       <div id="lbList"></div>
@@ -710,8 +731,9 @@ function randomNick(rng){
   const r = rng ? rng() : Math.random();
   return NICK_POOL[Math.min(NICK_POOL.length - 1, Math.floor(r * NICK_POOL.length))];
 }
-function normalizeNick(n){
-  return String(n === undefined || n === null ? '' : n).replace(/\s+/g, ' ').trim().slice(0, NICK_MAX);
+function normalizeNick(n, max){
+  const lim = (max === undefined || max === null) ? NICK_MAX : max;
+  return String(n === undefined || n === null ? '' : n).replace(/\s+/g, ' ').trim().slice(0, lim);
 }
 
 function blankProfile(){ return { nick:'', car:'sport', ts:0 }; }
@@ -762,7 +784,7 @@ function defaultRivals(){
 }
 function sanitizeRival(r){
   if (!r || typeof r !== 'object') return null;
-  const nick = normalizeNick(r.nick);
+  const nick = normalizeNick(r.nick, SERVER_NICK_MAX);
   if (!nick) return null;
   const km = Number(r.km);
   if (!isFinite(km) || km < 0) return null;
@@ -808,7 +830,7 @@ function mergeRival(list, r){
   if (!entry) return { list: src, action: 'invalid' };
   let idx = -1;
   for (let i=0;i<src.length;i++){
-    if (normalizeNick(src[i].nick).toLowerCase() === entry.nick.toLowerCase()){ idx = i; break; }
+    if (nickKey(src[i].nick) === nickKey(entry.nick)){ idx = i; break; }
   }
   if (idx < 0){ src.push(entry); return { list: src, action: 'added', entry: entry }; }
   const old = sanitizeRival(src[idx]) || entry;
@@ -894,6 +916,282 @@ function parseChallengeFromSearch(search){
   return decodeChallenge(raw);
 }
 
+/* =========================================================
+   실시간 서버 랭킹 (Firebase Realtime Database)
+   ========================================================= */
+const SERVER_DB = 'https://busan-rush-rank-default-rtdb.asia-southeast1.firebasedatabase.app';
+const SERVER_PATH = '/busan_records.json';
+const SERVER_TIMEOUT = 3500;      /* 3.5초 응답 없으면 로컬 모드로 조용히 전환 */
+const SERVER_LIMIT = 50;          /* 서버에서 받아올 상위 기록 수 */
+const SERVER_NICK_MAX = 24;       /* DB 보안 규칙: name 24자 이하 */
+const SERVER_MIN_KM = 1.0;        /* 1.0km 이상만 서버에 등록 */
+const SERVER_RIVAL_MAX = 20;      /* 순위표·라이벌에 올리는 서버 기록 최대 수 */
+const GHOST_MAX = 8;              /* 도로 위 고스트 차량 최대 수 */
+const SERVER_POST_KEY = 'busan8_server_post_v1';
+
+function nickKey(n){
+  return String(n === undefined || n === null ? '' : n).replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+/* 서버 레코드 1건 정리 (name 24자 · km 0~50000) */
+function sanitizeServerRival(raw){
+  if (!raw || typeof raw !== 'object') return null;
+  const src = (raw.name !== undefined) ? raw.name : raw.nick;
+  const nick = normalizeNick(src, SERVER_NICK_MAX);
+  if (!nick) return null;
+  const km = Number(raw.km);
+  if (!isFinite(km) || km < 0) return null;
+  const spot = (raw.spot === undefined || raw.spot === null || raw.spot === '')
+    ? (raw.reason || '') : raw.spot;
+  return {
+    nick: nick,
+    car: carById(raw.car).id,
+    km: Math.round(clamp(km, 0, 50000) * 10) / 10,
+    score: Math.max(0, Math.round(Number(raw.score) || 0)),
+    spot: String(spot).slice(0, 48),
+    d: false, s: true,
+    ts: Number(raw.ts) || 0,
+    key: raw.key ? String(raw.key) : ''
+  };
+}
+
+/* name 기준 중복 제거 — 같은 닉네임은 최고 km 한 건만 */
+function dedupeServerRivals(list){
+  const by = {}, out = [];
+  const src = list || [];
+  for (let i=0;i<src.length;i++){
+    const r = sanitizeServerRival(src[i]);
+    if (!r) continue;
+    const k = nickKey(r.nick);
+    if (by[k] === undefined){ by[k] = out.length; out.push(r); continue; }
+    const cur = out[by[k]];
+    if (r.km > cur.km + 0.05 || (Math.abs(r.km - cur.km) <= 0.05 && r.score > cur.score)) out[by[k]] = r;
+  }
+  out.sort(function(a, b){
+    if (b.km !== a.km) return b.km - a.km;
+    if (b.score !== a.score) return b.score - a.score;
+    return a.nick < b.nick ? -1 : (a.nick > b.nick ? 1 : 0);
+  });
+  return out;
+}
+
+/* GET 응답 {pushKey:{name,km,...}} → 정리된 배열 */
+function parseServerPayload(json){
+  if (!json || typeof json !== 'object') return [];
+  const list = [];
+  for (const k in json){
+    if (!Object.prototype.hasOwnProperty.call(json, k)) continue;
+    const v = json[k];
+    if (!v || typeof v !== 'object') continue;
+    list.push(Object.assign({ key: k }, v));
+  }
+  return dedupeServerRivals(list);
+}
+
+/*
+  로컬 라이벌(도전장·캐시) + 서버 기록 병합
+  - 서버 유저 기록이 기본 AI 라이벌보다 우선 (서버 기록이 있으면 기본 AI는 빠진다)
+  - 같은 닉네임은 최고 km 한 건
+  - 내 닉네임 기록은 라이벌이 아니라 mine 으로 분리 (내 서버 순위용)
+*/
+function mergeServerRivals(localList, serverList, opts){
+  const o = opts || {};
+  const limit = (o.limit === undefined || o.limit === null) ? SERVER_RIVAL_MAX : o.limit;
+  const myKey = nickKey(o.myNick || '');
+  const server = dedupeServerRivals(serverList || []);
+  const src = localList || [];
+  const locals = [];
+  for (let i=0;i<src.length;i++){
+    const s = sanitizeRival(src[i]);
+    if (s) locals.push({ entry: s, d: !!src[i].d });
+  }
+  const out = [], idx = {};
+  let mine = null;
+  function put(e){
+    const key = nickKey(e.nick);
+    if (!key) return;
+    if (myKey && key === myKey){
+      if (!mine || e.km > mine.km + 0.05) mine = e;
+      return;
+    }
+    if (idx[key] !== undefined){
+      const cur = out[idx[key]];
+      if (e.km > cur.km + 0.05 || (Math.abs(e.km - cur.km) <= 0.05 && e.score > cur.score)) out[idx[key]] = e;
+      return;
+    }
+    idx[key] = out.length;
+    out.push(e);
+  }
+  for (let i=0;i<server.length;i++) put(Object.assign({}, server[i], { s: true, d: false }));
+  const hasServer = server.length > 0;
+  for (let i=0;i<locals.length;i++){
+    if (locals[i].d && hasServer) continue;      /* 실제 서버 유저가 있으면 기본 AI 라이벌은 빠진다 */
+    put(Object.assign({}, locals[i].entry, { s: false, d: locals[i].d }));
+  }
+  out.sort(function(a, b){
+    if (b.km !== a.km) return b.km - a.km;
+    if (b.score !== a.score) return b.score - a.score;
+    return a.nick < b.nick ? -1 : (a.nick > b.nick ? 1 : 0);
+  });
+  return {
+    list: limit > 0 ? out.slice(0, limit) : out.slice(),
+    mine: mine,
+    serverCount: server.length,
+    total: out.length
+  };
+}
+
+/* POST 본문 정리 — DB 규칙(name 문자열·km 숫자)에 맞춘다 */
+function normalizeServerEntry(o){
+  if (!o) return null;
+  const name = normalizeNick(o.name !== undefined ? o.name : o.nick, SERVER_NICK_MAX);
+  if (!name) return null;
+  const km = Number(o.km);
+  if (!isFinite(km) || km < 0) return null;
+  return {
+    name: name,
+    km: Math.round(clamp(km, 0, 50000) * 10) / 10,
+    score: Math.max(0, Math.round(Number(o.score) || 0)),
+    car: carById(o.car).id,
+    reason: String(o.reason || '').slice(0, 32),
+    spot: String(o.spot || '').slice(0, 60),
+    ts: Number(o.ts) || Date.now()
+  };
+}
+
+/* 같은 닉네임으로 방금 보낸 것보다 낮거나 같은 기록은 다시 보내지 않는다 */
+function shouldPostEntry(prev, entry){
+  if (!entry || !entry.name) return false;
+  const km = Number(entry.km);
+  if (!isFinite(km) || km < SERVER_MIN_KM) return false;
+  if (prev && nickKey(prev.nick) === nickKey(entry.name) && km <= Number(prev.km) + 0.05) return false;
+  return true;
+}
+
+function loadPostMark(store){
+  try {
+    const st = store || defaultStore();
+    const raw = st.getItem(SERVER_POST_KEY);
+    if (raw){
+      const o = JSON.parse(raw);
+      const nick = normalizeNick(o.nick, SERVER_NICK_MAX);
+      if (nick) return { nick: nick, km: Math.max(0, Number(o.km) || 0), ts: Number(o.ts) || 0 };
+    }
+  } catch(e){}
+  return null;
+}
+function savePostMark(m, store){
+  try {
+    const st = store || defaultStore();
+    st.setItem(SERVER_POST_KEY, JSON.stringify({ nick: m.nick, km: m.km, ts: m.ts }));
+    return true;
+  } catch(e){ return false; }
+}
+
+/* 타임아웃 있는 fetch (응답 없으면 reject → 로컬 모드) */
+function fetchWithTimeout(fetchImpl, url, init, timeoutMs){
+  return new Promise(function(resolve, reject){
+    let settled = false, ac = null;
+    let cfg = init || {};
+    if (typeof AbortController !== 'undefined'){
+      try { ac = new AbortController(); cfg = Object.assign({}, cfg, { signal: ac.signal }); } catch(e){ ac = null; }
+    }
+    const ms = (timeoutMs === undefined || timeoutMs === null) ? SERVER_TIMEOUT : timeoutMs;
+    const timer = setTimeout(function(){
+      if (settled) return;
+      settled = true;
+      try { if (ac) ac.abort(); } catch(e){}
+      reject(new Error('timeout'));
+    }, ms);
+    Promise.resolve().then(function(){ return fetchImpl(url, cfg); }).then(function(res){
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(res);
+    }, function(err){
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+/* 서버 랭킹 컨트롤러 (조회 · 등록 · 상태) */
+function createServerRank(opts){
+  const o = opts || {};
+  const store = o.store || defaultStore();
+  const db = String(o.db || SERVER_DB).replace(/\/+$/, '');
+  const url = db + SERVER_PATH;
+  const timeoutMs = (o.timeoutMs === undefined || o.timeoutMs === null) ? SERVER_TIMEOUT : o.timeoutMs;
+  const limit = o.limit || SERVER_LIMIT;
+  const fetchImpl = (o.fetchImpl !== undefined) ? o.fetchImpl
+    : (typeof fetch === 'function' ? function(u, i){ return fetch(u, i); } : null);
+  const state = {
+    status: 'idle',        /* idle · loading · live · offline */
+    rows: [], error: '', lastAt: 0,
+    posted: loadPostMark(store), lastPost: null, inflight: null
+  };
+
+  function refresh(){
+    if (!fetchImpl){
+      state.status = 'offline';
+      state.error = 'no-fetch';
+      return Promise.resolve(state);
+    }
+    state.status = 'loading';
+    const q = url + '?orderBy="km"&limitToLast=' + limit;
+    const job = fetchWithTimeout(fetchImpl, q, { method: 'GET', cache: 'no-store' }, timeoutMs)
+      .then(function(res){
+        if (!res || !res.ok) throw new Error('http ' + (res && res.status));
+        return res.json();
+      })
+      .then(function(json){
+        state.rows = parseServerPayload(json);
+        state.status = 'live';
+        state.error = '';
+        state.lastAt = Date.now();
+        state.inflight = null;
+        return state;
+      }, function(err){
+        state.status = 'offline';
+        state.error = String((err && err.message) || err || 'error');
+        state.rows = [];
+        state.inflight = null;
+        return state;
+      });
+    state.inflight = job;
+    return job;
+  }
+
+  function post(raw){
+    const entry = normalizeServerEntry(raw);
+    if (!entry) return Promise.resolve({ ok: false, reason: 'invalid' });
+    if (!shouldPostEntry(state.posted, entry)) return Promise.resolve({ ok: false, reason: 'skip', entry: entry });
+    if (!fetchImpl){
+      state.status = 'offline';
+      return Promise.resolve({ ok: false, reason: 'offline', entry: entry });
+    }
+    return fetchWithTimeout(fetchImpl, url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry)
+    }, timeoutMs).then(function(res){
+      if (!res || !res.ok) throw new Error('http ' + (res && res.status));
+      state.posted = { nick: entry.name, km: entry.km, ts: entry.ts };
+      savePostMark(state.posted, store);
+      state.lastPost = { ok: true, entry: entry, at: Date.now() };
+      return { ok: true, entry: entry };
+    }, function(err){
+      const msg = String((err && err.message) || err || 'error');
+      state.lastPost = { ok: false, reason: 'error', error: msg, entry: entry, at: Date.now() };
+      return { ok: false, reason: 'error', error: msg, entry: entry };
+    });
+  }
+
+  return { state: state, refresh: refresh, post: post, db: db, url: url };
+}
+
 /* --- 순위표 --- */
 function buildLeaderboard(profile, records, rivals){
   const p = profile || blankProfile();
@@ -957,10 +1255,11 @@ function markerY(sim, rival){
 }
 function makeGhosts(rivals){
   const out = [];
-  const list = rivals || [];
+  /* 가까운(작은 km) 라이벌부터 최대 GHOST_MAX대만 도로에 올린다 */
+  const list = (rivals || []).slice().sort(function(a, b){ return a.km - b.km; }).slice(0, GHOST_MAX);
   for (let i=0;i<list.length;i++){
     const r = list[i];
-    const gap = 0.90 + i * 0.40;
+    const gap = 0.90 + (i % 4) * 0.40 + Math.floor(i / 4) * 0.12;
     out.push({
       nick: r.nick, car: carById(r.car).id,
       stopKm: r.km, km: Math.min(r.km, gap), targetGap: gap,
@@ -2985,6 +3284,14 @@ const API = {
   challengeUrl: challengeUrl, parseChallengeFromSearch: parseChallengeFromSearch, challengeRecord: challengeRecord,
   buildLeaderboard: buildLeaderboard, entryForRun: entryForRun, rankOfRun: rankOfRun, nextTarget: nextTarget,
   markerY: markerY, makeGhosts: makeGhosts, legProgressPct: legProgressPct,
+  SERVER_DB: SERVER_DB, SERVER_PATH: SERVER_PATH, SERVER_TIMEOUT: SERVER_TIMEOUT, SERVER_LIMIT: SERVER_LIMIT,
+  SERVER_NICK_MAX: SERVER_NICK_MAX, SERVER_MIN_KM: SERVER_MIN_KM, SERVER_RIVAL_MAX: SERVER_RIVAL_MAX,
+  GHOST_MAX: GHOST_MAX, SERVER_POST_KEY: SERVER_POST_KEY,
+  nickKey: nickKey, sanitizeServerRival: sanitizeServerRival, dedupeServerRivals: dedupeServerRivals,
+  parseServerPayload: parseServerPayload, mergeServerRivals: mergeServerRivals,
+  normalizeServerEntry: normalizeServerEntry, shouldPostEntry: shouldPostEntry,
+  fetchWithTimeout: fetchWithTimeout, createServerRank: createServerRank,
+  loadPostMark: loadPostMark, savePostMark: savePostMark,
   drawSim: drawSim, drawVehicle: drawVehicle, drawGhosts: drawGhosts, drawRivalMarkers: drawRivalMarkers,
   laneCenter: laneCenter, playerX: playerX, playerY: playerY,
   newGame: newGame, start: start, update: update, steer: steer, setLane: setLane,
@@ -3065,6 +3372,12 @@ if (typeof document !== 'undefined'){
     const lbMeEl = document.getElementById('lbMe');
     const rivalListEl = document.getElementById('rivalList');
     const rivalResetBtn = document.getElementById('rivalReset');
+    const tSrvEl = document.getElementById('tSrv');
+    const oSrvEl = document.getElementById('oSrv');
+    const tSrvBtn = document.getElementById('tSrvBtn');
+    const oSrvBtn = document.getElementById('oSrvBtn');
+    const serverRank = createServerRank({});
+    let overCtx = null;
 
     let profile = loadProfile();
     if (nickInput) nickInput.value = profile.nick || '';
@@ -3163,9 +3476,84 @@ if (typeof document !== 'undefined'){
     function unlockAudio(){ Sfx.unlock(); }
 
     /* ---------- 타이틀: 라이벌 순위 미리보기 ---------- */
+    function rivalMerge(){
+      return mergeServerRivals(loadRivals(), serverRank.state.rows, {
+        myNick: profile.nick, limit: SERVER_RIVAL_MAX
+      });
+    }
+    /* 내 기록은 로컬 최고 + 서버에 올라간 내 최고 중 높은 쪽으로 순위를 매긴다 */
+    function rankRecords(mg){
+      const r = Object.assign(blankRecords(), sim.rec || loadRecords());
+      if (mg && mg.mine && mg.mine.km > (r.bestKm || 0) + 0.05){
+        r.bestKm = mg.mine.km;
+        r.bestScore = Math.max(r.bestScore || 0, mg.mine.score || 0);
+        if (mg.mine.spot) r.bestSpot = mg.mine.spot;
+      }
+      return r;
+    }
+
+    /* 서버 랭킹 상태 표시 (타이틀 · 게임오버) */
+    function updateServerUI(){
+      const st = serverRank.state;
+      let cls = 'srvBar', txt = '';
+      if (st.status === 'live'){
+        cls += ' live';
+        txt = '실시간 서버 랭킹' + (st.rows.length ? ' · ' + st.rows.length + '명' : ' · 아직 기록 없음');
+      } else if (st.status === 'loading'){
+        cls += ' loading';
+        txt = '서버 랭킹 불러오는 중…';
+      } else if (st.status === 'offline'){
+        cls += ' offline';
+        txt = '로컬 모드 (서버 연결 안 됨)';
+      } else {
+        cls += ' offline';
+        txt = '로컬 모드';
+      }
+      const els = [tSrvEl, oSrvEl];
+      for (let i=0;i<els.length;i++){
+        const el = els[i];
+        if (!el) continue;
+        el.className = cls;
+        const t = el.querySelector('.txt');
+        if (t) t.textContent = txt;
+        const b = el.querySelector('button');
+        if (b) b.classList.toggle('busy', st.status === 'loading');
+      }
+    }
+
+    /* 서버 랭킹 조회 → 타이틀·게임오버 화면에 반영 */
+    function refreshServer(){
+      updateServerUI();
+      return serverRank.refresh().then(function(st){
+        updateServerUI();
+        if (sim.state === 'title'){
+          renderRivals();
+        } else if (sim.state === 'crash'){
+          refreshOverServer();
+        }
+        return st;
+      });
+    }
+
+    /* 게임오버 → 서버 등록(1km 이상) → 최신 랭킹 재조회 */
+    function submitRunToServer(run){
+      const nick = normalizeNick(profile.nick, SERVER_NICK_MAX);
+      const km = Math.round(run.dist * 10) / 10;
+      if (!nick || km < SERVER_MIN_KM) return Promise.resolve({ ok: false, reason: 'too-short' });
+      return serverRank.post({
+        name: nick, km: km,
+        score: Math.round(run.score || finalScore(run)),
+        car: run.car,
+        reason: run.crashCause || 'car',
+        spot: run.stopSpot || describeStop(run.dist, run.crashCause),
+        ts: Date.now()
+      });
+    }
+
     function renderRivals(){
       if (!rivalListEl) return;
-      const lb = buildLeaderboard(profile, sim.rec || loadRecords(), loadRivals());
+      const mg = rivalMerge();
+      const lb = buildLeaderboard(profile, rankRecords(mg), mg.list);
       const rows = lb.rows.slice(0, 5);
       const html = [];
       for (let i=0;i<rows.length;i++){
@@ -3234,18 +3622,26 @@ if (typeof document !== 'undefined'){
     }
 
     /* ---------- 게임오버: 전체 순위표 ---------- */
-    function renderLeaderboard(run){
+    function renderLeaderboard(run, rivalsIn, myBest){
       if (!lbListEl) return;
       const rows = [];
-      const list = run.rivals || [];
+      const myKey = nickKey(profile.nick || '');
+      const list = rivalsIn || run.rivals || [];
       for (let i=0;i<list.length;i++){
         const r = list[i];
+        if (myKey && nickKey(r.nick) === myKey) continue;   /* 내 기록은 아래 me 행으로만 */
         rows.push({ nick: r.nick, car: r.car, km: r.km, score: r.score || 0, spot: r.spot || '', me: false });
       }
+      const runKm = Math.round(run.dist * 10) / 10;
+      const bestKm = myBest ? Math.max(0, Number(myBest.km) || 0) : 0;
+      const myKm = Math.max(runKm, Math.round(bestKm * 10) / 10);
+      const mySpot = (myKm <= runKm + 0.05)
+        ? (run.stopSpot || describeStop(run.dist, run.crashCause))
+        : ((myBest && myBest.spot) || run.stopSpot || describeStop(run.dist, run.crashCause));
       rows.push({
         nick: profile.nick || '나', car: profile.car,
-        km: Math.round(run.dist * 10) / 10, score: run.score,
-        spot: run.stopSpot || describeStop(run.dist, run.crashCause), me: true
+        km: myKm, score: Math.max(run.score || 0, myBest ? (myBest.score || 0) : 0),
+        spot: mySpot, me: true
       });
       rows.sort(function(a, b){
         if (b.km !== a.km) return b.km - a.km;
@@ -3278,11 +3674,11 @@ if (typeof document !== 'undefined'){
       let nextTxt = '';
       let bestAhead = null;
       for (let i=0;i<rows.length;i++){
-        if (!rows[i].me && rows[i].km > run.dist + 0.05){
+        if (!rows[i].me && rows[i].km > myKm + 0.05){
           if (!bestAhead || rows[i].km < bestAhead.km) bestAhead = rows[i];
         }
       }
-      if (bestAhead) nextTxt = '다음 목표 ' + escapeHtml(bestAhead.nick) + ' ' + fmtKm(bestAhead.km - run.dist) + 'km';
+      if (bestAhead) nextTxt = '다음 목표 ' + escapeHtml(bestAhead.nick) + ' ' + fmtKm(bestAhead.km - myKm) + 'km';
       else nextTxt = '라이벌 전원 추월 🏆';
       if (lbMeEl) lbMeEl.innerHTML = '내 순위 <em>' + myRank + '위</em> / ' + rows.length + '명 · ' + nextTxt;
       return { rows: rows, myRank: myRank, total: rows.length, next: bestAhead };
@@ -3375,12 +3771,13 @@ if (typeof document !== 'undefined'){
     /* ---------- flow ---------- */
     function beginRun(){
       if (overTimer){ clearTimeout(overTimer); overTimer = null; }
+      overCtx = null;
       if (!normalizeNick(profile.nick)){
         profile.nick = randomNick();
         profile = saveProfile(profile) || profile;
         if (nickInput) nickInput.value = profile.nick;
       }
-      sim = newGame({ worldH: sim.worldH, records: sim.rec, profile: profile, rivals: loadRivals() });
+      sim = newGame({ worldH: sim.worldH, records: sim.rec, profile: profile, rivals: rivalMerge().list });
       sim.nick = profile.nick;
       sim.car = carById(profile.car).id;
       start(sim);
@@ -3407,6 +3804,7 @@ if (typeof document !== 'undefined'){
 
     function goTitle(){
       if (overTimer){ clearTimeout(overTimer); overTimer = null; }
+      overCtx = null;
       Sfx.engineStop();
       hud.classList.remove('on');
       backBtn.classList.remove('on');
@@ -3487,6 +3885,33 @@ if (typeof document !== 'undefined'){
       oSpd.textContent = Math.round(sim.topSpeed);
       oCombo.textContent = 'x' + sim.maxCombo;
 
+      const lb = renderLeaderboard(sim);
+      applyOverBest(lb);
+
+      retryBtn.textContent = '다시 달리기 🔁';
+      shareBtn.textContent = '도전장 링크 보내기 🔗';
+      showOver(650);
+
+      /* 실시간 서버 랭킹: 1km 이상이면 서버에 등록하고, 최신 순위를 다시 받아 순위표에 반영 */
+      submitRunToServer(sim).then(function(){
+        return serverRank.refresh();
+      }).then(function(){
+        updateServerUI();
+        refreshOverServer();
+      });
+    }
+
+    /* 서버 기록이 섞인 최신 순위표로 게임오버 화면 다시 그림 */
+    function refreshOverServer(){
+      if (sim.state !== 'crash' || !overCtx) return;
+      const mg = rivalMerge();
+      const lb = renderLeaderboard(sim, mg.list, mg.mine);
+      applyOverBest(lb);
+    }
+
+    function applyOverBest(lb){
+      if (!overCtx) return;
+      const st = overCtx.st;
       let line;
       if (st.firstRun){
         line = '첫 기록이야! 이게 네 기준선 🏁 <span>(' + Math.round(sim.topSpeed) + 'km/h · 콤보 x' + sim.maxCombo + ')</span>';
@@ -3497,16 +3922,17 @@ if (typeof document !== 'undefined'){
         line = '최고 ' + fmtKm(st.prevKm) + 'km까지 <span>' + fmtKm(Math.max(0, st.prevKm - sim.dist)) + 'km 남았어</span>';
         if (st.newScore) line += '<br><em>점수는 신기록!</em> <span>+' + fmtNum(st.dScore) + '점</span>';
       }
-      const lb = renderLeaderboard(sim);
       if (lb && lb.rows.length){
         if (lb.myRank === 1) line += '<br><em>🥇 라이벌 1위!</em> <span>도전장을 뿌려라</span>';
         else line += '<br><em>' + lb.myRank + '위</em> <span>· ' + (lb.next ? lb.next.nick + '까지 ' + fmtKm(lb.next.km - sim.dist) + 'km' : '전원 추월') + '</span>';
       }
+      const srv = serverRank.state;
+      if (srv.status === 'live' && srv.rows.length && lb && lb.myRank){
+        line += '<br><span>🌐 서버 실시간 순위 </span><em>' + lb.myRank + '위</em><span> / ' + lb.total + '명</span>';
+      } else if (srv.lastPost && !srv.lastPost.ok && srv.lastPost.reason === 'error'){
+        line += '<br><span>⚠️ 서버 등록 실패 · 기록은 이 기기에 남았어</span>';
+      }
       oBest.innerHTML = line;
-
-      retryBtn.textContent = '다시 달리기 🔁';
-      shareBtn.textContent = '도전장 링크 보내기 🔗';
-      showOver(650);
     }
 
     /* ---------- input ---------- */
@@ -3627,6 +4053,16 @@ if (typeof document !== 'undefined'){
       toast('라이벌을 기본 4명으로 초기화');
       Sfx.tick();
     });
+    function manualServerRefresh(){
+      Sfx.tick();
+      toast('서버 랭킹 새로고침…');
+      refreshServer().then(function(st){
+        if (st.status === 'live') toast('🟢 서버 랭킹 ' + st.rows.length + '명 불러옴');
+        else toast('⚪ 서버 연결 안 됨 · 로컬 모드');
+      });
+    }
+    if (tSrvBtn) tSrvBtn.addEventListener('click', function(e){ e.stopPropagation(); manualServerRefresh(); });
+    if (oSrvBtn) oSrvBtn.addEventListener('click', function(e){ e.stopPropagation(); manualServerRefresh(); });
     if (nickInput){
       nickInput.addEventListener('input', function(){
         profile.nick = normalizeNick(nickInput.value);
@@ -3779,7 +4215,11 @@ if (typeof document !== 'undefined'){
           const t = nextTarget(sim);
           return t ? { nick: t.nick, km: t.km, remain: t.km - sim.dist } : null;
         },
-        challenge: function(){ return challenge; }
+        challenge: function(){ return challenge; },
+        server: function(){ return serverRank; },
+        serverRows: function(){ return serverRank.state.rows.slice(); },
+        rivalMerge: function(){ const m = rivalMerge(); return { list: m.list, mine: m.mine, serverCount: m.serverCount, total: m.total }; },
+        refreshServer: function(){ return refreshServer(); }
       };
     } catch(e){}
 
@@ -3804,6 +4244,8 @@ if (typeof document !== 'undefined'){
 
     layout();
     updateTitle();
+    updateServerUI();
+    refreshServer();
     try {
       const incoming = parseChallengeFromSearch(location.search);
       if (incoming){
