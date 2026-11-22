@@ -4,19 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v5.5">
+<meta name="busan-build" content="v6.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="서울→부산">
-<meta name="description" content="서울에서 부산까지, 친구들과 순위 경쟁하며 죽을 때까지 끝없이 달리는 병맛 무한 하드코어 질주. 갈수록 빨라지고 막힌다. 스치면 끝.">
+<meta name="description" content="서울에서 부산까지, 친구들과 순위 경쟁하며 죽을 때까지 끝없이 달리는 병맛 무한 하드코어 질주. 차량 8종·비/눈·아이템·경찰 추격·돌발 미션까지.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="🚗 서울→부산 무한 하드코어 질주">
-<meta property="og:description" content="끝없이 달려 기록을 세워라. 친구 기록을 추월하고, 어디서 멈췄는지 확인하라. 스치면 데이고, 데이면 끝.">
+<meta property="og:description" content="끝없이 달려 기록을 세워라. 차량 8종 · 비/눈길 · 아이템 · 경찰 추격 · 돌발 미션. 친구 기록을 추월하고, 어디서 멈췄는지 확인하라. 스치면 데이고, 데이면 끝.">
 <meta property="og:url" content="https://jh30042-spec.github.io/busan/">
 <meta property="og:site_name" content="종혁의 미니게임">
 <meta property="og:locale" content="ko_KR">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://jh30042-spec.github.io/busan/og-busan.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="서울→부산 8차로 고속도로를 질주하는 병맛 아케이드 게임 썸네일">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jh30042-spec.github.io/busan/og-busan.png">
 <title>🚗 서울→부산 무한 하드코어 질주</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E">
 <style>
@@ -168,6 +174,21 @@
     100%{opacity:0;transform:translateY(calc(var(--u)*-2.4)) scale(.98)}
   }
 
+  /* ---------- 돌발 미션 (조작 방해 없는 슬림 칩) ---------- */
+  #mission{
+    position:absolute;left:50%;top:calc(var(--u)*27);transform:translateX(-50%);z-index:26;
+    display:flex;align-items:center;gap:calc(var(--u)*1.1);pointer-events:none;opacity:0;
+    transition:opacity .22s;white-space:nowrap;max-width:94%;
+    padding:calc(var(--u)*1.0) calc(var(--u)*1.9);border-radius:99px;
+    background:rgba(8,14,26,.80);border:1px solid rgba(255,212,121,.42);
+    box-shadow:0 2px 14px rgba(0,0,0,.45)
+  }
+  #mission.on{opacity:1}
+  #mission.done{border-color:rgba(125,255,192,.8)}
+  #mission .mtxt{font-size:calc(var(--u)*2.35);font-weight:900;color:#ffe08a;letter-spacing:-.01em}
+  #mission.done .mtxt{color:#7dffc0}
+  #mission .mprog{font-size:calc(var(--u)*2.2);font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
+
   /* ---------- hint ---------- */
   #hint{
     position:absolute;left:0;right:0;bottom:calc(var(--u)*17);z-index:22;text-align:center;pointer-events:none;
@@ -255,6 +276,8 @@
   .carName{font-size:calc(var(--u)*3.2);font-weight:900;letter-spacing:-.03em;color:#fff;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .carTag{font-size:calc(var(--u)*2.2);font-weight:700;color:#9fb4d0;line-height:1.3;margin-top:calc(var(--u)*.3)}
+  .carSpec{font-size:calc(var(--u)*2.2);font-weight:900;color:#ffd479;line-height:1.3;margin-top:calc(var(--u)*.55);
+    white-space:normal;letter-spacing:-.01em}
   .dots{display:flex;gap:calc(var(--u)*1);margin-top:calc(var(--u)*1)}
   .dots i{width:calc(var(--u)*1.7);height:calc(var(--u)*1.7);border-radius:50%;background:rgba(255,255,255,.24);cursor:pointer}
   .dots i.on{background:#63d2ff;box-shadow:0 0 calc(var(--u)*1.2) rgba(99,210,255,.85)}
@@ -431,6 +454,7 @@
   <div id="banner"><div class="b1"></div><div class="b2"></div></div>
   <div id="record"><div class="r1">🔥 NEW RECORD!</div><div class="r2"></div></div>
   <div id="hint"></div>
+  <div id="mission"><span class="mtxt"></span><span class="mprog"></span></div>
   <div id="flash"></div>
   <div id="toast"></div>
 
@@ -450,6 +474,7 @@
         <div class="carInfo">
           <div class="carName" id="carName">빨간 스포츠카</div>
           <div class="carTag" id="carTag">레이싱 스트라이프 · 듀얼 배기 불꽃</div>
+          <div class="carSpec" id="carSpec">균형형 · 최고속도 우수 · 칼치기 점수 +20%</div>
           <div class="dots" id="carDots"></div>
         </div>
         <button class="arrow" id="carNext" aria-label="다음 차">▶</button>
@@ -524,8 +549,11 @@ function shuffle(arr, rng){
 /* =========================================================
    config
    ========================================================= */
-const WORLD_W = 800;
-const ROAD_L = 28, ROAD_R = 772;
+/* 도로 양옆에 '갓길 여백'을 두어 사고 푯말이 차선을 가리지 않게 한다.
+   차선 폭(LANE_W)은 그대로 93이라 주행 판정은 이전 버전과 동일하다. */
+const WORLD_W = 880;
+const ROAD_L = 68, ROAD_R = 812;
+const SHOULDER_W = ROAD_L;              // 68 — 도로 밖 갓길 폭
 const ROAD_W = ROAD_R - ROAD_L;
 const LANES = 8;
 const LANE_W = ROAD_W / LANES;          // 93
@@ -542,6 +570,28 @@ const COMBO_WINDOW = 4.2;               // 칼치기 콤보 유지 시간
 const START_KMH = 190;                  // 초반부터 빠르게
 const TOP_KMH = 470;
 const DAY_LEN = 150;                    // 낮→노을→한밤중→새벽 한 바퀴(초)
+
+/* --- v6.0 신규: 날씨 · 아이템 · 돌발 미션 · 경찰 추격 --- */
+const WX_TYPES = {
+  clear: { label:'맑음',  emoji:'',     lane:1.00, accel:1.00, brake:1.00, top:1.00 },
+  rain:  { label:'비',    emoji:'🌧️',  lane:0.86, accel:0.94, brake:1.00, top:0.97 },
+  snow:  { label:'눈',    emoji:'❄️',  lane:0.72, accel:0.82, brake:0.74, top:0.92 }
+};
+const WX_FIRST_KM = 34;                 // 첫 비/눈이 오는 거리
+const WX_CLEAR_KM = 26;                 // 비/눈 사이 맑은 구간
+const ITEM_TYPES = [
+  { id:'shield', emoji:'🛡️', color:'#6fc9ff', label:'실드',   dur:0 },
+  { id:'nitro',  emoji:'🔥', color:'#ff8c42', label:'니트로', dur:3.0 },
+  { id:'double', emoji:'🧲', color:'#ffd479', label:'더블',   dur:8.0 }
+];
+const ITEM_R = 30;                      // 아이템 픽업 반경
+const MISSION_DEFS = [
+  { kind:'kalchi', emoji:'🎯', text:'15초 내 칼치기 3회', goal:3, dur:15, bonus:300 },
+  { kind:'lane0',  emoji:'🎯', text:'10초간 1차로 질주',  goal:10, dur:15, bonus:250 },
+  { kind:'item',   emoji:'🎯', text:'아이템 1개 먹기',    goal:1, dur:15, bonus:200 }
+];
+const CHASE_DUR = 12;                   // 경찰 추격 지속(초)
+const CHASE_BONUS = 500;
 
 /* =========================================================
    themes (낮 → 노을 → 한밤중 → 새벽)
@@ -719,19 +769,52 @@ const CHALLENGE_PARAM = 'c';
 const NICK_MAX = 14;
 const UNITS_PER_KM = SPD_SCALE * KM_DIV;     // 1km = 390 world units (거리↔화면 환산)
 
-/* 차종: id · 이름 · 이모지 · 차체색 · 설명 · 엔진 배율 · 경적 성격 */
+/* 차종: id · 이름 · 이모지 · 차체색 · 외형 설명 · 능력 한 줄 · 스펙 · 엔진 배율 · 경적 성격
+   spec: top(최고속도) accel(가속) lane(차선변경 민첩) nitro(부스트 효율) danger(길막 위험 상승)
+         hitbox(피격 판정) score(점수 배율) kalchi(칼치기 점수) combo(콤보 유지) shield(기본 실드)
+         coneBreak(꼬깔콘 파괴) policeImmune(경찰 추격 면역) laneHeavy(묵직한 차선변경 연출) */
+const CAR_SPEC_DEFAULT = {
+  top:1, accel:1, lane:1, nitro:1, danger:1, hitbox:1, score:1, kalchi:1, combo:1,
+  shield:0, coneBreak:false, policeImmune:false, laneHeavy:0
+};
 const CARS = [
   { id:'sport',   name:'빨간 스포츠카', emoji:'🏎️', color:'#ff3b47', short:'스포츠카',
-    tag:'레이싱 스트라이프 · 듀얼 배기 불꽃', eng:0.90, horn:'high' },
+    tag:'레이싱 스트라이프 · 듀얼 배기 불꽃',
+    ability:'균형형 · 최고속도 우수 · 칼치기 점수 +20%',
+    spec:{ top:1.03, kalchi:1.20 }, eng:0.90, horn:'high' },
   { id:'taxi',    name:'노란 총알택시', emoji:'🚕', color:'#ffd12e', short:'택시',
-    tag:'빈차 갓등 · 칼치기 본능', eng:1.02, horn:'double' },
+    tag:'빈차 갓등 · 칼치기 본능',
+    ability:'민첩한 차선 변경 · 니트로/부스트 효율 ↑',
+    spec:{ accel:1.10, lane:1.50, nitro:1.35 }, eng:1.02, horn:'double' },
   { id:'porter',  name:'파란 1톤 포터', emoji:'🚚', color:'#2f7bff', short:'포터',
-    tag:'만재 적재함 · 우직한 존재감', eng:0.70, horn:'low' },
+    tag:'만재 적재함 · 우직한 존재감',
+    ability:'길막 위험 35% 덜 쌓임(버팀) · 묵직한 차선 변경',
+    spec:{ top:0.98, accel:0.86, lane:0.78, danger:0.65, laneHeavy:0.6 }, eng:0.70, horn:'low' },
   { id:'police',  name:'경광등 경찰차', emoji:'🚓', color:'#eef3fb', short:'경찰차',
-    tag:'빨강/파랑 점멸 · 사이렌 경적', eng:1.06, horn:'siren' },
+    tag:'빨강/파랑 점멸 · 사이렌 경적',
+    ability:'경찰 추격 면역(면제 보너스) · 사이렌으로 앞차 양보 유도',
+    spec:{ top:1.01, policeImmune:true }, eng:1.06, horn:'siren' },
   { id:'tractor', name:'병맛 경운기', emoji:'🚜', color:'#57b34a', short:'경운기',
-    tag:'왕바퀴 · 연기 두 통 · 논두렁 감성', eng:0.62, horn:'rattle' }
+    tag:'왕바퀴 · 연기 두 통 · 논두렁 감성',
+    ability:'피격 히트박스 15% 작음 · 점수 배율 +30%',
+    spec:{ top:0.86, accel:0.80, hitbox:0.85, score:1.30, laneHeavy:0.4 }, eng:0.62, horn:'rattle' },
+  { id:'ambulance', name:'구급차', emoji:'🚑', color:'#f4f8ff', short:'구급차',
+    tag:'적십자 표식 · 회전 사이렌등',
+    ability:'한 판 1회 기사회생 실드 (첫 충돌에서 부활)',
+    spec:{ shield:1, accel:1.02 }, eng:0.95, horn:'wail' },
+  { id:'supercar', name:'불랙 수퍼카', emoji:'🚘', color:'#1b1d26', short:'수퍼카',
+    tag:'불랙 카본 · 네온 언더글로우',
+    ability:'최상위 가속·최고속도 · 칼치기 콤보 1.5배 유지',
+    spec:{ top:1.12, accel:1.35, lane:1.10, combo:1.50 }, eng:1.10, horn:'hyper' },
+  { id:'armored', name:'덤프트럭 장갑차', emoji:'🚛', color:'#55613f', short:'장갑차',
+    tag:'리벳 판금 · 앞밤이 철제 범푸',
+    ability:'꼬깔콘을 부수고 돌진(+30점) · 차선 이동이 묵직함',
+    spec:{ top:1.02, accel:0.90, lane:0.74, coneBreak:true, laneHeavy:0.8 }, eng:0.78, horn:'air' }
 ];
+function carSpec(id){
+  const c = carById(id);
+  return Object.assign({}, CAR_SPEC_DEFAULT, c.spec || {});
+}
 const NICK_POOL = ['무명질주자','칼치기장인','8차로고수','빈차아저씨','과속스캔들','갓길의신',
   '핸들잡은곰','부산행만렙','콘돌파전문','고속도로원숭이','속도광','새벽반장'];
 
@@ -1349,6 +1432,190 @@ function difficulty(sim){
 function playerY(sim){ return sim.worldH - PLAYER_Y_OFF; }
 function playerX(sim){ return laneCenter(sim.lanePos); }
 
+/* =========================================================
+   v6.0 — 점수 배율 · 날씨 · 아이템 · 미션 · 경찰 추격
+   ========================================================= */
+/* 차량 점수 배율 × 더블 점수 아이템(×2) */
+function scoreMult(sim){
+  const spec = sim.spec || carSpec(sim.car);
+  return (spec.score || 1) * (sim.doubleT > 0 ? 2 : 1);
+}
+function addBonus(sim, v){
+  const gained = Math.round(v * scoreMult(sim));
+  sim.bonus += gained;
+  return gained;
+}
+/* 날씨 계수 (맑음=1) */
+function wxMul(sim, key){
+  const t = WX_TYPES[sim.wx] || WX_TYPES.clear;
+  const k = sim.wxInten || 0;
+  return lerp(1, t[key], k);
+}
+function wxLabel(sim){
+  const t = WX_TYPES[sim.wx] || WX_TYPES.clear;
+  if (!sim.wxInten || sim.wxInten < 0.35) return '';
+  return t.emoji + ' ' + t.label;
+}
+
+/* --- 날씨 순환: 맑음 → 비 → 맑음 → 눈 → … (시드 고정) --- */
+function updateWeather(sim, dt, ev){
+  if (sim.wxLeft > 0){
+    sim.wxLeft -= dt;
+    if (sim.wxLeft <= 0){
+      sim.wx = 'clear';
+      sim.wxLeft = 0;
+      sim.wxNext = 11 + sim.rng() * 9;
+    }
+  } else {
+    sim.wxNext -= dt;
+    if (sim.wxNext <= 0){
+      sim.wx = sim.wxFlip ? 'rain' : 'snow';
+      sim.wxFlip = !sim.wxFlip;
+      sim.wxLeft = 9 + sim.rng() * 6;
+      ev.push({ type:'weather', wx: sim.wx, label: (WX_TYPES[sim.wx] || {}).label });
+    }
+  }
+  const target = (sim.wx === 'clear') ? 0 : 1;
+  const k = 1 - Math.exp(-dt / 1.1);
+  sim.wxInten += (target - sim.wxInten) * k;
+  if (sim.wxInten < 0.002) sim.wxInten = 0;
+  if (sim.wxInten > 0.998) sim.wxInten = 1;
+}
+
+/* --- 아이템 3종 --- */
+function itemDef(id){
+  for (let i=0;i<ITEM_TYPES.length;i++) if (ITEM_TYPES[i].id === id) return ITEM_TYPES[i];
+  return ITEM_TYPES[0];
+}
+function spawnItem(sim){
+  const y = -180;
+  const free = freeInBand(sim, y - 160, y + 160);
+  if (!free.length) return null;
+  const type = ITEM_TYPES[Math.floor(sim.rng() * ITEM_TYPES.length)];
+  const lane = free[Math.floor(sim.rng() * free.length)];
+  const it = { id: sim.nextId++, type: type.id, x: laneCenter(lane), y: y, lane: lane, t: 0, dead: false };
+  sim.items.push(it);
+  return it;
+}
+function grantShield(sim){ sim.shield = Math.min(2, (sim.shield || 0) + 1); return sim.shield; }
+function itemPickup(sim, it, ev){
+  const def = itemDef(it.type);
+  if (it.type === 'shield'){
+    grantShield(sim);
+  } else if (it.type === 'nitro'){
+    sim.nitro = Math.max(sim.nitro || 0, def.dur);
+  } else if (it.type === 'double'){
+    sim.doubleT = Math.max(sim.doubleT || 0, def.dur);
+  }
+  if (sim.mission && !sim.mission.done && sim.mission.kind === 'item'){
+    sim.mission.prog += 1;
+  }
+  ev.push({ type:'item', item: def, x: it.x, y: it.y });
+  return def;
+}
+
+/* --- 돌발 미션 --- */
+function startMission(sim, ev){
+  const def = MISSION_DEFS[Math.floor(sim.rng() * MISSION_DEFS.length)];
+  sim.mission = { kind: def.kind, text: def.text, emoji: def.emoji, goal: def.goal,
+    dur: def.dur, bonus: def.bonus, prog: 0, t: 0, done: false, ok: false };
+  ev.push({ type:'missionStart', mission: sim.mission });
+  return sim.mission;
+}
+function updateMission(sim, dt, ev){
+  const m = sim.mission;
+  if (!m){
+    sim.missionCd -= dt;
+    if (sim.missionCd <= 0) startMission(sim, ev);
+    return;
+  }
+  if (m.done) return;
+  m.t += dt;
+  if (m.kind === 'lane0' && sim.lanePos < 0.4) m.prog = Math.min(m.goal, m.prog + dt);
+  if (m.prog >= m.goal){
+    m.done = true; m.ok = true;
+    const g = addBonus(sim, m.bonus);
+    sim.combo = Math.min(99, sim.combo + 1);
+    sim.comboT = COMBO_WINDOW * (sim.spec || carSpec(sim.car)).combo;
+    ev.push({ type:'missionDone', mission: m, gain: g });
+  } else if (m.t >= m.dur){
+    m.done = true; m.ok = false;
+    sim.missionCd = 13 + sim.rng() * 6;
+    ev.push({ type:'missionFail', mission: m });
+  }
+}
+
+/* --- 경찰 추격 --- */
+function startChase(sim, ev){
+  const py = playerY(sim);
+  sim.chase = {
+    t: 0, dur: CHASE_DUR, lanePos: sim.lanePos, baseLane: clamp(Math.round(sim.lanePos), 0, LANES-1),
+    y: py + 460, warned: false, lungeT: 0, lungeCd: 2.6, kalchiAt: sim.kalchi,
+    phase: 'follow', dodged: 0
+  };
+  ev.push({ type:'chaseStart' });
+  return sim.chase;
+}
+function updateChase(sim, dt, ev){
+  const ch = sim.chase;
+  if (!ch) return;
+  ch.t += dt;
+  const py = playerY(sim);
+  const chaseLen = ch.t / ch.dur;
+  if (ch.phase === 'follow'){
+    const wantY = py + lerp(420, 132, Math.min(1, ch.t / 2.4));
+    ch.y += (wantY - ch.y) * Math.min(1, dt * 3.4);
+    ch.lanePos += (clamp(sim.lanePos, 0, LANES-1) - ch.lanePos) * Math.min(1, dt * 2.2);
+    ch.lungeCd -= dt;
+    if (ch.lungeCd <= 0.75 && !ch.warned){ ch.warned = true; ev.push({ type:'chaseWarn' }); }
+    if (ch.lungeCd <= 0){
+      ch.phase = 'lunge'; ch.lungeT = 0; ch.warned = false;
+      ch.lungeLane = clamp(Math.round(sim.lanePos), 0, LANES-1);
+      ev.push({ type:'chaseLunge' });
+    }
+  } else {
+    ch.lungeT += dt;
+    const p = Math.min(1, ch.lungeT / 0.75);
+    ch.y = lerp(py + 150, py - 90, p * p * (3 - 2 * p));
+    ch.lanePos += (ch.lungeLane - ch.lanePos) * Math.min(1, dt * 7);
+    if (p >= 1){
+      ch.phase = 'follow'; ch.lungeCd = 2.8; ch.y = py + 150;
+    }
+  }
+  /* 칼치기로 따돌리기: 추격 중 칼치기 3회면 조기 성공 */
+  if (sim.kalchi - ch.kalchiAt >= 3 && ch.t < ch.dur){
+    sim.chase = null;
+    sim.chaseCd = 26 + sim.rng() * 10;
+    sim.chaseWins = (sim.chaseWins || 0) + 1;
+    const g = addBonus(sim, CHASE_BONUS);
+    ev.push({ type:'chaseSuccess', gain: g, early: true });
+    return;
+  }
+  if (ch.t >= ch.dur){
+    sim.chase = null;
+    sim.chaseCd = 28 + sim.rng() * 10;
+    sim.chaseWins = (sim.chaseWins || 0) + 1;
+    const g = addBonus(sim, CHASE_BONUS);
+    ev.push({ type:'chaseSuccess', gain: g, early: false });
+    return;
+  }
+  /* 추격차가 내 차를 덮치면 체포 */
+  const dx = Math.abs(laneCenter(ch.lanePos) - playerX(sim));
+  const dy = Math.abs(ch.y - py);
+  if (!sim.god && sim.invuln <= 0 && sim.nitro <= 0 &&
+      dx < (PLAYER.w + PLAYER.w) / 2 * HIT && dy < (PLAYER.h + PLAYER.h) / 2 * HIT){
+    sim.chase = null;
+    sim.chaseCaught = (sim.chaseCaught || 0) + 1;
+    ev.push({ type:'caught' });
+    const endEv = endRun(sim, 'police');
+    for (let i=0;i<endEv.length;i++) ev.push(endEv[i]);
+    return;
+  }
+  if (chaseLen > 0.5 && ch.dodged === 0 && ch.phase === 'follow' && ch.t > 3){
+    ch.dodged = 1;
+  }
+}
+
 function newGame(opts){
   opts = opts || {};
   const seed = (opts.seed === undefined || opts.seed === null)
@@ -1386,6 +1653,15 @@ function newGame(opts){
     obstacles: [], pops: [], particles: [],
     nextId: 1, spawnTimer: 0.42, waveCount: 0, coneCount: 0,
 
+    /* v6.0: 차량 스펙 · 날씨 · 아이템 · 미션 · 경찰 추격 · 타격감 */
+    spec: carSpec(opts.car !== undefined ? opts.car : prof.car),
+    wx: 'clear', wxInten: 0, wxLeft: 0, wxNext: 12 + (seed % 8), wxFlip: (seed % 2) === 0,
+    items: [], itemTimer: 5.5, itemCount: 0,
+    mission: null, missionCd: 9, missionWins: 0, missionTries: 0,
+    chase: null, chaseCd: 15, chaseWins: 0, chaseCaught: 0,
+    shield: 0, nitro: 0, doubleT: 0, invuln: 0,
+    hitstop: 0, flashT: 0, sirenCd: 5, sirenCount: 0,
+
     leg: 0, landSeq: null, landIdx: 0, corridor: 4,
 
     blocked: false, blockT: 0,
@@ -1396,6 +1672,7 @@ function newGame(opts){
     god: false
   };
   sim.landSeq = buildSeq(0);
+  sim.shield = sim.spec.shield || 0;
   return sim;
 }
 
@@ -1408,6 +1685,14 @@ function start(sim){
   sim.combo = 0;
   sim.comboT = 0;
   sim.dayT = 0;
+  sim.spec = carSpec(sim.car);
+  sim.shield = sim.spec.shield || 0;
+  sim.nitro = 0; sim.doubleT = 0; sim.invuln = 0;
+  sim.hitstop = 0; sim.flashT = 0;
+  sim.items = []; sim.itemTimer = 5.5;
+  sim.wx = 'clear'; sim.wxInten = 0; sim.wxLeft = 0; sim.wxNext = 12 + (sim.seed % 8);
+  sim.mission = null; sim.missionCd = 9;
+  sim.chase = null; sim.chaseCd = 15; sim.sirenCd = 5;
   return sim;
 }
 
@@ -1646,7 +1931,7 @@ function pruneForEscape(sim, ids, y0, y1, minFree){
    ========================================================= */
 const ENDING_TAGS = {
   car:'스치기 참변', truck:'화물차 참변', bus:'버스 참변', cone:'공사구간 참변',
-  cutter:'끼어들기 참변', danger:'추월 실패'
+  cutter:'끼어들기 참변', danger:'추월 실패', police:'경찰 체포'
 };
 const ENDINGS = {
   car: [
@@ -1678,6 +1963,11 @@ const ENDINGS = {
     { t:'앞차 뒤에서 노래 세 곡 다 듣고 폐차 😩', s:'길막은 못 참지' },
     { t:'뒤차들이 빵빵거리다 결국 등짝을 봄 🚗💥', s:'속도가 곧 생명' },
     { t:'느려서 뒤차한테 민원 넣고 폐차 📞', s:'고속도로는 서행 금지' }
+  ],
+  police: [
+    { t:'경찰차가 옆구리를 받고 수갑 채워짐 🚨', s:'추격 12초를 못 버텼다' },
+    { t:'"내려서 손 올리세요" 결국 잡혔다 🚓', s:'칼치기 3번이면 따돌렸는데' },
+    { t:'사이렌 소리가 가까워지더니 체포 🚨', s:'도망치는 것도 기술이다' }
   ]
 };
 function pickEnding(sim, cause){
@@ -1707,6 +1997,23 @@ function makeParticles(sim, o){
   return parts;
 }
 function finalScore(sim){ return Math.floor(sim.dist * 10) + sim.bonus; }
+
+/* 칼치기 스파크 (가벼운 금속 불붕) */
+function spawnSparks(sim, o){
+  const px = playerX(sim), py = playerY(sim);
+  const sx = px + (o ? (o.x - px) * 0.55 : 0);
+  const sy = py + (o ? (o.y - py) * 0.55 : 0);
+  for (let i=0;i<10;i++){
+    const a = sim.rng() * Math.PI * 2, sp = 120 + sim.rng() * 300;
+    sim.particles.push({
+      x: sx, y: sy,
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 60,
+      life: 0.18 + sim.rng() * 0.28, max: 0.46,
+      size: 2 + sim.rng() * 3.4,
+      color: ['#fff6c8','#ffd166','#9fe8ff','#ffffff'][Math.floor(sim.rng() * 4)]
+    });
+  }
+}
 
 function compareRecord(sim){
   const r = sim.rec || blankRecords();
@@ -1805,17 +2112,38 @@ function update(sim, dt){
     return ev;
   }
 
+  /* --- 타격감: 칼치기 직후 0.05초 히트스탑(슬로우) --- */
+  if (sim.hitstop > 0){
+    sim.hitstop = Math.max(0, sim.hitstop - dt);
+    dt = dt * 0.18;
+  }
+
   sim.time += dt;
   sim.dayT += dt;
   sim.themeP = (sim.dayT / DAY_LEN) % 1;
   sim.theme = toCss(themeAt(sim.themeP));
 
-  /* --- 끝없는 가속 --- */
-  sim.maxSpeed = maxSpeedAt(sim.dist);
+  const spec = sim.spec || carSpec(sim.car);
+  sim.spec = spec;
 
-  /* --- lane movement --- */
+  /* --- v6.0 날씨 순환 (맑음 → 비 → 맑음 → 눈) --- */
+  updateWeather(sim, dt, ev);
+
+  /* --- 아이템/실드/부스터 타이머 --- */
+  sim.invuln = Math.max(0, (sim.invuln || 0) - dt);
+  sim.nitro = Math.max(0, (sim.nitro || 0) - dt);
+  sim.doubleT = Math.max(0, (sim.doubleT || 0) - dt);
+  sim.flashT = Math.max(0, (sim.flashT || 0) - dt);
+  if (sim.state === 'playing') sim.shake = Math.max(0, (sim.shake || 0) - dt * 2.2);
+  const nitroOn = sim.nitro > 0;
+
+  /* --- 끝없는 가속 (차종·날씨 반영) --- */
+  sim.maxSpeed = Math.min(TOP_KMH * 1.2, maxSpeedAt(sim.dist) * spec.top * wxMul(sim, 'top'));
+
+  /* --- lane movement (차종·날씨에 따른 반응/미끄러짐) --- */
   const prevLane = sim.lanePos;
-  const k = 1 - Math.exp(-dt * 14);
+  const laneK = 14 * spec.lane * wxMul(sim, 'lane');
+  const k = 1 - Math.exp(-dt * laneK);
   sim.lanePos += (sim.targetLane - sim.lanePos) * k;
   if (Math.abs(sim.targetLane - sim.lanePos) < 0.004) sim.lanePos = sim.targetLane;
   sim.laneVel = (sim.lanePos - prevLane) / Math.max(dt, 1e-6);
@@ -1850,9 +2178,10 @@ function update(sim, dt){
   /* --- speed --- */
   const speedBefore = sim.speed;
   sim.rush = Math.max(0, sim.rush - dt);
-  const cap = sim.maxSpeed * (1 + 0.12 * Math.min(1, sim.rush / 1.5));
+  const cap = sim.maxSpeed * (1 + 0.12 * Math.min(1, sim.rush / 1.5)) * (nitroOn ? 1.32 : 1);
+  if (nitroOn) goal = cap;
   if (goal > cap) goal = cap;
-  const rate = (goal < sim.speed) ? 420 : 78;
+  const rate = (goal < sim.speed) ? 420 * wxMul(sim, 'brake') : 78 * spec.accel * (nitroOn ? 2.6 : 1);
   if (goal > sim.speed) sim.speed = Math.min(goal, sim.speed + rate * dt);
   else sim.speed = Math.max(goal, sim.speed - rate * dt);
   sim.speed = clamp(sim.speed, 30, cap * 1.02);
@@ -1926,7 +2255,7 @@ function update(sim, dt){
   /* 위험 게이지: 앞차에 '실제로 막혀' 속도가 크게 떨어졌을 때만 찬다 */
   const stuck = !!blocker && (sim.speed < sim.maxSpeed * 0.86 || blocker.speed < sim.maxSpeed * 0.55);
   const crawling = sim.speed < sim.maxSpeed * 0.55;
-  if (stuck || crawling) sim.danger = Math.min(1, sim.danger + dt * d.dangerRate);
+  if (stuck || crawling) sim.danger = Math.min(1, sim.danger + dt * d.dangerRate * spec.danger);
   else sim.danger = Math.max(0, sim.danger - dt * 0.70);
   if (sim.danger > sim.dangerMax) sim.dangerMax = sim.danger;
   if (blocker && sim.blockT > 2.0 && sim.combo > 0){
@@ -1981,6 +2310,73 @@ function update(sim, dt){
     }
   }
 
+  /* --- v6.0: 도로 위 아이템 3종 (실드 · 니트로 · 더블) --- */
+  sim.itemTimer -= dt;
+  if (sim.itemTimer <= 0 && sim.items.length < 2){
+    spawnItem(sim);
+    sim.itemTimer = 6.5 + sim.rng() * 5;
+  }
+  for (let i=sim.items.length-1;i>=0;i--){
+    const it = sim.items[i];
+    it.t += dt;
+    it.y += sim.speed * SPD_SCALE * dt;
+    if (it.y > sim.worldH + 140){ sim.items.splice(i,1); continue; }
+    if (Math.abs(it.x - px) < ITEM_R + PLAYER.w / 2 && Math.abs(it.y - py) < ITEM_R + PLAYER.h / 2){
+      itemPickup(sim, it, ev);
+      sim.itemCount++;
+      sim.items.splice(i,1);
+    }
+  }
+
+  /* --- v6.0: 돌발 미션 --- */
+  updateMission(sim, dt, ev);
+
+  /* --- v6.0: 경찰 추격전 --- */
+  if (!sim.chase){
+    sim.chaseCd -= dt;
+    if (sim.chaseCd <= 0 && sim.speed >= 290 && sim.dist > 2.5){
+      if (spec.policeImmune){
+        sim.chaseCd = 24 + sim.rng() * 8;
+        const g = addBonus(sim, 150);
+        ev.push({ type:'chaseImmune', gain: g });
+      } else {
+        startChase(sim, ev);
+      }
+    }
+  }
+  if (sim.chase){
+    updateChase(sim, dt, ev);
+    if (sim.state !== 'playing') return ev;
+  }
+
+  /* --- 경찰차 능력: 사이렌으로 전방 1대 차선 양보 유도 --- */
+  if (spec.policeImmune){
+    sim.sirenCd -= dt;
+    if (sim.sirenCd <= 0){
+      sim.sirenCd = 7 + sim.rng() * 3;
+      let sy = null;
+      for (let i=0;i<sim.obstacles.length;i++){
+        const o = sim.obstacles[i];
+        if (o.dead || o.type === 'cone') continue;
+        const dy = py - o.y;
+        if (dy < 60 || dy > 680) continue;
+        if (Math.abs(o.x - px) > LANE_W * 2.2) continue;
+        if (!sy || o.y > sy.y) sy = o;
+      }
+      if (sy && !sy.cutter){
+        const dir = (sy.lane <= 3) ? 1 : -1;
+        const to = clamp(sy.lane + dir, 0, LANES - 1);
+        if (to !== sy.lane){
+          sy.cutter = true; sy.cutLane = to; sy.blinker = true;
+          sy.cutState = 'warn'; sy.cutT = 0;
+          sy.cutFrom = sy.x; sy.cutTo = laneCenter(to); sy.cutDur = 0.5;
+          sim.sirenCount++;
+          ev.push({ type:'siren', obs: sy });
+        }
+      }
+    }
+  }
+
   /* --- collision / near miss --- */
   for (let i=0;i<sim.obstacles.length;i++){
     const o = sim.obstacles[i];
@@ -1993,7 +2389,35 @@ function update(sim, dt){
     const gap = Math.max(gx, gy);
     if (gap < o.minGap) o.minGap = gap;
 
-    if (!sim.god && dx < (o.w + PLAYER.w) / 2 * HIT && dy < (o.h + PLAYER.h) / 2 * HIT){
+    if (!sim.god && dx < (o.w + PLAYER.w) / 2 * HIT * spec.hitbox && dy < (o.h + PLAYER.h) / 2 * HIT * spec.hitbox){
+      /* 장갑차: 꼬깔콘은 그냥 부수고 지나감 (+30점) */
+      if (spec.coneBreak && o.type === 'cone'){
+        o.dead = true;
+        const g = addBonus(sim, 30);
+        sim.shake = Math.max(sim.shake || 0, 0.18);
+        sim.flashT = Math.max(sim.flashT || 0, 0.12);
+        ev.push({ type:'coneSmash', x: o.x, y: o.y, gain: g, obs: o });
+        continue;
+      }
+      /* 니트로: 무적 돌진 — 앞차를 튕겨냄 */
+      if (sim.nitro > 0){
+        o.dead = true;
+        const g = addBonus(sim, 20);
+        sim.shake = Math.max(sim.shake || 0, 0.3);
+        ev.push({ type:'nitroSmash', x: o.x, y: o.y, gain: g, obs: o });
+        continue;
+      }
+      /* 실드: 1회 충돌 방어 + 무적 1.5초 */
+      if ((sim.shield || 0) > 0 && sim.invuln <= 0){
+        sim.shield--;
+        sim.invuln = 1.5;
+        o.dead = true;
+        sim.shake = 1;
+        sim.flashT = 0.3;
+        sim.particles = makeParticles(sim, o);
+        ev.push({ type:'shield', x: o.x, y: o.y, left: sim.shield });
+        continue;
+      }
       o.dead = true;
       return ev.concat(crashAt(sim, o));
     }
@@ -2003,12 +2427,17 @@ function update(sim, dt){
       if (o.minGap < NEAR_MISS){
         sim.kalchi++;
         sim.combo++;
-        sim.comboT = COMBO_WINDOW;
+        sim.comboT = COMBO_WINDOW * spec.combo;
+        if (sim.mission && !sim.mission.done && sim.mission.kind === 'kalchi') sim.mission.prog++;
         if (sim.combo > sim.maxCombo) sim.maxCombo = sim.combo;
         const mult = Math.min(12, sim.combo);
-        const gained = 40 * mult;
-        sim.bonus += gained;
-        sim.rush = Math.min(2.2, sim.rush + 0.26 + Math.min(6, sim.combo) * 0.05);
+        const gained = addBonus(sim, 40 * mult * spec.kalchi);
+        sim.rush = Math.min(2.2, sim.rush + (0.26 + Math.min(6, sim.combo) * 0.05) * spec.nitro);
+        /* 손맛: 히트스탑 + 스피드라인 플래시 + 스파크 + 화면 흔들림 */
+        sim.hitstop = 0.05;
+        sim.flashT = Math.max(sim.flashT || 0, 0.24);
+        sim.shake = Math.max(sim.shake || 0, 0.26);
+        spawnSparks(sim, o);
         ev.push({ type:'kalchi', x: o.x, y: py - 40, combo: sim.combo, gain: gained, obs: o });
       }
     }
@@ -2026,14 +2455,14 @@ function update(sim, dt){
     const m = sim.landSeq[sim.landIdx];
     sim.landIdx++;
     if (m.final){
-      sim.bonus += 400 + sim.leg * 100;
+      addBonus(sim, 400 + sim.leg * 100);
       sim.leg++;
       sim.landIdx = 0;
       sim.landSeq = buildSeq(sim.leg);
       sim.gantry = { name: m.name, sub: m.sub, km: LEG_KM, y: -280, t: 0, final: true };
       ev.push({ type:'lap', leg: sim.leg, name: m.name });
     } else {
-      sim.bonus += 150;
+      addBonus(sim, 150);
       sim.gantry = { name: m.name, sub: m.sub, km: m.rel, y: -280, t: 0 };
       ev.push({ type:'milestone', m: m, next: sim.landSeq[sim.landIdx] || null });
     }
@@ -2608,6 +3037,156 @@ function drawVehicle(ctx, o){
     return;
   }
 
+  /* ---------------- 구급차 ---------------- */
+  if (kind === 'ambulance'){
+    const bg = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+    bg.addColorStop(0, '#b6c2d4'); bg.addColorStop(0.42, '#ffffff'); bg.addColorStop(1, '#b6c2d4');
+    ctx.fillStyle = bg;
+    rr(ctx, -w*0.49, -h*0.50, w*0.98, h, w*0.18); ctx.fill();
+
+    /* 빨간 띠 */
+    ctx.fillStyle = '#e0283c';
+    ctx.fillRect(-w*0.49, -h*0.04, w*0.98, h*0.19);
+
+    /* 지붕 적십자 */
+    ctx.fillStyle = '#ff3446';
+    ctx.fillRect(-w*0.17, -h*0.33, w*0.34, h*0.055);
+    ctx.fillRect(-w*0.055, -h*0.45, w*0.11, h*0.30);
+
+    /* 앞유리 · 뒷창 */
+    ctx.fillStyle = 'rgba(12,22,38,0.90)';
+    rr(ctx, -w*0.36, -h*0.47, w*0.72, h*0.12, 4); ctx.fill();
+    ctx.fillStyle = 'rgba(12,22,38,0.86)';
+    rr(ctx, -w*0.34, h*0.30, w*0.68, h*0.12, 4); ctx.fill();
+
+    /* 사이렌 바 (빨강/파랑 교대) */
+    const ph = (t * 3.4) % 1;
+    const redOn = ph < 0.5;
+    ctx.fillStyle = '#232a35';
+    rr(ctx, -w*0.34, h*0.03, w*0.68, h*0.075, 3); ctx.fill();
+    ctx.fillStyle = redOn ? '#ff3344' : '#5d1018';
+    rr(ctx, -w*0.31, h*0.048, w*0.28, h*0.055, 2); ctx.fill();
+    ctx.fillStyle = redOn ? '#101f66' : '#4b74ff';
+    rr(ctx, w*0.03, h*0.048, w*0.28, h*0.055, 2); ctx.fill();
+
+    /* 측면 'AMBULANCE' 생략, 대신 빨간 십자 마크 */
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(-w*0.42, -h*0.36, 3, h*0.72);
+    ctx.fillRect(w*0.39, -h*0.36, 3, h*0.72);
+
+    ctx.fillStyle = 'rgba(255,252,230,0.98)';
+    rr(ctx, -w*0.42, -h*0.50 + 3, w*0.20, h*0.04, 2); ctx.fill();
+    rr(ctx, w*0.22, -h*0.50 + 3, w*0.20, h*0.04, 2); ctx.fill();
+    ctx.fillStyle = brake ? '#ff2a2a' : '#d41f2e';
+    rr(ctx, -w*0.46, h*0.46, w*0.22, h*0.05, 2); ctx.fill();
+    rr(ctx, w*0.24, h*0.46, w*0.22, h*0.05, 2); ctx.fill();
+    return;
+  }
+
+  /* ---------------- 블랙 수퍼카 ---------------- */
+  if (kind === 'supercar'){
+    const bg = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+    bg.addColorStop(0, '#05060a'); bg.addColorStop(0.42, '#272b38'); bg.addColorStop(0.72, '#14161e'); bg.addColorStop(1, '#05060a');
+    ctx.fillStyle = bg;
+    rr(ctx, -w*0.47, -h*0.50, w*0.94, h, w*0.26); ctx.fill();
+
+    /* 노즈 테이퍼 */
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.beginPath();
+    ctx.moveTo(-w*0.26, -h*0.50 + 2);
+    ctx.lineTo(w*0.26, -h*0.50 + 2);
+    ctx.lineTo(w*0.17, -h*0.30);
+    ctx.lineTo(-w*0.17, -h*0.30);
+    ctx.closePath(); ctx.fill();
+
+    /* 주항색 액센트 */
+    ctx.fillStyle = '#ff7a1a';
+    ctx.fillRect(-w*0.42, -h*0.13, w*0.84, h*0.022);
+    ctx.fillRect(-w*0.30, -h*0.47, w*0.05, h*0.5);
+    ctx.fillRect(w*0.25, -h*0.47, w*0.05, h*0.5);
+
+    /* 캐빈 */
+    ctx.fillStyle = 'rgba(8,14,26,0.94)';
+    rr(ctx, -w*0.31, -h*0.28, w*0.62, h*0.22, 8); ctx.fill();
+    ctx.fillStyle = 'rgba(120,190,255,0.14)';
+    rr(ctx, -w*0.26, -h*0.24, w*0.52, h*0.12, 6); ctx.fill();
+
+    /* 리어 윙 */
+    ctx.fillStyle = '#0c0e14';
+    rr(ctx, -w*0.50, h*0.27, w*1.00, h*0.05, 3); ctx.fill();
+    ctx.fillStyle = '#ff7a1a';
+    ctx.fillRect(-w*0.50, h*0.27, w*1.00, h*0.012);
+
+    /* 사이드미러 */
+    ctx.fillStyle = '#22252f';
+    ctx.fillRect(-w*0.60, -h*0.22, w*0.13, h*0.035);
+    ctx.fillRect(w*0.47, -h*0.22, w*0.13, h*0.035);
+
+    /* 등화 */
+    ctx.fillStyle = 'rgba(240,250,255,0.98)';
+    rr(ctx, -w*0.40, -h*0.50 + 3, w*0.24, h*0.04, 2); ctx.fill();
+    rr(ctx, w*0.16, -h*0.50 + 3, w*0.24, h*0.04, 2); ctx.fill();
+    ctx.fillStyle = brake ? '#ff2222' : '#c81420';
+    rr(ctx, -w*0.44, h*0.46, w*0.26, h*0.05, 2); ctx.fill();
+    rr(ctx, w*0.18, h*0.46, w*0.26, h*0.05, 2); ctx.fill();
+    return;
+  }
+
+  /* ---------------- 덤프트럭 장갑차 ---------------- */
+  if (kind === 'armored'){
+    /* 앞밤이 철제 범푸 */
+    ctx.fillStyle = '#6d7a55';
+    ctx.beginPath();
+    ctx.moveTo(-w*0.54, -h*0.52);
+    ctx.lineTo(w*0.54, -h*0.52);
+    ctx.lineTo(w*0.62, -h*0.60);
+    ctx.lineTo(-w*0.62, -h*0.60);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#3f4a33';
+    ctx.fillRect(-w*0.62, -h*0.60, w*1.24, h*0.022);
+
+    /* 적재함 */
+    const bg = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+    bg.addColorStop(0, '#3d4832'); bg.addColorStop(0.45, '#67754d'); bg.addColorStop(1, '#3d4832');
+    ctx.fillStyle = bg;
+    rr(ctx, -w*0.52, -h*0.28, w*1.03, h*0.76, 5); ctx.fill();
+    /* 리벳 */
+    ctx.fillStyle = 'rgba(210,220,200,0.35)';
+    for (let i=0;i<5;i++){
+      const yy = -h*0.22 + i * (h*0.66) / 5;
+      ctx.fillRect(-w*0.44, yy, 3, 3);
+      ctx.fillRect(w*0.38, yy, 3, 3);
+    }
+    ctx.strokeStyle = 'rgba(20,26,18,0.55)';
+    ctx.lineWidth = 2;
+    for (let i=1;i<4;i++){
+      const yy = -h*0.28 + i * (h*0.76) / 4;
+      ctx.beginPath(); ctx.moveTo(-w*0.48, yy); ctx.lineTo(w*0.48, yy); ctx.stroke();
+    }
+
+    /* 운전석 */
+    ctx.fillStyle = '#4b5740';
+    rr(ctx, -w*0.40, -h*0.50, w*0.80, h*0.25, 6); ctx.fill();
+    ctx.fillStyle = 'rgba(12,20,16,0.92)';
+    rr(ctx, -w*0.30, -h*0.46, w*0.60, h*0.11, 3); ctx.fill();
+
+    /* 바퀴 (광폭) */
+    ctx.fillStyle = '#12151a';
+    rr(ctx, -w*0.66, -h*0.20, w*0.16, h*0.30, 6); ctx.fill();
+    rr(ctx, w*0.50, -h*0.20, w*0.16, h*0.30, 6); ctx.fill();
+    rr(ctx, -w*0.66, h*0.24, w*0.16, h*0.30, 6); ctx.fill();
+    rr(ctx, w*0.50, h*0.24, w*0.16, h*0.30, 6); ctx.fill();
+
+    /* 등화 */
+    ctx.fillStyle = 'rgba(255,246,200,0.95)';
+    ctx.fillRect(-w*0.46, -h*0.56, w*0.16, 5);
+    ctx.fillRect(w*0.30, -h*0.56, w*0.16, 5);
+    ctx.fillStyle = brake ? '#ff2a2a' : '#c31f26';
+    ctx.fillRect(-w*0.48, h*0.46, w*0.18, 6);
+    ctx.fillRect(w*0.30, h*0.46, w*0.18, 6);
+    return;
+  }
+
   /* ---------------- 빨간 스포츠카 (기본) ---------------- */
   const g = ctx.createLinearGradient(-w/2, 0, w/2, 0);
   g.addColorStop(0, '#8c0b16'); g.addColorStop(0.40, '#ff4a52'); g.addColorStop(0.72, '#e11f2e'); g.addColorStop(1, '#8c0b16');
@@ -2697,12 +3276,41 @@ function drawExhaust(ctx, w, h, t, boost, pipes){
 /* ---------- 내 차 ---------- */
 function drawPlayer(ctx, sim, now){
   const x = playerX(sim), y = playerY(sim);
-  const tilt = clamp(-(sim.laneVel || 0) * 0.16, -0.34, 0.34);
+  const spec = sim.spec || carSpec(sim.car);
+  const tilt = clamp(-(sim.laneVel || 0) * 0.16 * (1 + 0.3 * (spec.laneHeavy || 0)), -0.4, 0.4);
   const car = carById(sim.car);
+
+  /* 실드 방어막 링 */
+  if ((sim.shield || 0) > 0){
+    ctx.save();
+    const pulse = 0.55 + 0.35 * Math.abs(Math.sin(now * 4.2));
+    ctx.globalCompositeOperation = 'lighter';
+    const g = ctx.createRadialGradient(x, y, 26, x, y, 96);
+    g.addColorStop(0, 'rgba(110,200,255,0)');
+    g.addColorStop(0.72, 'rgba(110,200,255,' + (0.18 * pulse).toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(110,200,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, 96, 0, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(150,225,255,' + (0.7 * pulse).toFixed(3) + ')';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(x, y, 72, 0, 7); ctx.stroke();
+    ctx.restore();
+    if (sim.shield > 1){
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = '#9fe8ff';
+      ctx.font = '900 15px system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🛡️×' + sim.shield, x + PLAYER.w * 0.8, y + 6);
+      ctx.restore();
+    }
+  }
 
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(tilt);
+  if (sim.invuln > 0 && Math.floor(now * 16) % 2 === 0) ctx.globalAlpha = 0.55;
   const w = PLAYER.w, h = PLAYER.h;
 
   /* 차체 아래 네온 */
@@ -2727,9 +3335,9 @@ function drawPlayer(ctx, sim, now){
 
   drawVehicle(ctx, {
     car: car, w: w, h: h, t: now,
-    boost: sim.state === 'playing' ? Math.min(1, sim.rush) : 0,
+    boost: sim.state === 'playing' ? Math.min(1.35, Math.min(1, sim.rush) + (sim.nitro > 0 ? 0.9 : 0)) : 0,
     brake: !!sim.braking,
-    smoke: car.id === 'tractor'
+    smoke: car.id === 'tractor' || car.id === 'armored'
   });
 
   /* 차종 장식: 경찰차 사이렌 반짝임은 drawVehicle 안에서 */
@@ -2750,6 +3358,24 @@ function drawPlayer(ctx, sim, now){
   /* 내 닉네임 */
   if (sim.state === 'playing' && sim.nick){
     nameTag(ctx, x, y - h/2 - 20, sim.nick, '#7dffc0', 0.72);
+  }
+
+  /* 니트로 화염 */
+  if (sim.nitro > 0 && sim.state === 'playing'){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const fl = 0.7 + 0.3 * Math.sin(now * 34);
+    const g2 = ctx.createLinearGradient(0, y + h/2, 0, y + h/2 + 170 * fl);
+    g2.addColorStop(0, 'rgba(255,250,210,0.9)');
+    g2.addColorStop(0.5, 'rgba(255,140,40,0.55)');
+    g2.addColorStop(1, 'rgba(255,40,20,0)');
+    ctx.fillStyle = g2;
+    ctx.beginPath();
+    ctx.moveTo(x - 20, y + h/2 - 4);
+    ctx.lineTo(x + 20, y + h/2 - 4);
+    ctx.lineTo(x, y + h/2 + 170 * fl);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
   }
 
   if (sim.horn > 0){
@@ -2808,7 +3434,28 @@ function nameTag(ctx, x, y, text, color, alpha, maxW){
   ctx.restore();
 }
 
-/* ---------- 라이벌 고스트 ---------- */
+/* ---------- 라이벌 고스트 (장애물 차와 완전히 분리된 '유령' 표식) ---------- */
+/* 작고 얇은 반투명 태그 — 고스트 위에만 쓰인다 */
+function smallTag(ctx, x, y, text, color, alpha){
+  const label = String(text === undefined || text === null ? '' : text).slice(0, 12);
+  if (!label) return;
+  ctx.save();
+  ctx.globalAlpha = (alpha === undefined ? 0.45 : alpha);
+  ctx.font = '700 13px system-ui,sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  const tw = Math.ceil(ctx.measureText(label).width) + 10;
+  const boxH = 17;
+  let bx = x - tw / 2;
+  bx = clamp(bx, 4, Math.max(4, WORLD_W - 4 - tw));
+  ctx.fillStyle = 'rgba(6,10,18,0.40)';
+  rr(ctx, bx, y - boxH / 2, tw, boxH, 6); ctx.fill();
+  ctx.fillStyle = color || '#bcdcff';
+  ctx.fillText(label, bx + 5, y + 0.5);
+  ctx.restore();
+}
+
+const GHOST_ALPHA = 0.28;          // 고스트 차 투명도 (실제 장애물과 구분)
 function drawGhosts(ctx, sim){
   const list = sim.ghosts || [];
   const py = playerY(sim);
@@ -2817,39 +3464,51 @@ function drawGhosts(ctx, sim){
     const y = py - (g.km - sim.dist) * UNITS_PER_KM;
     if (y < -320 || y > sim.worldH + 320) continue;
     if (sim.dist > g.stopKm + 0.10) continue;
-    if (g.stopped) continue;            // 멈춘 순간부터는 잔해·푯말로 대신 보여준다
+    if (g.stopped) continue;            // 멈춘 순간부터는 갓길 잔해·푯말로 대신 보여준다
     const x = laneCenter(g.lanePos);
+
+    /* 1) 낮은 투명도 차체 */
     ctx.save();
-    ctx.globalAlpha = g.stopped ? 0.4 : 0.55;
+    ctx.globalAlpha = GHOST_ALPHA;
     ctx.translate(x, y);
     drawVehicle(ctx, {
       car: g.car, w: PLAYER.w, h: PLAYER.h, t: (sim.time || 0) + i,
       boost: 0, brake: false, smoke: false
     });
-    /* 고스트 테두리 */
-    ctx.strokeStyle = g.stopped ? 'rgba(255,120,110,0.7)' : 'rgba(140,220,255,0.65)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash && ctx.setLineDash([7, 6]);
-    rr(ctx, -PLAYER.w/2, -PLAYER.h/2, PLAYER.w, PLAYER.h, PLAYER.w*0.22);
-    ctx.stroke();
-    ctx.setLineDash && ctx.setLineDash([]);
     ctx.restore();
-    nameTag(ctx, x, y - PLAYER.h/2 - 16,
-      carById(g.car).emoji + ' ' + g.nick, g.stopped ? '#ffb0a0' : '#bcdcff', 0.62);
-    if (g.stopped){
-      /* 멈춘 고스트 연기 */
-      for (let k=0;k<2;k++){
-        const ph = ((sim.time || 0) * 0.7 + k * 0.5) % 1;
-        ctx.fillStyle = 'rgba(200,205,212,' + (0.20 * (1 - ph)) + ')';
-        ctx.beginPath();
-        ctx.arc(x + Math.sin(ph * 6 + k) * 10, y - 20 - ph * 60, 8 + ph * 20, 0, 7);
-        ctx.fill();
-      }
-    }
+
+    /* 2) 점선 테두리 — '부딪히지 않는 차'임을 한눈에 */
+    ctx.save();
+    ctx.globalAlpha = 0.56;
+    ctx.strokeStyle = 'rgba(130,215,255,0.95)';
+    ctx.lineWidth = 2;
+    if (ctx.setLineDash) ctx.setLineDash([8, 7]);
+    rr(ctx, x - PLAYER.w/2, y - PLAYER.h/2, PLAYER.w, PLAYER.h, PLAYER.w*0.22);
+    ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    ctx.restore();
+
+    /* 3) 얇고 반투명한 작은 이름 태그 (차 위를 가리지 않게) */
+    smallTag(ctx, x, y - PLAYER.h/2 - 11,
+      carById(g.car).emoji + ' ' + g.nick, '#b9dcff', 0.42);
   }
 }
 
-/* ---------- 라이벌이 멈춘 지점 (잔해 + 푯말) ---------- */
+/* ---------- 라이벌이 멈춘 지점 (갓길 잔해 + 작은 푯말) ---------- */
+/* 푯말은 도로 밖 갓길에만 그린다 → 차선·앞차·꼬깔콘을 가리지 않는다. */
+function markerSignSide(i){ return (i % 2 === 0) ? -1 : 1; }
+/* 푯말 사각형 (도로 밖 갓길에만 놓인다 — 테스트에서도 같은 값을 쓴다) */
+function markerSignRect(i){
+  const side = markerSignSide(i);
+  const w = SHOULDER_W - 6;
+  const h = 62;
+  return { side: side, w: w, h: h, x: side < 0 ? 3 : (WORLD_W - 3 - w) };
+}
+function shortName(n, n2){
+  const s = String(n || '');
+  const lim = n2 || 4;
+  return s.length > lim ? s.slice(0, lim) + '…' : s;
+}
 function drawRivalMarkers(ctx, sim){
   const list = sim.rivals || [];
   const H = sim.worldH;
@@ -2858,61 +3517,55 @@ function drawRivalMarkers(ctx, sim){
     const y = markerY(sim, r);
     if (y < -260 || y > H + 160) continue;
     const fade = clamp(1 - Math.max(0, (sim.dist - r.km)) * 0.9, 0.35, 1);
-    const wx = ROAD_L + 60;
+    const side = markerSignSide(i);
+    const rect = markerSignRect(i);
+    const signW = rect.w;
+    const signX = rect.x;
+    const signH = rect.h;
+    const cx = signX + signW / 2;
 
+    /* 1) 갓길로 빠진 잔해 차량 (작게, 비스듬히) — 차선 위를 지나지 않는다 */
     ctx.save();
-    ctx.globalAlpha = fade;
-    /* 잔해 차량 (비스듬히) */
-    ctx.translate(wx, y);
-    ctx.rotate(0.24);
+    ctx.globalAlpha = fade * 0.9;
+    ctx.translate(side < 0 ? signX + signW * 0.5 : signX - signW * 0.5, y);
+    ctx.rotate(side * 0.42);
     drawVehicle(ctx, {
-      car: r.car, w: PLAYER.w * 0.92, h: PLAYER.h * 0.92,
+      car: r.car, w: PLAYER.w * 0.52, h: PLAYER.h * 0.52,
       t: (sim.time || 0) + i, boost: 0, brake: true, smoke: false
     });
-    ctx.fillStyle = 'rgba(14,16,20,0.45)';
-    rr(ctx, -PLAYER.w*0.44, -PLAYER.h*0.44, PLAYER.w*0.88, PLAYER.h*0.88, PLAYER.w*0.2);
-    ctx.fill();
     ctx.restore();
 
-    /* 연기 */
-    ctx.save();
-    ctx.globalAlpha = 0.8 * fade;
-    for (let k=0;k<3;k++){
-      const ph = ((sim.time || 0) * 0.55 + k * 0.34) % 1;
-      ctx.fillStyle = 'rgba(176,182,190,' + (0.24 * (1 - ph)) + ')';
-      ctx.beginPath();
-      ctx.arc(wx + Math.sin(ph * 5 + k) * 12, y - 10 - ph * 120, 10 + ph * 30, 0, 7);
-      ctx.fill();
-    }
-    ctx.restore();
-
-    /* 푯말 */
-    const sw = 264, sh = 62;
-    const sx = ROAD_L + 104;
+    /* 2) 작은 푯말 (갓길 안쪽에 고정) */
     ctx.save();
     ctx.globalAlpha = fade;
-    ctx.fillStyle = 'rgba(8,12,20,0.88)';
-    rr(ctx, sx, y - sh/2, sw, sh, 8); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillStyle = 'rgba(9,13,22,0.90)';
+    rr(ctx, signX, y - signH/2, signW, signH, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,120,110,0.75)';
     ctx.lineWidth = 2;
-    rr(ctx, sx, y - sh/2, sw, sh, 8); ctx.stroke();
-    ctx.fillStyle = '#ffd479';
-    ctx.font = '900 23px system-ui,sans-serif';
-    ctx.textAlign = 'left';
+    rr(ctx, signX, y - signH/2, signW, signH, 7); ctx.stroke();
+    ctx.fillStyle = '#ff8b7a';
+    ctx.fillRect(side < 0 ? signX : signX + signW - 3, y - signH/2 + 5, 3, signH - 10);
+
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('💀 ' + r.nick + ' ' + r.km.toFixed(1) + 'km', sx + 12, y - 12);
-    ctx.fillStyle = '#cfe0f5';
-    ctx.font = '700 18px system-ui,sans-serif';
-    ctx.fillText((r.spot || '여기서') + ' · 여기서 멈춤', sx + 12, y + 14);
+    ctx.fillStyle = '#ffe0d8';
+    ctx.font = '900 14px system-ui,sans-serif';
+    ctx.fillText('💀 ' + shortName(r.nick, 4), cx, y - 17);
+    ctx.fillStyle = '#ffd479';
+    ctx.font = '900 17px system-ui,sans-serif';
+    ctx.fillText(r.km.toFixed(1) + 'km', cx, y + 3);
+    ctx.fillStyle = 'rgba(190,208,230,0.85)';
+    ctx.font = '700 10px system-ui,sans-serif';
+    ctx.fillText('여기서 멈춤', cx, y + 21);
     ctx.restore();
 
-    /* 지금 내가 지나가는 중이면 강조 */
+    /* 3) 지금 내가 지나가는 중이면 강조 */
     if (sim.state === 'playing' && Math.abs(sim.dist - r.km) < 0.35){
       ctx.save();
-      ctx.globalAlpha = 0.5 + 0.3 * Math.sin((sim.time || 0) * 12);
+      ctx.globalAlpha = 0.4 + 0.3 * Math.sin((sim.time || 0) * 12);
       ctx.strokeStyle = '#ff8b7a';
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(wx, y, 70, 0, 7); ctx.stroke();
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cx, y, 44, 0, 7); ctx.stroke();
       ctx.restore();
     }
   }
@@ -2963,23 +3616,25 @@ function drawRoadSigns(ctx, sim){
     const legIdx = Math.floor(distAt / LEG_KM);
     const remain = (legIdx + 1) * LEG_KM - distAt;
     const target = (legIdx % 2 === 0) ? '부산' : '서울';
-    const px = ROAD_R - 8;
+    const px = ROAD_R + 6;
     /* 기둥 */
     ctx.fillStyle = 'rgba(120,128,140,0.9)';
     ctx.fillRect(px - 3, y - 10, 6, 120);
-    /* 판 */
-    const sw = 104, sh = 38;
-    const sx = px - 12 - sw;
+    /* 판 (갓길 안쪽에 작게 — 차선을 가리지 않는다) */
+    const sw = 56, sh = 34;
+    const sx = ROAD_R + 8;
     ctx.fillStyle = 'rgba(22,112,64,0.95)';
-    rr(ctx, sx, y - 14, sw, sh, 5); ctx.fill();
+    rr(ctx, sx, y - 12, sw, sh, 5); ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.75)';
     ctx.lineWidth = 2;
-    rr(ctx, sx, y - 14, sw, sh, 5); ctx.stroke();
+    rr(ctx, sx, y - 12, sw, sh, 5); ctx.stroke();
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '900 19px system-ui,sans-serif';
-    ctx.fillText(target + ' ' + Math.max(0, Math.round(remain)) + 'km', sx + sw/2, y + 5);
+    ctx.font = '900 13px system-ui,sans-serif';
+    ctx.fillText(target, sx + sw/2, y - 2);
+    ctx.font = '900 12px system-ui,sans-serif';
+    ctx.fillText(Math.max(0, Math.round(remain)) + 'km', sx + sw/2, y + 13);
   }
 }
 
@@ -3061,6 +3716,133 @@ function drawStreaks(ctx, sim){
   }
 }
 
+const ITEM_GLOW = { shield:'111,201,255', nitro:'255,140,66', double:'255,212,121' };
+
+/* ---------- 도로 위 아이템 (반짝이는 아이콘) ---------- */
+function drawItems(ctx, sim){
+  const list = sim.items || [];
+  for (let i=0;i<list.length;i++){
+    const it = list[i];
+    const def = itemDef(it.type);
+    const rgb = ITEM_GLOW[it.type] || '255,255,255';
+    const bob = Math.sin(it.t * 5.2 + i) * 3;
+    const pulse = 0.55 + 0.45 * Math.abs(Math.sin(it.t * 4.4 + i));
+    const y = it.y + bob;
+    ctx.save();
+    ctx.translate(it.x, y);
+    const g = ctx.createRadialGradient(0, 0, 2, 0, 0, 52);
+    g.addColorStop(0, 'rgba(' + rgb + ',' + (0.42 * pulse).toFixed(3) + ')');
+    g.addColorStop(0.55, 'rgba(' + rgb + ',' + (0.15 * pulse).toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(' + rgb + ',0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(0, 0, 52, 0, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.75 * pulse).toFixed(3) + ')';
+    ctx.lineWidth = 2.5;
+    if (ctx.setLineDash) ctx.setLineDash([6, 6]);
+    ctx.beginPath(); ctx.arc(0, 0, 25, 0, 7); ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(10,16,28,0.74)';
+    ctx.beginPath(); ctx.arc(0, 0, 19, 0, 7); ctx.fill();
+    ctx.font = '700 23px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(def.emoji, 0, 1);
+    ctx.restore();
+  }
+}
+
+/* ---------- 경찰 추격차 ---------- */
+function drawChase(ctx, sim){
+  const ch = sim.chase;
+  if (!ch) return;
+  const x = laneCenter(ch.lanePos), y = ch.y;
+  const warned = ch.phase === 'follow' && ch.lungeCd < 0.9;
+  const lunge = ch.phase === 'lunge';
+  if (lunge || warned){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const pulse = 0.32 + 0.30 * Math.abs(Math.sin((sim.time || 0) * 14));
+    const g = ctx.createRadialGradient(x, y, 4, x, y, 150);
+    g.addColorStop(0, 'rgba(255,60,70,' + pulse.toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(255,60,70,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, 150, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.translate(x, y);
+  drawVehicle(ctx, { car: 'police', w: PLAYER.w, h: PLAYER.h, t: (sim.time || 0), boost: 0.3, brake: false });
+  ctx.restore();
+  ctx.save();
+  ctx.globalAlpha = 0.9;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '900 12px system-ui,sans-serif';
+  ctx.fillStyle = warned || lunge ? '#ff6b6b' : 'rgba(190,210,240,0.75)';
+  ctx.fillText(warned || lunge ? '🚨 비켜!' : '🚨 경찰 추격', x, y - PLAYER.h/2 - 12);
+  ctx.restore();
+}
+
+/* ---------- 비 · 눈 날씨 이펙트 ---------- */
+function drawWeather(ctx, sim){
+  const k = sim.wxInten || 0;
+  if (k <= 0.01) return;
+  const H = sim.worldH, W = WORLD_W;
+  const rain = sim.wx === 'rain';
+  ctx.save();
+  if (rain){
+    ctx.strokeStyle = 'rgba(175,208,255,' + (0.34 * k).toFixed(3) + ')';
+    ctx.lineWidth = 1.6;
+    for (let i=0;i<46;i++){
+      const seed = i * 137.5;
+      const x = ((seed * 7.3 + sim.scroll * 0.6) % (W + 120)) - 60;
+      const y = ((seed * 11.7 + sim.scroll * 2.1 + (sim.time || 0) * 900) % (H + 160)) - 80;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - 8, y + 44);
+      ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(38,66,116,' + (0.12 * k).toFixed(3) + ')';
+    ctx.fillRect(0, 0, W, H);
+  } else {
+    ctx.fillStyle = 'rgba(238,246,255,' + (0.85 * k).toFixed(3) + ')';
+    for (let i=0;i<52;i++){
+      const seed = i * 97.3;
+      const x = ((seed * 5.1 + Math.sin((sim.time || 0) * 0.7 + i) * 24 + sim.scroll * 0.2) % (W + 80)) - 40;
+      const y = ((seed * 13.9 + sim.scroll * 0.9 + (sim.time || 0) * 150) % (H + 120)) - 60;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.6 + (i % 3), 0, 7);
+      ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(222,236,255,' + (0.14 * k).toFixed(3) + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+  ctx.restore();
+}
+
+/* ---------- 칼치기 스피드라인 플래시 ---------- */
+function drawSpeedFlash(ctx, sim){
+  const t = sim.flashT || 0;
+  if (t <= 0) return;
+  const a = Math.min(1, t / 0.24);
+  const H = sim.worldH;
+  ctx.save();
+  ctx.globalAlpha = a * 0.85;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2.5;
+  for (let i=0;i<7;i++){
+    const y = (i * 173 + (sim.scroll * 1.9) % 173) % H;
+    const len = 90 + (i * 37) % 120;
+    ctx.beginPath(); ctx.moveTo(10, y); ctx.lineTo(10, y + len); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(WORLD_W - 10, y + 60); ctx.lineTo(WORLD_W - 10, y + 60 + len); ctx.stroke();
+  }
+  ctx.globalAlpha = a * 0.5;
+  ctx.fillStyle = '#dff2ff';
+  ctx.fillRect(0, 0, 26, H);
+  ctx.fillRect(WORLD_W - 26, 0, 26, H);
+  ctx.restore();
+}
+
 function drawWarnings(ctx, sim){
   if (sim.state !== 'playing') return;
   ctx.save();
@@ -3136,6 +3918,7 @@ function drawSim(ctx, sim, now){
   if (sim.state !== 'title'){
     drawRivalMarkers(ctx, sim);
     drawGhosts(ctx, sim);
+    drawItems(ctx, sim);
   }
 
   const list = sim.obstacles.slice().sort(function(a,b){ return a.y - b.y; });
@@ -3147,11 +3930,14 @@ function drawSim(ctx, sim, now){
   for (let i=0;i<list.length;i++) drawCarLights(ctx, list[i], lightStrength);
   drawBeam(ctx, sim);
 
+  drawChase(ctx, sim);
   drawGantry(ctx, sim);
   if (sim.state !== 'crash' || sim.crashT < 0.75) drawPlayer(ctx, sim, now);
   drawParticles(ctx, sim);
   drawPops(ctx, sim);
   drawStreaks(ctx, sim);
+  drawWeather(ctx, sim);
+  drawSpeedFlash(ctx, sim);
   drawWarnings(ctx, sim);
   drawCrashOverlay(ctx, sim);
   ctx.restore();
@@ -3164,11 +3950,14 @@ const Sfx = (function(){
   let actx = null, muted = false, engine = null, engineGain = null, master = null;
   let carId = 'sport';
   const CAR_AUDIO = {
-    sport:   { base:54, mult:0.150, wave:'sawtooth', filter:1.8 },
-    taxi:    { base:58, mult:0.140, wave:'sawtooth', filter:1.6 },
-    porter:  { base:38, mult:0.120, wave:'square',   filter:0.9 },
-    police:  { base:60, mult:0.160, wave:'sawtooth', filter:2.0 },
-    tractor: { base:30, mult:0.100, wave:'square',   filter:0.7 }
+    sport:     { base:54, mult:0.150, wave:'sawtooth', filter:1.8 },
+    taxi:      { base:58, mult:0.140, wave:'sawtooth', filter:1.6 },
+    porter:    { base:38, mult:0.120, wave:'square',   filter:0.9 },
+    police:    { base:60, mult:0.160, wave:'sawtooth', filter:2.0 },
+    tractor:   { base:30, mult:0.100, wave:'square',   filter:0.7 },
+    ambulance: { base:56, mult:0.138, wave:'sawtooth', filter:1.5 },
+    supercar:  { base:66, mult:0.172, wave:'sawtooth', filter:2.3 },
+    armored:   { base:34, mult:0.108, wave:'square',   filter:0.8 }
   };
 
   function ensure(){
@@ -3265,6 +4054,17 @@ const Sfx = (function(){
           tone(150 + i * 12, 0.10, 'square', 0.075, 120, i * 0.13);
           noise(0.09, 0.05, 900, 500, 'bandpass');
         }
+      } else if (kind === 'ambulance'){
+        /* 구급차 웨일 사이렌 */
+        tone(660, 0.42, 'sine', 0.062, 990, 0);
+        tone(990, 0.42, 'sine', 0.055, 660, 0.40);
+      } else if (kind === 'supercar'){
+        tone(1046, 0.07, 'sawtooth', 0.05, 1620, 0);
+        tone(1620, 0.12, 'sawtooth', 0.045, 1100, 0.09);
+      } else if (kind === 'armored'){
+        /* 에어혼 */
+        tone(104, 0.85, 'square', 0.085, null, 0);
+        tone(142, 0.85, 'square', 0.06, null, 0.02);
       } else {
         tone(523, 0.12, 'square', 0.07, null, 0);
         tone(659, 0.12, 'square', 0.06, null, 0);
@@ -3304,6 +4104,40 @@ const Sfx = (function(){
       tone(740, 0.12, 'square', 0.07, 520, 0);
       tone(740, 0.12, 'square', 0.07, 520, 0.16);
     },
+    /* v6.0 신규 효과음 */
+    item: function(){
+      tone(988, 0.09, 'triangle', 0.07, null, 0);
+      tone(1318, 0.09, 'triangle', 0.065, null, 0.08);
+      tone(1760, 0.14, 'triangle', 0.05, null, 0.16);
+    },
+    shield: function(){
+      noise(0.30, 0.10, 3400, 900, 'bandpass');
+      tone(420, 0.24, 'sine', 0.06, 1200, 0);
+    },
+    nitro: function(){
+      noise(0.60, 0.16, 500, 4200, 'bandpass');
+      tone(180, 0.55, 'sawtooth', 0.10, 640, 0);
+    },
+    mission: function(){
+      tone(587, 0.11, 'square', 0.06, null, 0);
+      tone(784, 0.11, 'square', 0.06, null, 0.1);
+      tone(1175, 0.22, 'square', 0.05, null, 0.2);
+    },
+    fail: function(){
+      tone(233, 0.16, 'square', 0.05, 155, 0);
+      tone(155, 0.22, 'square', 0.045, 110, 0.14);
+    },
+    siren: function(){
+      for (let i=0;i<4;i++){
+        tone(900, 0.18, 'sine', 0.055, 1250, i * 0.20);
+        tone(1250, 0.18, 'sine', 0.05, 900, i * 0.20 + 0.10);
+      }
+    },
+    caught: function(){
+      tone(300, 0.30, 'sawtooth', 0.09, 120, 0);
+      tone(180, 0.40, 'square', 0.07, 90, 0.24);
+      noise(0.40, 0.14, 1600, 300, 'lowpass');
+    },
     engineStart: function(){
       const c = ensure(); if (!c || engine) return;
       const a = CAR_AUDIO[carId] || CAR_AUDIO.sport;
@@ -3332,15 +4166,41 @@ const Sfx = (function(){
 })();
 
 /* =========================================================
+   haptics — iOS 등 미지원 기기에서도 예외를 던지지 않는 안전 래퍼
+   ========================================================= */
+const Haptics = {
+  on: true,
+  buzz: function(pattern){
+    if (!this.on) return false;
+    try {
+      if (typeof navigator !== 'undefined' && navigator && typeof navigator.vibrate === 'function'){
+        return navigator.vibrate(pattern);
+      }
+    } catch(e){ /* 무시 */ }
+    return false;
+  }
+};
+
+/* =========================================================
    export for tests
    ========================================================= */
 const API = {
-  WORLD_W: WORLD_W, ROAD_L: ROAD_L, ROAD_R: ROAD_R, LANE_W: LANE_W, LANES: LANES,
+  WORLD_W: WORLD_W, ROAD_L: ROAD_L, ROAD_R: ROAD_R, LANE_W: LANE_W, LANES: LANES, ROAD_W: ROAD_W,
   PLAYER: PLAYER, PLAYER_Y_OFF: PLAYER_Y_OFF,
   SPD_SCALE: SPD_SCALE, KM_DIV: KM_DIV, HIT: HIT, NEAR_MISS: NEAR_MISS,
   LEG_KM: LEG_KM, START_KMH: START_KMH, TOP_KMH: TOP_KMH, DAY_LEN: DAY_LEN, COMBO_WINDOW: COMBO_WINDOW,
   REC_KEY: REC_KEY, THEMES: THEMES, SKY_KEYS: SKY_KEYS, ROUTE_FWD: ROUTE_FWD, ROUTE_REV: ROUTE_REV,
   CARS: CARS, NICK_POOL: NICK_POOL, NICK_MAX: NICK_MAX,
+  carSpec: carSpec, CAR_SPEC_DEFAULT: CAR_SPEC_DEFAULT,
+  WX_TYPES: WX_TYPES, ITEM_TYPES: ITEM_TYPES, MISSION_DEFS: MISSION_DEFS,
+  CHASE_DUR: CHASE_DUR, CHASE_BONUS: CHASE_BONUS, ITEM_R: ITEM_R,
+  GHOST_ALPHA: GHOST_ALPHA, SHOULDER_W: SHOULDER_W,
+  addBonus: addBonus, scoreMult: scoreMult, wxMul: wxMul, wxLabel: wxLabel,
+  spawnSparks: spawnSparks, spawnItem: spawnItem, itemPickup: itemPickup, itemDef: itemDef,
+  startMission: startMission, updateMission: updateMission,
+  startChase: startChase, updateChase: updateChase, shortName: shortName,
+  drawItems: drawItems, drawChase: drawChase, drawWeather: drawWeather,
+  drawSpeedFlash: drawSpeedFlash, smallTag: smallTag,
   PROFILE_KEY: PROFILE_KEY, RIVALS_KEY: RIVALS_KEY, CHALLENGE_PARAM: CHALLENGE_PARAM, UNITS_PER_KM: UNITS_PER_KM,
   carById: carById, carIndex: carIndex, randomNick: randomNick, normalizeNick: normalizeNick,
   blankProfile: blankProfile, loadProfile: loadProfile, saveProfile: saveProfile,
@@ -3360,7 +4220,7 @@ const API = {
   fetchWithTimeout: fetchWithTimeout, createServerRank: createServerRank,
   loadPostMark: loadPostMark, savePostMark: savePostMark,
   drawSim: drawSim, drawVehicle: drawVehicle, drawGhosts: drawGhosts, drawRivalMarkers: drawRivalMarkers,
-  nameTag: nameTag,
+  nameTag: nameTag, Haptics: Haptics, markerSignRect: markerSignRect, markerSignSide: markerSignSide,
   laneCenter: laneCenter, playerX: playerX, playerY: playerY,
   newGame: newGame, start: start, update: update, steer: steer, setLane: setLane,
   spawnWave: spawnWave, freeInBand: freeInBand, addObstacle: addObstacle, addCone: addCone,
@@ -3412,6 +4272,10 @@ if (typeof document !== 'undefined'){
     const recordEl = document.getElementById('record');
     const record2 = recordEl.querySelector('.r2');
     const hintEl = document.getElementById('hint');
+    const missionEl = document.getElementById('mission');
+    const missionTxt = missionEl ? missionEl.querySelector('.mtxt') : null;
+    const missionProg = missionEl ? missionEl.querySelector('.mprog') : null;
+    const carSpecEl = document.getElementById('carSpec');
     const flashEl = document.getElementById('flash');
     const toastEl = document.getElementById('toast');
     const tBest = document.getElementById('tBest');
@@ -3491,6 +4355,7 @@ if (typeof document !== 'undefined'){
       const c = carById(profile.car);
       if (carNameEl) carNameEl.textContent = c.name;
       if (carTagEl) carTagEl.textContent = c.tag;
+      if (carSpecEl) carSpecEl.textContent = c.ability || '';
       if (carDotsEl){
         const html = [];
         for (let i=0;i<CARS.length;i++){
@@ -3752,13 +4617,40 @@ if (typeof document !== 'undefined'){
       return { rows: rows, myRank: myRank, total: rows.length, next: bestAhead };
     }
 
+    /* ---------- 돌발 미션 칩 (상단 중앙, 조작 방해 없음) ---------- */
+    let missionRef = null, missionHideAt = 0;
+    function updateMissionUI(){
+      if (!missionEl) return;
+      const m = sim.mission;
+      if (m !== missionRef){ missionRef = m; missionHideAt = 0; }
+      if (!m){ missionEl.classList.remove('on'); return; }
+      if (!m.done){
+        const left = Math.max(0, Math.ceil(m.dur - m.t));
+        const prog = (m.kind === 'lane0')
+          ? (Math.floor(m.prog) + '/' + m.goal + 's')
+          : (m.prog + '/' + m.goal);
+        if (missionTxt) missionTxt.textContent = m.emoji + ' ' + m.text;
+        if (missionProg) missionProg.textContent = prog + ' · ' + left + 's';
+        missionEl.classList.remove('done');
+        missionEl.classList.add('on');
+        return;
+      }
+      if (!missionHideAt) missionHideAt = sim.time + 1.8;
+      if (missionTxt) missionTxt.textContent = m.ok ? ('✅ 미션 성공! +' + m.bonus) : '❌ 미션 실패';
+      if (missionProg) missionProg.textContent = '';
+      if (m.ok) missionEl.classList.add('done'); else missionEl.classList.remove('done');
+      if (sim.time <= missionHideAt) missionEl.classList.add('on');
+      else missionEl.classList.remove('on');
+    }
+
     function updateHUD(){
       const next = sim.landSeq[sim.landIdx];
       legName.textContent = legTitle(sim.leg);
       nextName.textContent = next ? ('다음 ' + next.emoji + ' ' + next.name + ' · ' + fmtKm(Math.max(0, next.abs - sim.dist)) + 'km')
         : '';
       distVal.textContent = fmtKm(sim.dist);
-      wxVal.textContent = themeLabel(sim.themeP);
+      const wxTxt = wxLabel(sim);
+      wxVal.textContent = (wxTxt ? wxTxt + ' · ' : '') + themeLabel(sim.themeP);
       spdVal.textContent = Math.round(sim.speed);
       bestVal.textContent = '🏆 ' + (sim.rec.bestKm > 0 ? fmtKm(sim.rec.bestKm) + 'km' : '—');
 
@@ -3786,6 +4678,7 @@ if (typeof document !== 'undefined'){
       }
       lastComboShown = sim.combo;
       updateTargetLine();
+      updateMissionUI();
     }
 
     function buildTicks(){
@@ -3896,6 +4789,7 @@ if (typeof document !== 'undefined'){
         const e = ev[i];
         if (e.type === 'kalchi'){
           Sfx.whoosh();
+          Haptics.buzz(15);
           const label = e.combo >= 2 ? ('칼치기 x' + e.combo + '  +' + e.gain) : ('칼치기 +' + e.gain);
           pop(label, playerX(sim) + (sim.laneVel || 0) * 10, playerY(sim) - 80, e.combo >= 3 ? '#ffd479' : '#ffe066', e.combo >= 5 ? 31 : 26);
         } else if (e.type === 'cut'){
@@ -3920,10 +4814,67 @@ if (typeof document !== 'undefined'){
         } else if (e.type === 'record'){
           if (e.kind === 'speed') toast('⚡ 최고 속도 경신 · ' + Math.round(e.value) + 'km/h');
           else showRecord(e.kind, e.value, e.prev);
+        } else if (e.type === 'weather'){
+          if (e.wx === 'rain'){
+            toast('🌧️ 비가 쏟아진다 · 노면이 미끄럽다');
+            pop('빗줄기!', playerX(sim), playerY(sim) - 150, '#9fd0ff', 22);
+          } else {
+            toast('❄️ 눈길 · 제동과 조향이 무겁다');
+            pop('눈길!', playerX(sim), playerY(sim) - 150, '#eaf6ff', 22);
+          }
+        } else if (e.type === 'item'){
+          Haptics.buzz(25);
+          if (e.item.id === 'nitro'){ Sfx.nitro(); }
+          else if (e.item.id === 'shield'){ Sfx.shield(); }
+          else { Sfx.item(); }
+          pop(e.item.emoji + ' ' + e.item.label + '!', e.x, e.y, e.item.color, 24);
+          if (e.item.id === 'double') toast('🧲 더블 점수 · 8초간 점수 2배');
+          else if (e.item.id === 'nitro') toast('🔥 니트로 · 3초 무적 광속 돌진');
+          else toast('🛡️ 실드 장착 · 충돌 1회 방어');
+        } else if (e.type === 'shield'){
+          Haptics.buzz(40);
+          Sfx.shield();
+          pop('🛡️ 실드 방어!', e.x, e.y - 30, '#9fe8ff', 26);
+          sim.shake = 0.7;
+        } else if (e.type === 'coneSmash'){
+          Haptics.buzz(20);
+          Sfx.cut();
+          pop('+ ' + e.gain + ' 꼬깔콘 분쇄!', e.x, e.y - 20, '#ffb072', 23);
+        } else if (e.type === 'nitroSmash'){
+          Sfx.cut();
+          pop('+' + e.gain + ' 튕겨냈다!', e.x, e.y - 20, '#ff8c42', 22);
+        } else if (e.type === 'siren'){
+          Sfx.alarm();
+          pop('🚓 사이렌!', e.obs.x, e.obs.y - 40, '#8fc6ff', 22);
+        } else if (e.type === 'chaseStart'){
+          Haptics.buzz([40, 60, 40]);
+          Sfx.siren();
+          banner('🚨 경찰 추격 시작!', '12초 버티거나 칼치기 3회로 따돌려라');
+        } else if (e.type === 'chaseLunge'){
+          Sfx.alarm();
+        } else if (e.type === 'chaseSuccess'){
+          Haptics.buzz(25);
+          Sfx.record();
+          banner('🚨 경찰 따돌림 성공! +' + e.gain, e.early ? '칼치기로 따돌렸다' : '12초 버텼다');
+          pop('도망 성공!', playerX(sim), playerY(sim) - 110, '#7dffc0', 26);
+        } else if (e.type === 'chaseImmune'){
+          pop('🚓 경찰차는 추격 면제 +' + e.gain, playerX(sim), playerY(sim) - 110, '#9fd0ff', 23);
+        } else if (e.type === 'caught'){
+          Haptics.buzz([80, 40, 120]);
+          Sfx.caught();
+        } else if (e.type === 'missionStart'){
+          Sfx.mission();
+        } else if (e.type === 'missionDone'){
+          Haptics.buzz(25);
+          Sfx.mission();
+          pop('🎯 미션 성공 +' + e.gain, playerX(sim), playerY(sim) - 140, '#7dffc0', 26);
+        } else if (e.type === 'missionFail'){
+          Sfx.fail();
         } else if (e.type === 'comboEnd'){
           if (e.blocked) pop('콤보 끊김', playerX(sim), playerY(sim) - 70, '#ff8b7a', 24);
         } else if (e.type === 'crash'){
           Sfx.crash();
+          Haptics.buzz([80, 40, 120]);
           Sfx.engineStop();
           flashEl.classList.remove('go');
           void flashEl.offsetWidth;
