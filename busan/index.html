@@ -6337,7 +6337,12 @@ if (typeof document !== 'undefined'){
       Sfx.unlock();
       Sfx.engineStart();
       Sfx.bgmStart(bgmTrackIdFor(sim.leg));
-      if (pauseBtn) pauseBtn.classList.add('on');
+      if (pauseBtn){
+        pauseBtn.classList.add('on');
+        pauseBtn.classList.remove('paused');
+        pauseBtn.textContent = '⏸';
+        pauseBtn.setAttribute('aria-label', '일시정지');
+      }
       if (pauseOv) pauseOv.classList.add('hidden');
       hintEl.innerHTML = '<b>←</b> 왼쪽 탭 · <b>→</b> 오른쪽 탭 · 내 차 탭 = <b>빵빵</b>';
       hintEl.classList.add('on');
