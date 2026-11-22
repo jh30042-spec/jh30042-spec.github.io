@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v5.2">
+<meta name="busan-build" content="v5.3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -275,6 +275,14 @@
   .rRow .km{color:#ffd479;font-variant-numeric:tabular-nums;white-space:nowrap}
   .rRow.me{background:rgba(125,255,192,.12);border-radius:calc(var(--u)*1.4);padding-left:calc(var(--u)*.6);padding-right:calc(var(--u)*.6)}
   .rRow.me .nm{color:#7dffc0}
+  /* TOP 10 — 화면이 좁아도 넘치지 않게 순위표만 스크롤 */
+  #rivalList{max-height:min(calc(var(--u)*44), 36vh);overflow-y:auto;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent}
+  #rivalList::-webkit-scrollbar{width:calc(var(--u)*1.2)}
+  #rivalList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.26);border-radius:99px}
+  #rivalList::-webkit-scrollbar-track{background:transparent}
+  .rGap{text-align:center;font-size:calc(var(--u)*2.2);font-weight:900;line-height:1;color:#7d8ea8;
+    padding:calc(var(--u)*.5) 0;border-top:1px solid rgba(255,255,255,.05)}
 
   .cta{
     width:100%;border:none;cursor:pointer;border-radius:calc(var(--u)*4);white-space:nowrap;
@@ -332,6 +340,14 @@
   .lbRow.me{background:rgba(125,255,192,.13);box-shadow:inset 0 0 0 1px rgba(125,255,192,.35)}
   .lbRow.me .nm{color:#7dffc0}
   .lbRow.me .km{color:#fff}
+  /* TOP 10 — 게임오버 화면에서도 순위표만 스크롤 (아래 버튼 영역 확보) */
+  #lbList{max-height:min(calc(var(--u)*44), 34vh);overflow-y:auto;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent}
+  #lbList::-webkit-scrollbar{width:calc(var(--u)*1.2)}
+  #lbList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.26);border-radius:99px}
+  #lbList::-webkit-scrollbar-track{background:transparent}
+  .lbGap{text-align:center;font-size:calc(var(--u)*2.0);font-weight:900;line-height:1;color:#7d8ea8;
+    padding:calc(var(--u)*.6) 0;border-top:1px solid rgba(255,255,255,.05)}
 
   /* 대전장 링크 수동 복사 */
   #linkBox{display:flex;gap:calc(var(--u)*1);align-items:center;margin-top:calc(var(--u)*1);
@@ -926,6 +942,7 @@ const SERVER_LIMIT = 50;          /* 서버에서 받아올 상위 기록 수 */
 const SERVER_NICK_MAX = 24;       /* DB 보안 규칙: name 24자 이하 */
 const SERVER_MIN_KM = 1.0;        /* 1.0km 이상만 서버에 등록 */
 const SERVER_RIVAL_MAX = 20;      /* 순위표·라이벌에 올리는 서버 기록 최대 수 */
+const LEADERBOARD_TOP = 10;       /* 순위표(타이틀·게임오버)에 보여주는 최대 인원 (TOP 10) */
 const GHOST_MAX = 8;              /* 도로 위 고스트 차량 최대 수 */
 const SERVER_POST_KEY = 'busan8_server_post_v1';
 
@@ -1228,6 +1245,25 @@ function buildLeaderboard(profile, records, rivals){
   for (let i=0;i<rows.length;i++) rows[i].rank = i + 1;
   return { rows: rows, mine: myRow, total: rows.length };
 }
+/*
+  순위표에 실제로 그릴 행 — TOP N + (내가 N위 밖이면) 내 행을 맨 아래에 덧붙인다.
+  타이틀 미리보기와 게임오버 순위표가 같은 규칙을 쓰도록 한 곳에 모은다.
+*/
+function topRowsForDisplay(rows, limit){
+  const list = rows || [];
+  const n = Math.max(1, Math.floor(Number(limit) || LEADERBOARD_TOP));
+  const top = list.slice(0, n);
+  let me = null;
+  for (let i=0;i<list.length;i++){
+    if (list[i] && list[i].me){ me = list[i]; break; }
+  }
+  if (!me) return top;
+  for (let i=0;i<top.length;i++){
+    if (top[i] === me || (top[i] && top[i].me)) return top;
+  }
+  return top.concat([me]);
+}
+
 function entryForRun(sim){
   return {
     nick: normalizeNick(sim.nick) || '나',
@@ -3287,7 +3323,8 @@ const API = {
   mergeRival: mergeRival, addRivalToList: addRivalToList, registerRival: registerRival, resetRivals: resetRivals,
   describeStop: describeStop, encodeChallenge: encodeChallenge, decodeChallenge: decodeChallenge,
   challengeUrl: challengeUrl, parseChallengeFromSearch: parseChallengeFromSearch, challengeRecord: challengeRecord,
-  buildLeaderboard: buildLeaderboard, entryForRun: entryForRun, rankOfRun: rankOfRun, nextTarget: nextTarget,
+  buildLeaderboard: buildLeaderboard, topRowsForDisplay: topRowsForDisplay, LEADERBOARD_TOP: LEADERBOARD_TOP,
+  entryForRun: entryForRun, rankOfRun: rankOfRun, nextTarget: nextTarget,
   markerY: markerY, makeGhosts: makeGhosts, legProgressPct: legProgressPct,
   SERVER_DB: SERVER_DB, SERVER_PATH: SERVER_PATH, SERVER_TIMEOUT: SERVER_TIMEOUT, SERVER_LIMIT: SERVER_LIMIT,
   SERVER_NICK_MAX: SERVER_NICK_MAX, SERVER_MIN_KM: SERVER_MIN_KM, SERVER_RIVAL_MAX: SERVER_RIVAL_MAX,
@@ -3559,10 +3596,11 @@ if (typeof document !== 'undefined'){
       if (!rivalListEl) return;
       const mg = rivalMerge();
       const lb = buildLeaderboard(profile, rankRecords(mg), mg.list);
-      const rows = lb.rows.slice(0, 5);
+      const rows = topRowsForDisplay(lb.rows, LEADERBOARD_TOP);
       const html = [];
       for (let i=0;i<rows.length;i++){
         const r = rows[i];
+        if (r.me && i === rows.length - 1 && r.rank > rows.length) html.push('<div class="rGap">⋯</div>');
         html.push('<div class="rRow' + (r.me ? ' me' : '') + '">' +
           '<span class="rk">' + r.rank + '</span>' +
           '<span class="em">' + carById(r.car).emoji + '</span>' +
@@ -3657,16 +3695,15 @@ if (typeof document !== 'undefined'){
       let myRank = 0;
       for (let i=0;i<rows.length;i++) if (rows[i].me) myRank = rows[i].rank;
 
-      const top = rows.slice(0, 8);
-      let meShown = false;
-      for (let i=0;i<top.length;i++) if (top[i].me) meShown = true;
-      let show = top;
-      if (!meShown){
-        for (let i=0;i<rows.length;i++) if (rows[i].me) show = top.slice(0, 7).concat([rows[i]]);
-      }
+      const top = topRowsForDisplay(rows, LEADERBOARD_TOP);
+      const show = top;
       const html = [];
       for (let i=0;i<show.length;i++){
         const r = show[i];
+        /* TOP 10 밖에서 맨 아래에 덧붙인 내 행 앞에는 생략 표시 (순위가 건너뛴 걸 알린다) */
+        if (r.me && i === show.length - 1 && r.rank > show.length){
+          html.push('<div class="lbGap">⋯</div>');
+        }
         html.push('<div class="lbRow' + (r.me ? ' me' : '') + '">' +
           '<span class="rk">' + r.rank + '</span>' +
           '<span class="em">' + carById(r.car).emoji + '</span>' +
