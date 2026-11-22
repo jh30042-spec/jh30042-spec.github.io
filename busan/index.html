@@ -280,6 +280,9 @@
   }
   .overlay.hidden{opacity:0;pointer-events:none;visibility:hidden;transition:opacity .28s,visibility .28s}
 
+  /* 오버레이 스크롤바는 모바일에서 보이지 않게 (내용이 조금 넘쳐도 화면을 가리지 않도록) */
+  #title,#over{scrollbar-width:none;-ms-overflow-style:none}
+  #title::-webkit-scrollbar,#over::-webkit-scrollbar{width:0;height:0;display:none}
   #title{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
     background:linear-gradient(to bottom,rgba(6,9,18,.97) 0%,rgba(7,10,19,.97) 30%,#070b14 100%)}
