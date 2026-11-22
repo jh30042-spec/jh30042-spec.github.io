@@ -209,6 +209,26 @@
   #hint b{color:#ffe08a}
 
   /* ---------- toast ---------- */
+  /* ---------- 아이템 안내 (타이틀 · 2×2 컴팩트) ---------- */
+  #itemGuide{
+    display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.8);
+    width:100%;box-sizing:border-box;margin:calc(var(--u)*1.4) 0 calc(var(--u)*.4);
+  }
+  #itemGuide .ig{
+    display:flex;align-items:center;gap:calc(var(--u)*.8);min-width:0;
+    padding:calc(var(--u)*.7) calc(var(--u)*1.0);border-radius:calc(var(--u)*1.5);
+    background:rgba(11,18,31,.74);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
+  }
+  #itemGuide .ig b{flex:0 0 auto;font-size:calc(var(--u)*2.9);line-height:1;
+    filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
+  #itemGuide .ig span{min-width:0;font-size:calc(var(--u)*2.05);font-weight:700;color:#b9cadf;line-height:1.12;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #itemGuide .ig em{display:block;font-style:normal;font-size:calc(var(--u)*2.3);font-weight:900;color:#fff;
+    letter-spacing:-.02em}
+  /* 함정은 빨간 테로 한눈에 구분 */
+  #itemGuide .ig.bad{background:rgba(44,7,11,.80);box-shadow:inset 0 0 0 1px rgba(255,59,71,.58)}
+  #itemGuide .ig.bad em{color:#ff9c94}
+
   #toast{
     position:absolute;left:50%;bottom:calc(var(--u)*26);transform:translateX(-50%);z-index:60;
     background:rgba(10,16,28,.94);border:1px solid rgba(255,255,255,.16);border-radius:99px;
@@ -495,6 +515,12 @@
     <div id="chBanner" class="hidden"><b></b><span></span></div>
     <div class="tEmoji">🚗💨</div>
     <h1>서울 → 부산<em>무한 하드코어 질주</em></h1>
+    <div id="itemGuide" aria-label="도로 위 아이템 4종 안내">
+      <div class="ig"><b>🛡️</b><span><em>쉴드</em>충돌·단속 1회 방어</span></div>
+      <div class="ig"><b>🔥</b><span><em>스피드업</em>폭발 가속·무적 돌파</span></div>
+      <div class="ig"><b>✨</b><span><em>점수 2배</em>8초간 점수 2배</span></div>
+      <div class="ig bad"><b>📸</b><span><em>과속카메라</em>3.5초 80km/h 제한</span></div>
+    </div>
     <div class="prof">
       <div class="nickRow">
         <label for="nickInput">닉네임</label>
