@@ -380,6 +380,13 @@ function makeObstacle(sim, props){
 
 function addObstacle(sim, props){ const o = makeObstacle(sim, props); sim.obstacles.push(o); return o; }
 
+function pickLane(sim, free, rng){
+  const avoid = Math.round(sim.lanePos);
+  const others = free.filter(function(i){ return i !== avoid; });
+  if (others.length && rng() < 0.75) return others[Math.floor(rng() * others.length)];
+  return free[Math.floor(rng() * free.length)];
+}
+
 function freeLanes(sim, minY, maxY){
   const busy = {};
   for (let k=0;k<sim.obstacles.length;k++){
@@ -416,7 +423,7 @@ function spawnObstacle(sim){
   if (type === 'cone'){
     if (free.length < 6) type = 'car';
     else {
-      const lane = free[Math.floor(rng() * free.length)];
+      const lane = pickLane(sim, free, rng);
       const n = 2 + Math.floor(rng() * 3);
       for (let i=0;i<n;i++) addCone(sim, lane, -170 - i * 92);
       return { type:'cone', lane: lane };
@@ -442,7 +449,7 @@ function spawnObstacle(sim){
   }
 
   // normal car
-  const lane = free[Math.floor(rng() * free.length)];
+  const lane = pickLane(sim, free, rng);
   const cutter = d > 55 && rng() < 0.34;
   let cutLane = null, blinker = false;
   if (cutter){
