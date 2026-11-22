@@ -1453,9 +1453,9 @@ function playerX(sim){ return laneCenter(sim.lanePos); }
           (2) 인앱이면 하단 툴바 높이만큼 덜어내고,
           (3) 내 차는 화면 바닥에서 21%(최소 120px) 위에 고정한다. */
 const IN_APP_UA = /(KAKAOTALK|KakaoTalk|NAVER|Instagram|FBAN|FBAV|FB_IAB|Line\/|DaumApps|everytime|Snapchat)/;
-const INAPP_BAR_RATE = 0.105;      /* 인앱 하단 툴바가 덮는 화면 비율 */
-const INAPP_BAR_MIN = 40, INAPP_BAR_MAX = 96;
-const PLAYER_GAP_RATE = 0.21;      /* 내 차 중심과 화면 바닥 사이 */
+const INAPP_BAR_RATE = 0.12;       /* 인앱 하단 툴바가 덮는 화면 비율 */
+const INAPP_BAR_MIN = 44, INAPP_BAR_MAX = 110;
+const PLAYER_GAP_RATE = 0.22;      /* 내 차 중심과 화면 바닥 사이 */
 const PLAYER_GAP_MIN = 120, PLAYER_GAP_MAX = 200;
 const VIEW_ASPECT_MAX = 0.72;        /* 이보다 가로로 넓으면(태블릿·데스크톱) 세로 비율로 */
 
