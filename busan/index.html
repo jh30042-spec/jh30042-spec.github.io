@@ -48,7 +48,7 @@
     pointer-events:none;opacity:0;transition:opacity .25s;
   }
   #hud.on{opacity:1}
-  #hud .row{display:flex;align-items:flex-start;gap:calc(var(--u)*2);padding-right:calc(var(--u)*11)}
+  #hud .row{display:flex;align-items:flex-start;gap:calc(var(--u)*2);padding-right:calc(var(--u)*13.5)}
   #hud .col{flex:1;min-width:0}
   #hud .col.mid{flex:0 0 auto;text-align:center}
   #hud .col.right{text-align:right;padding-right:calc(var(--u)*1)}
@@ -989,20 +989,22 @@ function drawCar(ctx, o){
     rr(ctx, x - w/2 + 7, y - h/2 + h*0.08, w - 14, h*0.11, 4);
     ctx.fill();
   } else if (isBus){
-    // windshield
-    ctx.fillStyle = 'rgba(18,28,44,0.9)';
-    rr(ctx, x - w/2 + 6, y - h/2 + 6, w - 12, h*0.07, 4);
+    // roof panel
+    ctx.fillStyle = 'rgba(255,255,255,0.14)';
+    rr(ctx, x - w/2 + 5, y - h/2 + 5, w - 10, h - 10, 9);
     ctx.fill();
-    // side windows
-    ctx.fillStyle = 'rgba(15,25,40,0.85)';
-    for (let i=0;i<6;i++){
-      rr(ctx, x - w/2 + 7, y - h/2 + 26 + i * 27, w - 14, 15, 3);
-      ctx.fill();
-    }
-    // stripe
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.fillRect(x - w/2 + 3, y - h/2 + 20, 3, h - 40);
-    ctx.fillRect(x + w/2 - 6, y - h/2 + 20, 3, h - 40);
+    // windshield (front edge)
+    ctx.fillStyle = 'rgba(14,24,38,0.92)';
+    rr(ctx, x - w/2 + 7, y - h/2 + 8, w - 14, h*0.065, 5);
+    ctx.fill();
+    // roof vent
+    ctx.fillStyle = 'rgba(20,30,46,0.35)';
+    rr(ctx, x - w/2 + 12, y - h*0.16, w - 24, h*0.2, 4);
+    ctx.fill();
+    // side stripes
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillRect(x - w/2 + 4, y - h/2 + 30, 4, h - 60);
+    ctx.fillRect(x + w/2 - 8, y - h/2 + 30, 4, h - 60);
   } else {
     // windshield / roof
     ctx.fillStyle = 'rgba(18,26,40,0.9)';
@@ -1224,12 +1226,14 @@ function drawTitleTraffic(ctx, sim, now){
     { lane:1, sp: 0.6, off: 0.0, c:'#e6e8ef' },
     { lane:3, sp: 0.9, off: 0.35, c:'#2f3d59' },
     { lane:5, sp: 0.75, off: 0.6, c:'#8c2434' },
-    { lane:6, sp: 1.1, off: 0.85, c:'#4a6fa5' }
+    { lane:6, sp: 1.1, off: 0.85, c:'#4a6fa5' },
+    { lane:2, sp: 0.7, off: 0.15, c:'#c8c1b2' },
+    { lane:4, sp: 0.95, off: 0.45, c:'#1f6f4a' }
   ];
+  const band = H * 0.5 + 260;
   for (let i=0;i<cars.length;i++){
     const cs = cars[i];
-    const span = H + 400;
-    const y = ((cs.off * span + sim.scroll * cs.sp) % span) - 200;
+    const y = ((cs.off * band + sim.scroll * cs.sp) % band) - 240;
     drawCar(ctx, { type:'car', x: laneCenter(cs.lane), y: y, w: 50, h: 104, color: cs.c, cutter:false });
   }
 }
