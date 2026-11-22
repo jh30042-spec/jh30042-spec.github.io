@@ -1183,10 +1183,10 @@ function describeStop(km, cause){
 /* --- 기본 라이벌 (처음부터 경쟁감) --- */
 function defaultRivals(){
   return [
-    { nick:'김부장', car:'taxi',    km:118.4, score:2380, spot:'천안 병목', d:true },
-    { nick:'박대리', car:'porter',  km:242.0, score:5120, spot:'대전 칼치기', d:true },
-    { nick:'이과장', car:'police',  km:389.5, score:8940, spot:'부산 10km 전 가드레일', d:true },
-    { nick:'최기사', car:'tractor', km:61.2,  score:1190, spot:'수원 톨게이트 경운기 참변', d:true }
+    { nick:'김부장', car:'taxi',    km:118.4, score:2380, maxCombo:4,  spot:'천안 병목', d:true },
+    { nick:'박대리', car:'porter',  km:242.0, score:5120, maxCombo:7,  spot:'대전 칼치기', d:true },
+    { nick:'이과장', car:'police',  km:389.5, score:8940, maxCombo:12, spot:'부산 10km 전 가드레일', d:true },
+    { nick:'최기사', car:'tractor', km:61.2,  score:1190, maxCombo:2,  spot:'수원 톨게이트 경운기 참변', d:true }
   ];
 }
 function sanitizeRival(r){
