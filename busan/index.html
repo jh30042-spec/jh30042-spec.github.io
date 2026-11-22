@@ -454,7 +454,8 @@
   .lbRow.me .nm{color:#7dffc0}
   .lbRow.me .km{color:#fff}
   /* TOP 10 — 게임오버 화면에서도 순위표만 스크롤 (아래 버튼 영역 확보) */
-  #lbList{max-height:min(calc(var(--u)*100), 50vh);overflow-y:auto;overscroll-behavior:contain;
+  /* 탭·기준 안내가 늘어난 만큼 목록 높이를 줄여, 게임오버 화면의 통계·제목이 밝은 도로 위로 올라가지 않게 한다 */
+  #lbList{max-height:min(calc(var(--u)*92), 44vh);overflow-y:auto;overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent}
   #lbList::-webkit-scrollbar{width:calc(var(--u)*1.2)}
   #lbList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.26);border-radius:99px}
