@@ -4196,11 +4196,12 @@ function drawImpacts(ctx, sim){
   for (let i=0;i<list.length;i++){
     const im = list[i];
     const p = clamp(im.t / im.life, 0, 1);
-    const sc = impactScale(p);
-    const a = impactAlpha(p);
+    const rank = list.length - 1 - i;          /* 0 = 가장 최근 */
+    const sc = impactScale(p) * (rank === 0 ? 1 : 0.6);
+    const a = impactAlpha(p) * (rank === 0 ? 1 : 0.55);
     if (a <= 0.01) continue;
-    /* 뒤에 오는 것이 앞에 보이게: 조금씩 아래로 밀어 준다 */
-    const y = cy + (i - (list.length - 1)) * 30 + (1 - sc) * 26 - p * 18;
+    /* 여러 개가 겹칠 때는 위로 밀어 올려 문구끼리 부딪히지 않게 한다 */
+    const y = cy - rank * 112 + (1 - sc) * 26 - p * 18;
     ctx.save();
     ctx.globalAlpha = a;
     ctx.translate(cx, y);
