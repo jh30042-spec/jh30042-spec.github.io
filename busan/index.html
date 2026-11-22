@@ -1023,9 +1023,14 @@ function mergeServerRivals(localList, serverList, opts){
     out.push(e);
   }
   for (let i=0;i<server.length;i++) put(Object.assign({}, server[i], { s: true, d: false }));
-  const hasServer = server.length > 0;
+  /* 서버·도전장에 "나 말고 다른 실제 유저"가 있을 때만 기본 AI 라이벌을 빼다 */
+  let realOthers = 0;
+  for (let i=0;i<server.length;i++) if (nickKey(server[i].nick) !== myKey) realOthers++;
   for (let i=0;i<locals.length;i++){
-    if (locals[i].d && hasServer) continue;      /* 실제 서버 유저가 있으면 기본 AI 라이벌은 빠진다 */
+    if (!locals[i].d && nickKey(locals[i].entry.nick) !== myKey) realOthers++;
+  }
+  for (let i=0;i<locals.length;i++){
+    if (locals[i].d && realOthers > 0) continue;      /* 실제 서버 유저가 있으면 기본 AI 라이벌은 빠진다 */
     put(Object.assign({}, locals[i].entry, { s: false, d: locals[i].d }));
   }
   out.sort(function(a, b){
