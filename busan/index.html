@@ -214,25 +214,51 @@
   #hint b{color:#ffe08a}
 
   /* ---------- toast ---------- */
-  /* ---------- 아이템 안내 (타이틀 · 2×2 컴팩트) ---------- */
+  /* ---------- 아이템 안내 (타이틀 · 3×3 컴팩트 9종) ---------- */
   #itemGuide{
-    display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.8);
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:calc(var(--u)*.6);
     width:100%;box-sizing:border-box;margin:calc(var(--u)*1.4) 0 calc(var(--u)*.4);
   }
   #itemGuide .ig{
-    display:flex;align-items:center;gap:calc(var(--u)*.8);min-width:0;
-    padding:calc(var(--u)*.7) calc(var(--u)*1.0);border-radius:calc(var(--u)*1.5);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.15);min-width:0;
+    padding:calc(var(--u)*.7) calc(var(--u)*.4);border-radius:calc(var(--u)*1.4);
     background:rgba(11,18,31,.74);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
+    text-align:center;overflow:hidden;
   }
-  #itemGuide .ig b{flex:0 0 auto;font-size:calc(var(--u)*3.2);line-height:1;
+  #itemGuide .ig b{flex:0 0 auto;font-size:calc(var(--u)*3.0);line-height:1;
     filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
-  #itemGuide .ig span{min-width:0;font-size:calc(var(--u)*2.3);font-weight:700;color:#b9cadf;line-height:1.14;
+  #itemGuide .ig span{display:block;min-width:0;width:100%;font-size:calc(var(--u)*1.95);font-weight:800;color:#90a4bd;line-height:1.1;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #itemGuide .ig em{display:block;font-style:normal;font-size:calc(var(--u)*2.55);font-weight:900;color:#fff;
-    letter-spacing:-.02em}
+  #itemGuide .ig em{display:block;font-style:normal;font-size:calc(var(--u)*2.35);font-weight:900;color:#fff;
+    letter-spacing:-.03em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
   /* 함정은 빨간 테로 한눈에 구분 */
   #itemGuide .ig.bad{background:rgba(44,7,11,.80);box-shadow:inset 0 0 0 1px rgba(255,59,71,.58)}
   #itemGuide .ig.bad em{color:#ff9c94}
+  #itemGuide .ig.bad span{color:#c08a86}
+  /* 랜덤 박스는 보라 테 */
+  #itemGuide .ig.fx{background:rgba(30,16,52,.82);box-shadow:inset 0 0 0 1px rgba(201,167,255,.55)}
+  #itemGuide .ig.fx em{color:#d9c2ff}
+
+  /* ---------- 순위표 4종 탭 (통합 · 거리 · 점수 · 칼치기) ---------- */
+  .rankTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.6);margin:calc(var(--u)*.2) 0 calc(var(--u)*.8)}
+  .rankTabs .rt{
+    min-width:0;border:none;cursor:pointer;font-family:inherit;
+    padding:calc(var(--u)*1.0) calc(var(--u)*.3);border-radius:calc(var(--u)*1.5);
+    background:rgba(255,255,255,.09);color:#a8bdd8;font-size:calc(var(--u)*2.15);font-weight:900;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;touch-action:manipulation;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)
+  }
+  .rankTabs .rt.on{background:linear-gradient(180deg,#7ce0ff,#39a9ff);color:#04121f;
+    box-shadow:0 calc(var(--u)*.5) 0 rgba(0,60,110,.55),0 0 calc(var(--u)*1.6) rgba(60,170,255,.45)}
+  .rankNote{font-size:calc(var(--u)*1.95);font-weight:800;color:#8ea4c2;line-height:1.3;
+    padding:0 0 calc(var(--u)*.7);letter-spacing:-.01em}
+  .rankNote.hidden{display:none}
+
+  /* 인게임 사용 중인 아이템 효과 (HUD) */
+  #fxLine{display:none;margin-top:calc(var(--u)*.8);font-size:calc(var(--u)*2.25);font-weight:900;
+    color:#ffe08a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    text-shadow:0 1px 6px rgba(0,0,0,.85)}
+  #fxLine.on{display:block}
 
   #toast{
     position:absolute;left:50%;bottom:calc(var(--u)*26);transform:translateX(-50%);z-index:60;
@@ -548,6 +574,7 @@
       <div id="barDot">🚗</div>
     </div>
     <div class="targetLine" id="targetLine">다음 목표: —</div>
+    <div id="fxLine"></div>
   </div>
 
   <button id="back" aria-label="타이틀로">☰</button>
@@ -579,11 +606,16 @@
     <div class="tEmoji">🚗💨</div>
     <h1>서울 → 부산<em>무한 하드코어 질주</em></h1>
     <div class="tRoute">🗺️ <b>경부선 → 남해·호남선 → 강원·동해선 → 제주 환상도로</b><br>400km마다 풍경·색감·배경음이 바뀐다</div>
-    <div id="itemGuide" aria-label="도로 위 아이템 4종 안내">
-      <div class="ig"><b>🛡️</b><span><em>쉴드</em>충돌·단속 1회 방어</span></div>
-      <div class="ig"><b>🔥</b><span><em>스피드업</em>폭발 가속·무적 돌파</span></div>
-      <div class="ig"><b>✨</b><span><em>점수 2배</em>8초간 점수 2배</span></div>
-      <div class="ig bad"><b>📸</b><span><em>과속카메라</em>3.5초 80km/h 제한</span></div>
+    <div id="itemGuide" aria-label="도로 위 아이템 9종 안내">
+      <div class="ig"><b>🛡️</b><em>실드</em><span>충돌·함정 1회 방어</span></div>
+      <div class="ig"><b>🔥</b><em>스피드업</em><span>3초 폭발 가속·돌파</span></div>
+      <div class="ig"><b>✨</b><em>점수 2배</em><span>8초 점수 2배</span></div>
+      <div class="ig"><b>🧲</b><em>자석</em><span>6초 아이템 흡인</span></div>
+      <div class="ig"><b>⏳</b><em>슬로우모션</em><span>4초 차량 0.55배</span></div>
+      <div class="ig"><b>📣</b><em>사이렌</em><span>4초 앞차 양보</span></div>
+      <div class="ig fx"><b>🎲</b><em>랜덤 박스</em><span>좋은 것/함정 랜덤</span></div>
+      <div class="ig bad"><b>📸</b><em>과속카메라</em><span>3.5초 80km/h</span></div>
+      <div class="ig bad"><b>🛢️</b><em>기름웅덩이</em><span>1.5초 미끈덩</span></div>
     </div>
     <div class="prof">
       <div class="nickRow">
@@ -612,6 +644,13 @@
     <div class="rivals">
       <div class="srvBar loading" id="tSrv"><span class="dot"></span><span class="txt">서버 랭킹 불러오는 중…</span><button id="tSrvBtn" aria-label="서버 랭킹 새로고침">↻</button></div>
       <div class="rHead">🏁 라이벌 순위 <button id="rivalReset">라이벌 초기화</button></div>
+      <div class="rankTabs" id="rTabs" role="tablist" aria-label="순위 기준">
+        <button class="rt on" data-tab="total" role="tab" aria-selected="true">🏆 통합</button>
+        <button class="rt" data-tab="dist" role="tab" aria-selected="false">🛣️ 거리</button>
+        <button class="rt" data-tab="score" role="tab" aria-selected="false">💯 점수</button>
+        <button class="rt" data-tab="combo" role="tab" aria-selected="false">⚡ 칼치기</button>
+      </div>
+      <div class="rankNote" id="rNote">통합 = 거리×10 + 점수×0.5 + 최대콤보×300</div>
       <div id="rivalList"></div>
     </div>
     <div class="tKeys"><b>좌우 탭</b> · 스와이프 · <b>← →</b> · 내 차 탭 = <b>빵빵!</b> 📣</div>
@@ -632,6 +671,13 @@
     <div class="srvBar loading" id="oSrv"><span class="dot"></span><span class="txt">서버 랭킹 불러오는 중…</span><button id="oSrvBtn" aria-label="서버 랭킹 새로고침">↻</button></div>
     <div class="lb">
       <div class="lbHead">🏆 순위표 <span id="lbMe">내 순위 —</span></div>
+      <div class="rankTabs" id="lbTabs" role="tablist" aria-label="순위 기준">
+        <button class="rt on" data-tab="total" role="tab" aria-selected="true">🏆 통합</button>
+        <button class="rt" data-tab="dist" role="tab" aria-selected="false">🛣️ 거리</button>
+        <button class="rt" data-tab="score" role="tab" aria-selected="false">💯 점수</button>
+        <button class="rt" data-tab="combo" role="tab" aria-selected="false">⚡ 칼치기</button>
+      </div>
+      <div class="rankNote" id="lbNote">통합 = 거리×10 + 점수×0.5 + 최대콤보×300</div>
       <div id="lbList"></div>
     </div>
     <button id="reviveBtn" class="hidden" aria-label="광고를 보고 이어달리기">📺 광고 보고 이어달리기</button>
@@ -706,11 +752,19 @@ const WX_TYPES = {
 };
 const WX_FIRST_KM = 34;                 // 첫 비/눈이 오는 거리
 const WX_CLEAR_KM = 26;                 // 비/눈 사이 맑은 구간
+/* 좋은 아이템 6종 (먹으면 이득) */
 const ITEM_TYPES = [
-  { id:'shield', emoji:'🛡️', color:'#6fc9ff', label:'실드',   dur:0,   impact:'실드 ON!',    impactEmoji:'🛡️', impactColor:'#8fe3ff' },
-  { id:'nitro',  emoji:'🔥', color:'#ff8c42', label:'니트로', dur:3.0, impact:'스피드업!',   impactEmoji:'🔥', impactColor:'#ffb066' },
-  { id:'double', emoji:'🧲', color:'#ffd479', label:'더블',   dur:8.0, impact:'점수 2배!',    impactEmoji:'✨', impactColor:'#ffe08a' }
+  { id:'shield', emoji:'🛡️', color:'#6fc9ff', label:'실드',       dur:0,   impact:'실드 ON!',      impactEmoji:'🛡️', impactColor:'#8fe3ff', hint:'충돌·함정 1회 방어' },
+  { id:'nitro',  emoji:'🔥', color:'#ff8c42', label:'스피드업',   dur:3.0, impact:'스피드업!',     impactEmoji:'🔥', impactColor:'#ffb066', hint:'3초 폭발 가속·돌파' },
+  { id:'double', emoji:'✨', color:'#ffd479', label:'점수 2배',   dur:8.0, impact:'점수 2배!',      impactEmoji:'✨', impactColor:'#ffe08a', hint:'8초 점수 2배' },
+  { id:'magnet', emoji:'🧲', color:'#ff7bd5', label:'자석',       dur:6.0, impact:'자석 ON!',      impactEmoji:'🧲', impactColor:'#ffb3ea', hint:'6초 아이템 흡인' },
+  { id:'slow',   emoji:'⏳', color:'#8fd3ff', label:'슬로우모션', dur:4.0, impact:'슬로우모션!',   impactEmoji:'⏳', impactColor:'#a9e2ff', hint:'4초 차량 0.55배 감속' },
+  { id:'siren',  emoji:'📣', color:'#ffd479', label:'사이렌',     dur:4.0, impact:'사이렌!',       impactEmoji:'📣', impactColor:'#ffe08a', hint:'4초 앞차 양보' }
 ];
+/* 랜덤 박스: 좋은 아이템 6종 + 함정 2종 중 하나가 무작위로 터진다 */
+const MYSTERY = { id:'mystery', emoji:'🎲', color:'#c9a7ff', label:'랜덤 박스', dur:0,
+  impact:'랜덤 박스!', impactEmoji:'🎲', impactColor:'#d9c2ff', hint:'? 좋은 것/함정 랜덤' };
+const GOOD_IDS = ['shield','nitro','double','magnet','slow','siren'];
 const ITEM_R = 30;                      // 아이템 픽업 반경
 /* 추월 보너스 기본점 (리무진은 +15%) */
 const OVERTAKE_BONUS = 150;
@@ -723,6 +777,27 @@ const CAMERA = {
 const CAMERA_R = 34;                    // 단속 판정 반경 (아이템보다 조금 넉넉하게 = 피하기 쉽게)
 const CAMERA_CD_MIN = 9, CAMERA_CD_MAX = 15;   // 함정 간격(초)
 const CAMERA_FIRST = 8;                 // 첫 함정까지
+/* --- 기름웅덩이 함정 (밟으면 1.5초 미끈덩, 죽지는 않는다) --- */
+const OIL = {
+  id:'oil', emoji:'🛢️', color:'#ff3b47', label:'기름웅덩이',
+  impact:'미끈덩!', impactEmoji:'🛢️', impactColor:'#ff9c94', dur: 1.5
+};
+const OIL_R = 40;                       // 밟는 판정 반경
+const OIL_CD_MIN = 11, OIL_CD_MAX = 18; // 함정 간격(초)
+const OIL_FIRST = 14;                   // 첫 기름웅덩이까지
+/* --- 신규 아이템 효과 수치 --- */
+const MAGNET_PULL = 760;                // 자석 흡인 속도 (world/s)
+const MAGNET_RANGE_Y = 620;             // 자석이 잡는 앞뒤 거리
+const MAGNET_RANGE_X = LANE_W * 4.2;    // 자석이 잡는 좌우 폭
+const SLOW_REL = 0.55;                  // 슬로우모션 상대 속도 배율
+const SIREN_RANGE_Y = 920;              // 사이렌이 닿는 앞쪽 거리
+const SIREN_DODGE_DUR = 0.42;           // 비켜주는 차선 변경 시간(초)
+const SIREN_BLINK_TAIL = 0.7;           // 비켜준 뒤 깜빡이 유지(초)
+/* 함정 2종 (과속카메라 · 기름웅덩이) */
+const TRAP_TYPES = [CAMERA, OIL];
+/* 타이틀 아이템 안내·검증용 9종 카탈로그 */
+const ITEM_CATALOG = ITEM_TYPES.concat([MYSTERY], TRAP_TYPES);
+const ITEM_SPAWN_POOL = ['shield','nitro','double','magnet','magnet','slow','slow','siren','siren','mystery'];
 const IMPACT_LIFE = 1.0;                // 화면 중앙 임팩트 팝업 수명(초)
 const MISSION_ITEM_CD = 3.4;            // 미션 아이템 재스폰 간격(초)
 const MISSION_DEFS = [
@@ -1125,6 +1200,7 @@ function sanitizeRival(r){
     car: carById(r.car).id,
     km: Math.round(clamp(km, 0, 99999) * 10) / 10,
     score: Math.max(0, Math.round(Number(r.score) || 0)),
+    maxCombo: Math.max(0, Math.round(Number(r.maxCombo !== undefined ? r.maxCombo : r.combo) || 0)),
     spot: String(r.spot === undefined || r.spot === null ? '' : r.spot).slice(0, 48),
     d: !!r.d,
     ts: Number(r.ts) || 0
@@ -1280,7 +1356,9 @@ function sanitizeServerRival(raw){
     nick: nick,
     car: carById(raw.car).id,
     km: Math.round(clamp(km, 0, 50000) * 10) / 10,
-    score: Math.max(0, Math.round(Number(raw.score) || 0)),
+    score: Math.max(0, Math.round(Number(raw.score !== undefined && raw.score !== null ? raw.score : raw.totalScore) || 0)),
+    /* 예전 기록에는 maxCombo가 없다 → 0으로 안전하게 호환 */
+    maxCombo: Math.max(0, Math.round(Number(raw.maxCombo !== undefined ? raw.maxCombo : raw.combo) || 0)),
     spot: String(spot).slice(0, 48),
     d: false, s: true,
     ts: Number(raw.ts) || 0,
@@ -1390,6 +1468,9 @@ function normalizeServerEntry(o){
     name: name,
     km: Math.round(clamp(km, 0, 50000) * 10) / 10,
     score: Math.max(0, Math.round(Number(o.score) || 0)),
+    /* 점수는 totalScore 로도 함께 남긴다 */
+    totalScore: Math.max(0, Math.round(Number(o.score !== undefined ? o.score : o.totalScore) || 0)),
+    maxCombo: Math.max(0, Math.round(Number(o.maxCombo !== undefined ? o.maxCombo : o.combo) || 0)),
     car: carById(o.car).id,
     reason: String(o.reason || '').slice(0, 32),
     spot: String(o.spot || '').slice(0, 60),
@@ -1531,7 +1612,8 @@ function createServerRank(opts){
 }
 
 /* --- 순위표 --- */
-function buildLeaderboard(profile, records, rivals){
+function buildLeaderboard(profile, records, rivals, opts){
+  const o = opts || {};
   const p = profile || blankProfile();
   const r = records || blankRecords();
   const rows = [];
@@ -1539,7 +1621,7 @@ function buildLeaderboard(profile, records, rivals){
   for (let i=0;i<list.length;i++){
     const s = sanitizeRival(list[i]);
     if (!s) continue;
-    rows.push({ nick:s.nick, car:s.car, km:s.km, score:s.score, spot:s.spot, me:false, d:s.d });
+    rows.push({ nick:s.nick, car:s.car, km:s.km, score:s.score, maxCombo:s.maxCombo || 0, spot:s.spot, me:false, d:s.d });
   }
   const mine = normalizeNick(p.nick) || '나';
   const myKm = Math.max(0, Number(r.bestKm) || 0);
@@ -1549,21 +1631,67 @@ function buildLeaderboard(profile, records, rivals){
       nick: mine, car: carById(p.car).id,
       km: Math.round(myKm * 10) / 10,
       score: Math.max(0, Math.round(Number(r.bestScore) || 0)),
+      maxCombo: Math.max(0, Math.round(Number(r.bestCombo) || 0)),
       spot: r.bestSpot || '', me: true, d:false
     };
     rows.push(myRow);
   }
-  rows.sort(function(a, b){
-    if (b.km !== a.km) return b.km - a.km;
-    if (b.score !== a.score) return b.score - a.score;
+  /* 기본은 거리순 (기존 호출부 호환) — 탭을 주면 그 기준으로 */
+  const sorted = sortRowsByTab(rows, o.tab || 'dist');
+  let mineRow = null;
+  for (let i=0;i<sorted.length;i++) if (sorted[i].me){ mineRow = sorted[i]; break; }
+  return { rows: sorted, mine: mineRow, total: sorted.length, tab: rankTabId(o.tab || 'dist') };
+}
+/* =========================================================
+   순위표 4종 (통합 · 거리 · 점수 · 칼치기)
+   - 같은 행 집합을 기준만 바꿔 재정렬한다 (TOP 10 규칙은 그대로).
+   ========================================================= */
+const RANK_TABS = [
+  { id:'total', label:'🏆 통합', unit:'점', key:'합산' },
+  { id:'dist',  label:'🛣️ 거리', unit:'km', key:'거리' },
+  { id:'score', label:'💯 점수', unit:'점', key:'점수' },
+  { id:'combo', label:'⚡ 칼치기', unit:'콤보', key:'콤보' }
+];
+const RANK_TAB_IDS = ['total','dist','score','combo'];
+const COMBO_POINT = 300;                /* 통합 점수에서 최대 콤보 1회 = 300점 */
+const RANK_NOTE = '통합 = 거리×10 + 점수×0.5 + 최대콤보×300';
+/* 통합 점수: 거리·점수·최대 칼치기 콤보를 한 숫자로 */
+function combinedScore(km, score, combo){
+  const k = Math.max(0, Number(km) || 0);
+  const s = Math.max(0, Number(score) || 0);
+  const c = Math.max(0, Math.round(Number(combo) || 0));
+  return Math.round(k * 10 + s * 0.5 + c * COMBO_POINT);
+}
+function rankTabId(tab){
+  const t = String(tab === undefined || tab === null ? '' : tab);
+  return RANK_TAB_IDS.indexOf(t) >= 0 ? t : 'total';
+}
+/* 행에서 해당 탭의 기준 값 */
+function rankValue(row, tab){
+  const r = row || {};
+  const t = rankTabId(tab);
+  if (t === 'dist') return Math.max(0, Number(r.km) || 0);
+  if (t === 'score') return Math.max(0, Number(r.score) || 0);
+  if (t === 'combo') return Math.max(0, Math.round(Number(r.maxCombo) || 0));
+  return combinedScore(r.km, r.score, r.maxCombo);
+}
+/* 해당 탭 기준으로 재정렬 + 1..N 순위 (원본 행은 건드리지 않는다) */
+function sortRowsByTab(rows, tab){
+  const t = rankTabId(tab);
+  const list = (rows || []).map(function(r){ return Object.assign({}, r); });
+  list.sort(function(a, b){
+    const va = rankValue(a, t), vb = rankValue(b, t);
+    if (vb !== va) return vb - va;
+    if ((b.km || 0) !== (a.km || 0)) return (b.km || 0) - (a.km || 0);
+    if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
     return a.nick < b.nick ? -1 : (a.nick > b.nick ? 1 : 0);
   });
-  for (let i=0;i<rows.length;i++) rows[i].rank = i + 1;
-  return { rows: rows, mine: myRow, total: rows.length };
+  for (let i=0;i<list.length;i++) list[i].rank = i + 1;
+  return list;
 }
-/*
-  순위표에 실제로 그릴 행 — TOP N + (내가 N위 밖이면) 내 행을 맨 아래에 덧붙인다.
-  타이틀 미리보기와 게임오버 순위표가 같은 규칙을 쓰도록 한 곳에 모은다.
+
+/* 순위표에 실제로 그릴 행 — TOP N + (내가 N위 밖이면) 내 행을 맨 아래에 덧붙인다.
+   타이틀 미리보기와 게임오버 순위표가 같은 규칙을 쓰도록 한 곳에 모은다.
 */
 function topRowsForDisplay(rows, limit){
   const list = rows || [];
@@ -1586,6 +1714,7 @@ function entryForRun(sim){
     car: carById(sim.car).id,
     km: Math.round(sim.dist * 10) / 10,
     score: finalScore(sim),
+    maxCombo: Math.max(0, Math.round(sim.maxCombo || 0)),
     spot: sim.stopSpot || describeStop(sim.dist, sim.crashCause),
     me: true
   };
@@ -1784,11 +1913,13 @@ function updateWeather(sim, dt, ev){
   if (sim.wxInten > 0.998) sim.wxInten = 1;
 }
 
-/* --- 아이템 3종 --- */
+/* --- 아이템 9종 (좋은 6 · 랜덤 박스 · 함정 2) --- */
 function itemDef(id){
-  for (let i=0;i<ITEM_TYPES.length;i++) if (ITEM_TYPES[i].id === id) return ITEM_TYPES[i];
+  for (let i=0;i<ITEM_CATALOG.length;i++) if (ITEM_CATALOG[i].id === id) return ITEM_CATALOG[i];
   return ITEM_TYPES[0];
 }
+/* 함정인지 (과속카메라 · 기름웅덩이) */
+function isTrapItem(id){ return id === CAMERA.id || id === OIL.id; }
 /* opts.lane  : 그 차선에 확정 스폰 (미션 보장용)
    opts.force : 빈 밴드가 없어도 스폰한다 (아이템은 충돌 판정이 없어 겹쳐도 안전)
    opts.type  : 아이템 종류 지정 */
@@ -1801,29 +1932,66 @@ function spawnItem(sim, opts){
   else if (free.length) lane = free[Math.floor(sim.rng() * free.length)];
   else if (o.force) lane = clamp(Math.round(sim.lanePos), 0, LANES - 1);
   else return null;
-  const type = o.type ? itemDef(o.type) : ITEM_TYPES[Math.floor(sim.rng() * ITEM_TYPES.length)];
+  let typeId;
+  if (o.type) typeId = itemDef(o.type).id;
+  else typeId = ITEM_SPAWN_POOL[Math.floor(sim.rng() * ITEM_SPAWN_POOL.length)];
+  const type = itemDef(typeId);
   const it = { id: sim.nextId++, type: type.id, x: laneCenter(lane), y: y, lane: lane, t: 0, dead: false };
   sim.items.push(it);
   return it;
 }
 function grantShield(sim){ sim.shield = Math.min(2, (sim.shield || 0) + 1); return sim.shield; }
-function itemPickup(sim, it, ev){
-  const def = itemDef(it.type);
-  /* 아이템 효과 시간 보정 (구급차 +1.2초) — 시간형 아이템(니트로·더블)에만 적용 */
+
+/*
+  아이템 효과 적용 — 일반 픽업과 랜덤 박스가 같은 규칙을 쓴다.
+  함정(camera·oil)이 랜덤 박스에서 나오면 그 자리에서 함정 효과가 터진다.
+*/
+function applyItemEffect(sim, typeId, ev){
+  const def = itemDef(typeId);
+  const evs = ev || [];
+  /* 아이템 효과 시간 보정 (구급차 +1.2초) — 시간형 아이템에만 적용 */
   const plus = (sim && sim.spec && sim.spec.itemTime) || 0;
   const dur = (def.dur || 0) > 0 ? def.dur + plus : 0;
-  if (it.type === 'shield'){
+  if (typeId === 'shield'){
     grantShield(sim);
-  } else if (it.type === 'nitro'){
+  } else if (typeId === 'nitro'){
     sim.nitro = Math.max(sim.nitro || 0, dur);
-  } else if (it.type === 'double'){
+  } else if (typeId === 'double'){
     sim.doubleT = Math.max(sim.doubleT || 0, dur);
+  } else if (typeId === 'magnet'){
+    sim.magnetT = Math.max(sim.magnetT || 0, dur);
+  } else if (typeId === 'slow'){
+    sim.slowT = Math.max(sim.slowT || 0, dur);
+  } else if (typeId === 'siren'){
+    sim.sirenT = Math.max(sim.sirenT || 0, dur);
+  } else if (typeId === CAMERA.id){
+    hitCamera(sim, { id: -1, x: playerX(sim), y: playerY(sim) }, evs);
+  } else if (typeId === OIL.id){
+    hitOil(sim, { id: -1, x: playerX(sim), y: playerY(sim) }, evs);
   }
+  return def;
+}
+
+function itemPickup(sim, it, ev){
+  const isMystery = it.type === MYSTERY.id;
+  let def;
+  let picked = it.type;
+  if (isMystery){
+    /* 좋은 아이템 6종 또는 함정 2종 — 한 번만 뽑아 그 효과를 바로 발동한다 */
+    const pool = GOOD_IDS.concat([CAMERA.id, OIL.id]);
+    picked = pool[Math.floor(sim.rng() * pool.length)];
+    def = applyItemEffect(sim, picked, ev);
+    addImpact(sim, '🎲', '→ ' + def.impactEmoji + ' ' + def.label + '!',
+      isTrapItem(picked) ? '#ff9c94' : '#ffe08a', { key: 'mystery' });
+  } else {
+    def = applyItemEffect(sim, it.type, ev);
+    addImpact(sim, def.impactEmoji || def.emoji, def.impact || (def.label + '!'), def.impactColor || def.color);
+  }
+  /* '아이템 1개 먹기' 미션 — 기름웅덩이·과속카메라는 함정이라 카운트하지 않는다 */
   if (sim.mission && !sim.mission.done && sim.mission.kind === 'item'){
     sim.mission.prog += 1;
   }
-  addImpact(sim, def.impactEmoji || def.emoji, def.impact || (def.label + '!'), def.impactColor || def.color);
-  ev.push({ type:'item', item: def, x: it.x, y: it.y });
+  ev.push({ type:'item', item: def, x: it.x, y: it.y, mystery: isMystery, picked: picked });
   return def;
 }
 
@@ -1890,6 +2058,177 @@ function camZoneLabel(sim){
 }
 
 /* =========================================================
+   기름웅덩이 함정 (🛢️) — 밟으면 1.5초 미끈덩, 죽지는 않는다
+   - 빨간 경고 테두리의 물웅덩이. 실드가 있으면 1회 방어.
+   - '아이템 1개 먹기' 미션에는 카운트하지 않는다 (함정).
+   ========================================================= */
+/* opts.y 로 위치 지정, opts.lane 으로 차로 강제 (테스트용) */
+function spawnOil(sim, opts){
+  const o = opts || {};
+  const y = (o.y === undefined) ? -300 : o.y;
+  /* 앞뒤 밴드에 장애물이 없는 빈 차로만 (겹쳐서 억울하게 밟지 않게) */
+  const free = freeInBand(sim, y - 200, y + 200);
+  if (free.length < 3) return null;
+  for (let i=0;i<(sim.cams || []).length;i++){
+    if (Math.abs(sim.cams[i].y - y) < 620) return null;
+  }
+  for (let i=0;i<(sim.oils || []).length;i++){
+    if (Math.abs(sim.oils[i].y - y) < 620) return null;
+  }
+  for (let i=0;i<sim.items.length;i++){
+    if (Math.abs(sim.items[i].y - y) < 300) return null;
+  }
+  const mine = clamp(Math.round(sim.lanePos), 0, LANES - 1);
+  let cand = free.filter(function(l){ return l !== mine; });
+  if (!cand.length) cand = free.slice();
+  let lane;
+  if (o.lane !== undefined && o.lane !== null){
+    lane = clamp(Math.round(o.lane), 0, LANES - 1);
+    if (free.indexOf(lane) < 0) return null;
+  } else {
+    lane = cand[Math.floor(sim.rng() * cand.length)];
+  }
+  /* 피할 차로가 내 좌우 2칸 안에 남아 있어야 한다 */
+  const escape = free.some(function(l){ return l !== lane && Math.abs(l - mine) <= 2; });
+  if (!escape) return null;
+  const oil = { id: sim.nextId++, x: laneCenter(lane), y: y, lane: lane, t: 0, dead: false, free: free.slice() };
+  if (!sim.oils) sim.oils = [];
+  sim.oils.push(oil);
+  return oil;
+}
+function hitOil(sim, oil, ev){
+  const evs = ev || [];
+  if ((sim.shield || 0) > 0){
+    sim.shield -= 1;
+    sim.oilBlocks = (sim.oilBlocks || 0) + 1;
+    addImpact(sim, '🛡️', '미끌 방어!', '#7dffc0');
+    evs.push({ type:'oilBlock', x: oil.x, y: oil.y, left: sim.shield });
+    return 'blocked';
+  }
+  sim.oilT = OIL.dur;
+  sim.oilPhase = 0;
+  sim.oilHits = (sim.oilHits || 0) + 1;
+  addImpact(sim, OIL.impactEmoji, OIL.impact, OIL.impactColor);
+  evs.push({ type:'oilHit', x: oil.x, y: oil.y, dur: OIL.dur });
+  return 'slipped';
+}
+/* 미끄러지는 좌우 흔들림 폭 (옆 차로에 차가 바짝 붙어 있으면 줄여 억울한 사고를 막는다) */
+function oilWobbleAmp(sim){
+  const px = playerX(sim), py = playerY(sim);
+  let amp = 0.42;
+  const list = sim.obstacles || [];
+  for (let i=0;i<list.length;i++){
+    const o = list[i];
+    if (o.dead || o.type === 'cone') continue;
+    if (Math.abs(o.y - py) > 240) continue;
+    if (Math.abs(o.x - px) > LANE_W * 1.15 + o.w * 0.5) continue;
+    amp = 0.16;
+    break;
+  }
+  return amp;
+}
+/* 지금 미끄러지는 중인가 (HUD·테스트 공용) */
+function oilLabel(sim){
+  if (!sim || !(sim.oilT > 0)) return '';
+  return '🛢️ 미끈덩 ' + sim.oilT.toFixed(1) + 's';
+}
+
+/* =========================================================
+   슬로우모션 · 자석 · 사이렌
+   ========================================================= */
+/* 자석: 주변 '좋은 아이템'만 끌어당긴다. 함정(과속카메라·기름웅덩이)은 절대 끌어당기지 않는다. */
+function magnetPull(sim, dt){
+  if (!(sim.magnetT > 0)) return 0;
+  const px = playerX(sim), py = playerY(sim);
+  let n = 0;
+  const list = sim.items || [];
+  for (let i=0;i<list.length;i++){
+    const it = list[i];
+    if (it.y < -120 || it.y > (sim.worldH || 1422) + 120) continue;
+    const dx = px - it.x, dy = py - it.y;
+    if (Math.abs(dy) > MAGNET_RANGE_Y) continue;
+    const far = Math.min(1, Math.abs(dy) / MAGNET_RANGE_Y);   /* 멀수록 약하게 */
+    const reach = MAGNET_RANGE_X * (1 - far * 0.45);
+    if (Math.abs(dx) > reach) continue;
+    const step = MAGNET_PULL * (1 - far * 0.35) * dt;
+    it.x += clamp(dx, -step, step);
+    it.y += clamp(dy, -step, step);
+    n++;
+  }
+  return n;
+}
+/*
+  사이렌: 앞차가 깜빡이를 켜고 양옆 빈 차선으로 비켜준다.
+  - 내 차선(진행 방향)으로는 절대 들어오지 않는다 (안전 차선 검증).
+  - 비켜줄 차선은 그 높이에서 실제로 빈 차선이어야 한다.
+*/
+function sirenDodge(sim, dt, ev){
+  if (!(sim.sirenT > 0)) return 0;
+  const px = playerX(sim), py = playerY(sim);
+  const mine = clamp(Math.round(sim.lanePos), 0, LANES - 1);
+  let n = 0;
+  const list = sim.obstacles || [];
+  for (let i=0;i<list.length;i++){
+    const o = list[i];
+    if (o.dead || o.type === 'cone') continue;
+    if (o.cutter) continue;                          /* 끼어들기 차는 자기 동작을 따른다 */
+    if (o.sirenDone || o.sirenLane !== undefined) continue;   /* 이미 비켜줬다 */
+    const gap = py - (o.y || 0);
+    if (gap < 40 || gap > SIREN_RANGE_Y) continue;     /* 앞쪽 차만 */
+    if (Math.abs((o.lane === undefined ? 0 : o.lane) - mine) > 1) continue;  /* 내 길을 막는 차만 */
+    const band = freeInBand(sim, o.y - 190, o.y + 190);
+    let best = -1, bestD = 99;
+    for (let l=0;l<band.length;l++){
+      const lane = band[l];
+      if (lane === mine) continue;                    /* 내 차선으로는 안 들어온다 */
+      if (Math.abs(lane - o.lane) < 1) continue;      /* 같은 차선은 의미 없음 */
+      const d = Math.abs(lane - o.lane);
+      if (d < bestD){ bestD = d; best = lane; }
+    }
+    if (best < 0) continue;
+    o.sirenFrom = o.x;
+    o.sirenTo = laneCenter(best);
+    o.sirenLane = best;
+    o.sirenT2 = 0;
+    o.sirenBlink = true;
+    o.blinker = true;
+    n++;
+    ev.push({ type:'sirenDodge', obs: o, x: o.x, y: o.y, lane: best, from: o.x });
+  }
+  return n;
+}
+/* 비켜주는 차선 변경 애니메이션 (매 프레임) */
+function updateSirenMove(o, dt){
+  if (o.sirenLane === undefined) return;
+  o.sirenT2 = (o.sirenT2 || 0) + dt;
+  const p = Math.min(1, o.sirenT2 / SIREN_DODGE_DUR);
+  const e = p * p * (3 - 2 * p);
+  o.x = lerp(o.sirenFrom, o.sirenTo, e);
+  if (p >= 1){
+    o.x = o.sirenTo;
+    o.lane = o.sirenLane;
+    o.sirenLane = undefined;
+    o.sirenDone = true;
+    o.sirenHold = SIREN_BLINK_TAIL;
+  }
+}
+function updateSirenBlink(o, dt){
+  if (o.sirenLane !== undefined){ o.sirenBlink = true; return; }
+  if (o.sirenHold > 0){
+    o.sirenHold = Math.max(0, o.sirenHold - dt);
+    o.sirenBlink = o.sirenHold > 0;
+  } else if (o.sirenBlink){
+    o.sirenBlink = false;
+    o.blinker = false;
+  }
+}
+/* 슬로우모션 남은 시간 표기 (HUD·테스트 공용) */
+function slowLabel(sim){
+  if (!sim || !(sim.slowT > 0)) return '';
+  return '⏳ 슬로우 ' + sim.slowT.toFixed(1) + 's';
+}
+
+/* =========================================================
    화면 중앙 임팩트 팝업 (아이콘 + 짧은 문구가 크게 튀어나왔다 들어감)
    매 프레임 그라디언트·그림자 생성 없이 글자만 그려 60fps 유지.
    ========================================================= */
@@ -1945,12 +2284,13 @@ function startMission(sim, ev){
   return sim.mission;
 }
 
-/* 미션용 아이템: 내 차선(좌우 1칸 여유)에 확정 스폰 */
+/* 미션용 아이템: 내 차선(좌우 1칸 여유)에 확정 스폰 — 함정이 나와 미션을 망치지 않게 좋은 아이템만 */
 function spawnMissionItem(sim){
   if (!sim.mission || sim.mission.kind !== 'item') return null;
   if (sim.items.length >= 2) return null;
   const mine = clamp(Math.round(sim.lanePos), 0, LANES - 1);
-  const it = spawnItem(sim, { lane: mine, force: true });
+  const pick = GOOD_IDS[Math.floor(sim.rng() * GOOD_IDS.length)];
+  const it = spawnItem(sim, { lane: mine, force: true, type: pick });
   if (it) sim.missionItemT = MISSION_ITEM_CD;
   return it;
 }
@@ -2021,6 +2361,8 @@ function newGame(opts){
     wx: 'clear', wxInten: 0, wxLeft: 0, wxNext: 12 + (seed % 8), wxFlip: (seed % 2) === 0,
     items: [], itemTimer: 5.5, itemCount: 0,
     cams: [], camTimer: CAMERA_FIRST, camT: 0, camHits: 0, camBlocks: 0,
+    oils: [], oilTimer: OIL_FIRST, oilT: 0, oilPhase: 0, oilHits: 0, oilBlocks: 0,
+    magnetT: 0, slowT: 0, sirenT: 0,
     impacts: [],
     mission: null, missionCd: 9, missionWins: 0, missionTries: 0, missionItemT: 0,
     shield: 0, nitro: 0, doubleT: 0, invuln: 0,
@@ -2060,6 +2402,8 @@ function start(sim){
   sim.hitstop = 0; sim.flashT = 0;
   sim.items = []; sim.itemTimer = 5.5;
   sim.cams = []; sim.camTimer = CAMERA_FIRST; sim.camT = 0; sim.camHits = 0; sim.camBlocks = 0;
+  sim.oils = []; sim.oilTimer = OIL_FIRST; sim.oilT = 0; sim.oilPhase = 0; sim.oilHits = 0; sim.oilBlocks = 0;
+  sim.magnetT = 0; sim.slowT = 0; sim.sirenT = 0;
   sim.impacts = [];
   sim.wx = 'clear'; sim.wxInten = 0; sim.wxLeft = 0; sim.wxNext = 12 + (sim.seed % 8);
   sim.mission = null; sim.missionCd = 9; sim.missionItemT = 0;
@@ -2158,6 +2502,13 @@ function freeInBand(sim, y0, y1){
     const c = cams[k];
     if (c.y + 80 < y0 || c.y - 80 > y1) continue;
     for (let i=0;i<LANES;i++) if (Math.abs(laneCenter(i) - c.x) < LANE_W * 0.6) busy[i] = true;
+  }
+  /* 기름웅덩이도 같은 밴드에서는 차로를 점유한 것으로 본다 */
+  const oils = sim.oils || [];
+  for (let k=0;k<oils.length;k++){
+    const o = oils[k];
+    if (o.y + 90 < y0 || o.y - 90 > y1) continue;
+    for (let i=0;i<LANES;i++) if (Math.abs(laneCenter(i) - o.x) < LANE_W * 0.6) busy[i] = true;
   }
   for (let i=0;i<LANES;i++){
     if (busy[i]){ const at = free.indexOf(i); if (at >= 0) free.splice(at, 1); }
@@ -2572,6 +2923,11 @@ function update(sim, dt){
   sim.doubleT = Math.max(0, (sim.doubleT || 0) - dt);
   sim.flashT = Math.max(0, (sim.flashT || 0) - dt);
   sim.camT = Math.max(0, (sim.camT || 0) - dt);
+  sim.magnetT = Math.max(0, (sim.magnetT || 0) - dt);
+  sim.slowT = Math.max(0, (sim.slowT || 0) - dt);
+  sim.sirenT = Math.max(0, (sim.sirenT || 0) - dt);
+  sim.oilT = Math.max(0, (sim.oilT || 0) - dt);
+  const slowOn = (sim.slowT || 0) > 0;
   updateImpacts(sim, dt);
   if (sim.state === 'playing') sim.shake = Math.max(0, (sim.shake || 0) - dt * 2.2);
   const nitroOn = sim.nitro > 0;
@@ -2585,7 +2941,14 @@ function update(sim, dt){
   const slipK = (spec.slip === undefined) ? 1 : spec.slip;
   const laneK = 14 * spec.lane * lerp(1, wxMul(sim, 'lane'), slipK);
   const k = 1 - Math.exp(-dt * laneK);
-  sim.lanePos += (sim.targetLane - sim.lanePos) * k;
+  /* 기름웅덩이: 1.5초간 좌우로 미끈덩 (차선은 목표 차선으로 돌아오려 한다) */
+  let oilWob = 0;
+  if ((sim.oilT || 0) > 0){
+    sim.oilPhase = (sim.oilPhase || 0) + dt;
+    oilWob = Math.sin(sim.oilPhase * 15.5) * oilWobbleAmp(sim);
+  }
+  const laneGoal = clamp(sim.targetLane + oilWob, 0, LANES - 1);
+  sim.lanePos += (laneGoal - sim.lanePos) * k;
   /* 비·눈길 관성: 미끄러지듯 목표 차선을 살짝 지나쳤다 돌아온다 (맑을 때는 없음) */
   const wet = (sim.wxInten || 0) * (sim.wx === 'snow' ? 1 : 0.72) * slipK;
   const rem = sim.targetLane - sim.lanePos;
@@ -2598,7 +2961,7 @@ function update(sim, dt){
     sim.laneSpd *= Math.exp(-dt * 8);
     if (Math.abs(sim.laneSpd) < 0.02) sim.laneSpd = 0;
   }
-  if (Math.abs(sim.targetLane - sim.lanePos) < 0.005 && Math.abs(sim.laneSpd || 0) < 0.08){
+  if (oilWob === 0 && Math.abs(sim.targetLane - sim.lanePos) < 0.005 && Math.abs(sim.laneSpd || 0) < 0.08){
     sim.lanePos = sim.targetLane;
     sim.laneSpd = 0;
   }
@@ -2737,7 +3100,9 @@ function update(sim, dt){
   const stuck = !!blocker && (sim.speed < sim.maxSpeed * 0.86 || blocker.speed < sim.maxSpeed * 0.55);
   /* 단속 중 감속은 억울하게 위험 게이지를 채우지 않는다 (80km/h 제한은 벌칙이 아니라 시간 제한) */
   const crawling = (sim.camT || 0) <= 0 && sim.speed < sim.maxSpeed * 0.55;
-  if (stuck || crawling) sim.danger = Math.min(1, sim.danger + dt * d.dangerRate * spec.danger);
+  /* 슬로우모션 중에는 위험 게이지가 차오르지 않고 오히려 줄어든다 (틈새 칼치기 지원) */
+  if (slowOn) sim.danger = Math.max(0, sim.danger - dt * 1.15);
+  else if (stuck || crawling) sim.danger = Math.min(1, sim.danger + dt * d.dangerRate * spec.danger);
   else sim.danger = Math.max(0, sim.danger - dt * 0.70);
   if (sim.danger > sim.dangerMax) sim.dangerMax = sim.danger;
   if (blocker && sim.blockT > 2.0 && sim.combo > 0){
@@ -2758,10 +3123,14 @@ function update(sim, dt){
   }
 
   /* --- obstacles --- */
+  const relK = slowOn ? SLOW_REL : 1;      /* 슬로우모션: 주변 차량의 상대 속도 0.55배 */
   for (let i=0;i<sim.obstacles.length;i++){
     const o = sim.obstacles[i];
     if (o.dead) continue;
-    o.y += (sim.speed - o.speed) * SPD_SCALE * dt;
+    o.y += (sim.speed - o.speed) * SPD_SCALE * dt * relK;
+    /* 사이렌에 놀라 비켜주는 중이면 차선 변경 애니메이션 */
+    updateSirenMove(o, dt);
+    updateSirenBlink(o, dt);
 
     /* 분노 모션 타이머 (칼치기 당한 차) */
     if (o.angryT > 0){
@@ -2806,7 +3175,7 @@ function update(sim, dt){
     }
   }
 
-  /* --- v6.0: 도로 위 아이템 3종 (실드 · 니트로 · 더블) --- */
+  /* --- v6.0: 도로 위 아이템 (좋은 6종 · 랜덤 박스) --- */
   sim.itemTimer -= dt;
   const itemMission = !!(sim.mission && !sim.mission.done && sim.mission.kind === 'item');
   if (itemMission){
@@ -2821,6 +3190,8 @@ function update(sim, dt){
     spawnItem(sim);
     sim.itemTimer = 6.5 + sim.rng() * 5;
   }
+  /* 자석: 주변 좋은 아이템을 내 차 쪽으로 끌어당긴다 (함정은 대상 아님) */
+  magnetPull(sim, dt);
   const grabR = ITEM_R * (spec.itemGrab || 1);
   for (let i=sim.items.length-1;i>=0;i--){
     const it = sim.items[i];
@@ -2850,6 +3221,27 @@ function update(sim, dt){
       sim.cams.splice(i,1);
     }
   }
+
+  /* --- 기름웅덩이 함정 (밟으면 미끈덩, 죽지는 않음) --- */
+  sim.oilTimer = ((sim.oilTimer === undefined) ? OIL_FIRST : sim.oilTimer) - dt;
+  if (sim.oilTimer <= 0 && sim.dist > 0.6){
+    if (spawnOil(sim)) sim.oilTimer = OIL_CD_MIN + sim.rng() * (OIL_CD_MAX - OIL_CD_MIN);
+    else sim.oilTimer = 1.2;                     /* 자리가 없으면 조금 뒤 재시도 */
+  }
+  if (!sim.oils) sim.oils = [];
+  for (let i=sim.oils.length-1;i>=0;i--){
+    const oil = sim.oils[i];
+    oil.t += dt;
+    oil.y += sim.speed * SPD_SCALE * dt * relK;
+    if (oil.y > sim.worldH + 160){ sim.oils.splice(i,1); continue; }
+    if (Math.abs(oil.x - px) < OIL_R + PLAYER.w / 2 && Math.abs(oil.y - py) < OIL_R + PLAYER.h / 2){
+      hitOil(sim, oil, ev);
+      sim.oils.splice(i,1);
+    }
+  }
+
+  /* --- 사이렌: 앞차가 깜빡이를 켜고 양옆 빈 차선으로 비켜준다 --- */
+  sirenDodge(sim, dt, ev);
 
   /* --- v6.0: 돌발 미션 --- */
   updateMission(sim, dt, ev);
@@ -3518,6 +3910,22 @@ function drawCar(ctx, o){
     ctx.lineWidth = 2;
     rr(ctx, x - w/2 - 2, y - h/2 - 2, w + 4, h + 4, w*0.24);
     ctx.stroke();
+  }
+  /* 사이렌에 놀라 양옆으로 비켜주는 차 — 좌우 비상깜빡이가 번갈아 터진다 */
+  if (o.sirenBlink){
+    const on = ((o.sirenT2 || 0) * 8 | 0) % 2 === 0;
+    const dir = (o.sirenLane !== undefined) ? (o.sirenTo > o.x ? 1 : -1) : 0;
+    const tx = dir ? x + dir * (w/2 - 4) : x;
+    const ty = y + h/2 - 14;
+    if (on){
+      ctx.fillStyle = 'rgba(255,170,40,0.95)';
+      ctx.beginPath(); ctx.arc(tx, ty, 5, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(x - dir * (w/2 - 4), ty, 4, 0, 7); ctx.fill();
+    } else {
+      ctx.fillStyle = 'rgba(255,210,140,0.55)';
+      ctx.beginPath(); ctx.arc(x - (w/2 - 4), ty, 3.4, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + (w/2 - 4), ty, 3.4, 0, 7); ctx.fill();
+    }
   }
 }
 
@@ -4850,7 +5258,8 @@ function drawStreaks(ctx, sim){
   }
 }
 
-const ITEM_GLOW = { shield:'111,201,255', nitro:'255,140,66', double:'255,212,121' };
+const ITEM_GLOW = { shield:'111,201,255', nitro:'255,140,66', double:'255,212,121',
+  magnet:'255,123,213', slow:'143,211,255', siren:'255,212,121', mystery:'201,167,255' };
 
 /* ---------- 도로 위 아이템 (반짝이는 아이콘) ---------- */
 function drawItems(ctx, sim){
@@ -4882,10 +5291,57 @@ function drawItems(ctx, sim){
     if (ctx.setLineDash) ctx.setLineDash([]);
     ctx.fillStyle = 'rgba(255,255,255,0.20)';
     ctx.beginPath(); ctx.arc(0, 0, 24, 0, 7); ctx.fill();
-    ctx.font = '700 32px system-ui,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(def.emoji, 0, 1);
+    if (it.type === MYSTERY.id){
+      /* 랜덤 박스: 물음표(?)가 적힌 상자 — 한눈에 '뭐가 나올까' 로 보이게 */
+      ctx.fillStyle = 'rgba(38,22,64,0.96)';
+      rrPath(ctx, -25, -25, 50, 50, 11); ctx.fill();
+      ctx.lineWidth = 3.2;
+      ctx.strokeStyle = 'rgba(217,194,255,' + (0.75 + 0.25 * pulse).toFixed(3) + ')';
+      rrPath(ctx, -25, -25, 50, 50, 11); ctx.stroke();
+      ctx.fillStyle = '#f3e9ff';
+      ctx.font = '900 34px system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('?', 0, 1);
+    } else {
+      ctx.font = '700 32px system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(def.emoji, 0, 1);
+    }
+    ctx.restore();
+  }
+}
+
+/* ---------- 기름웅덩이 함정 (빨간 경고 테두리 · 미끈덩) ---------- */
+function drawOils(ctx, sim){
+  const list = sim.oils || [];
+  for (let i=0;i<list.length;i++){
+    const oil = list[i];
+    const pulse = 0.55 + 0.45 * Math.abs(Math.sin(oil.t * 5.6 + i));
+    ctx.save();
+    ctx.translate(oil.x, oil.y);
+    /* 검은 기름 + 무지갯빛 엷은 광택 (그라디언트 없이 원 두 개) */
+    ctx.fillStyle = 'rgba(10,8,14,0.86)';
+    ctx.beginPath();
+    ctx.ellipse ? ctx.ellipse(0, 0, 64, 46, 0, 0, 7) : ctx.arc(0, 0, 46, 0, 7);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(120,90,180,' + (0.16 + 0.10 * pulse).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.ellipse ? ctx.ellipse(-8, -6, 34, 20, 0.3, 0, 7) : ctx.arc(0, 0, 24, 0, 7);
+    ctx.fill();
+    /* 빨간 경고 테두리 (점선이 돌아간다) */
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(255,59,71,' + (0.72 + 0.28 * pulse).toFixed(3) + ')';
+    if (ctx.setLineDash) ctx.setLineDash([13, 9]);
+    ctx.beginPath();
+    ctx.ellipse ? ctx.ellipse(0, 0, 70, 51, 0, 0, 7) : ctx.arc(0, 0, 51, 0, 7);
+    ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    /* 물방울 반짝임 */
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.beginPath(); ctx.arc(-20, -10, 6, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(26, 12, 4, 0, 7); ctx.fill();
     ctx.restore();
   }
 }
@@ -4945,6 +5401,46 @@ function drawCameras(ctx, sim){
     ctx.fillStyle = '#1a0508';
     ctx.font = '900 24px system-ui,sans-serif';
     ctx.fillText('80', 0, 23);
+    ctx.restore();
+  }
+}
+
+/* ---------- 내 차 주변 아이템 효과 아우라 (자석·슬로우·사이렌) ---------- */
+function drawItemAuras(ctx, sim){
+  if (sim.state !== 'playing') return;
+  const x = playerX(sim), y = playerY(sim);
+  const t = sim.time || 0;
+  if (sim.magnetT > 0){
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,123,213,' + (0.30 + 0.16 * Math.sin(t * 7)).toFixed(3) + ')';
+    ctx.lineWidth = 5;
+    if (ctx.setLineDash) ctx.setLineDash([16, 12]);
+    ctx.beginPath();
+    ctx.arc(x, y, 66 + Math.sin(t * 5) * 6, t * 2.2, t * 2.2 + 6.0);
+    ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    ctx.restore();
+  }
+  if (sim.slowT > 0){
+    ctx.save();
+    ctx.strokeStyle = 'rgba(143,211,255,' + (0.22 + 0.10 * Math.sin(t * 5)).toFixed(3) + ')';
+    ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.arc(x, y, 120, 0, 7); ctx.stroke();
+    ctx.restore();
+  }
+  if (sim.sirenT > 0){
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,212,121,' + (0.26 + 0.14 * Math.sin(t * 12)).toFixed(3) + ')';
+    ctx.lineWidth = 4;
+    const p = (t * 1.6) % 1;
+    ctx.beginPath(); ctx.arc(x, y, 70 + p * 190, Math.PI * 0.62, Math.PI * 1.38); ctx.stroke();
+    ctx.restore();
+  }
+  if (sim.oilT > 0 && Math.sin((sim.oilPhase || 0) * 15.5) > 0.2){
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,59,71,0.30)';
+    ctx.beginPath(); ctx.arc(x - 34, y + 30, 9, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 30, y + 34, 7, 0, 7); ctx.fill();
     ctx.restore();
   }
 }
@@ -5122,6 +5618,7 @@ function drawSim(ctx, sim, now){
   if (sim.state !== 'title'){
     drawRivalMarkers(ctx, sim);
     drawGhosts(ctx, sim);
+    drawOils(ctx, sim);
     drawCameras(ctx, sim);
     drawItems(ctx, sim);
   }
@@ -5140,6 +5637,7 @@ function drawSim(ctx, sim, now){
   drawAngryBubbles(ctx, sim);
 
   drawGantry(ctx, sim);
+  if (sim.state !== 'crash' || sim.crashT < 0.75) drawItemAuras(ctx, sim);
   if (sim.state !== 'crash' || sim.crashT < 0.75) drawPlayer(ctx, sim, now);
   drawParticles(ctx, sim);
   drawPops(ctx, sim);
@@ -5927,7 +6425,17 @@ const API = {
   CARS: CARS, NICK_POOL: NICK_POOL, NICK_MAX: NICK_MAX,
   carSpec: carSpec, CAR_SPEC_DEFAULT: CAR_SPEC_DEFAULT,
   WX_TYPES: WX_TYPES, ITEM_TYPES: ITEM_TYPES, MISSION_DEFS: MISSION_DEFS,
-  ITEM_R: ITEM_R,
+  ITEM_R: ITEM_R, ITEM_TYPES: ITEM_TYPES, ITEM_CATALOG: ITEM_CATALOG, ITEM_SPAWN_POOL: ITEM_SPAWN_POOL,
+  MYSTERY: MYSTERY, GOOD_IDS: GOOD_IDS, TRAP_TYPES: TRAP_TYPES, isTrapItem: isTrapItem,
+  itemDef: itemDef, spawnItem: spawnItem, itemPickup: itemPickup, applyItemEffect: applyItemEffect, grantShield: grantShield,
+  OIL: OIL, OIL_R: OIL_R, OIL_FIRST: OIL_FIRST, OIL_CD_MIN: OIL_CD_MIN, OIL_CD_MAX: OIL_CD_MAX,
+  spawnOil: spawnOil, hitOil: hitOil, oilWobbleAmp: oilWobbleAmp, oilLabel: oilLabel,
+  MAGNET_PULL: MAGNET_PULL, MAGNET_RANGE_Y: MAGNET_RANGE_Y, MAGNET_RANGE_X: MAGNET_RANGE_X,
+  SLOW_REL: SLOW_REL, SIREN_RANGE_Y: SIREN_RANGE_Y, SIREN_DODGE_DUR: SIREN_DODGE_DUR,
+  magnetPull: magnetPull, sirenDodge: sirenDodge, slowLabel: slowLabel,
+  drawOils: drawOils, drawItemAuras: drawItemAuras,
+  RANK_TABS: RANK_TABS, RANK_TAB_IDS: RANK_TAB_IDS, RANK_NOTE: RANK_NOTE, COMBO_POINT: COMBO_POINT,
+  combinedScore: combinedScore, rankTabId: rankTabId, rankValue: rankValue, sortRowsByTab: sortRowsByTab,
   CAMERA: CAMERA, CAMERA_R: CAMERA_R, CAMERA_CD_MIN: CAMERA_CD_MIN, CAMERA_CD_MAX: CAMERA_CD_MAX,
   CAMERA_FIRST: CAMERA_FIRST, IMPACT_LIFE: IMPACT_LIFE,
   spawnCamera: spawnCamera, hitCamera: hitCamera, camDef: camDef, camZoneLabel: camZoneLabel,
@@ -6063,6 +6571,11 @@ if (typeof document !== 'undefined'){
     const lbMeEl = document.getElementById('lbMe');
     const rivalListEl = document.getElementById('rivalList');
     const rivalResetBtn = document.getElementById('rivalReset');
+    const rTabsEl = document.getElementById('rTabs');
+    const lbTabsEl = document.getElementById('lbTabs');
+    const rNoteEl = document.getElementById('rNote');
+    const lbNoteEl = document.getElementById('lbNote');
+    const fxLineEl = document.getElementById('fxLine');
     const tSrvEl = document.getElementById('tSrv');
     const oSrvEl = document.getElementById('oSrv');
     const tSrvBtn = document.getElementById('tSrvBtn');
@@ -6094,6 +6607,76 @@ if (typeof document !== 'undefined'){
     let profile = loadProfile();
     if (nickInput) nickInput.value = profile.nick || '';
     Sfx.setCar(profile.car);
+
+    /* ---------- 순위표 탭 (통합 · 거리 · 점수 · 칼치기) ---------- */
+    const RANK_TAB_KEY = 'busan8_ranktab_v1';
+    let rankTab = 'total';
+    try {
+      const saved = localStorage.getItem(RANK_TAB_KEY);
+      if (saved && RANK_TAB_IDS.indexOf(saved) >= 0) rankTab = saved;
+    } catch(e){}
+    function saveRankTab(t){
+      try { localStorage.setItem(RANK_TAB_KEY, t); } catch(e){}
+    }
+    let lastLbResult = null;
+    /* 탭 4개를 한 화면에: 누른 탭만 켜지고, 통합 탭에서만 계산 기준을 보여 준다 */
+    function syncRankTabs(){
+      const bars = [rTabsEl, lbTabsEl];
+      for (let i=0;i<bars.length;i++){
+        const bar = bars[i];
+        if (!bar) continue;
+        const btns = bar.querySelectorAll('.rt');
+        for (let j=0;j<btns.length;j++){
+          const on = btns[j].getAttribute('data-tab') === rankTab;
+          btns[j].classList.toggle('on', on);
+          btns[j].setAttribute('aria-selected', on ? 'true' : 'false');
+        }
+      }
+      if (rNoteEl) rNoteEl.classList.toggle('hidden', rankTab !== 'total');
+      if (lbNoteEl) lbNoteEl.classList.toggle('hidden', rankTab !== 'total');
+    }
+    function pickRankTab(tab){
+      const t = rankTabId(tab);
+      if (t === rankTab) return false;
+      rankTab = t;
+      saveRankTab(t);
+      syncRankTabs();
+      if (sim.state === 'title') renderRivals();
+      else if (sim.state === 'crash' && lastLbResult) renderLeaderboard(lastLbResult.run, lastLbResult.rivals, lastLbResult.best, true);
+      if (sim.state === 'playing') updateHUD();
+      return true;
+    }
+    (function wireRankTabs(){
+      const bars = [rTabsEl, lbTabsEl];
+      for (let i=0;i<bars.length;i++){
+        const bar = bars[i];
+        if (!bar) continue;
+        bar.addEventListener('click', function(e){
+          const btn = e.target && e.target.closest ? e.target.closest('.rt') : null;
+          if (!btn) return;
+          pickRankTab(btn.getAttribute('data-tab'));
+        });
+      }
+      syncRankTabs();
+    })();
+    /* 탭별 강조 수치 (탭에 맞는 값만 크게) */
+    function tabValueText(row, tab){
+      const t = rankTabId(tab);
+      if (t === 'dist') return fmtKm(row.km) + 'km';
+      if (t === 'score') return fmtNum(row.score || 0) + '점';
+      if (t === 'combo') return 'x' + Math.round(row.maxCombo || 0);
+      return fmtNum(combinedScore(row.km, row.score, row.maxCombo)) + '점';
+    }
+    /* 다른 탭에서도 참고할 수 있게 남은 수치를 작게 붙인다 */
+    function tabSubText(row, tab, spot){
+      const t = rankTabId(tab);
+      const bits = [];
+      if (t !== 'dist') bits.push(fmtKm(row.km) + 'km');
+      if (t !== 'score') bits.push(fmtNum(row.score || 0) + '점');
+      if (t !== 'combo' && (row.maxCombo || 0) > 0) bits.push('⚡x' + Math.round(row.maxCombo));
+      if (spot) bits.push(spot);
+      return bits.join(' · ');
+    }
 
     let view = { sx: 1, sy: 1 };
     let sim = newGame({ worldH: 1422, profile: profile });
@@ -6227,7 +6810,10 @@ if (typeof document !== 'undefined'){
       if (mg && mg.mine && mg.mine.km > (r.bestKm || 0) + 0.05){
         r.bestKm = mg.mine.km;
         r.bestScore = Math.max(r.bestScore || 0, mg.mine.score || 0);
+        r.bestCombo = Math.max(r.bestCombo || 0, mg.mine.maxCombo || 0);
         if (mg.mine.spot) r.bestSpot = mg.mine.spot;
+      } else if (mg && mg.mine){
+        r.bestCombo = Math.max(r.bestCombo || 0, mg.mine.maxCombo || 0);
       }
       return r;
     }
@@ -6283,6 +6869,7 @@ if (typeof document !== 'undefined'){
       return serverRank.post({
         name: nick, km: km,
         score: Math.round(run.score || finalScore(run)),
+        maxCombo: Math.max(0, Math.round(run.maxCombo || 0)),
         car: run.car,
         reason: run.crashCause || 'car',
         spot: run.stopSpot || describeStop(run.dist, run.crashCause),
@@ -6293,20 +6880,21 @@ if (typeof document !== 'undefined'){
     function renderRivals(){
       if (!rivalListEl) return;
       const mg = rivalMerge();
-      const lb = buildLeaderboard(profile, rankRecords(mg), mg.list);
+      const lb = buildLeaderboard(profile, rankRecords(mg), mg.list, { tab: rankTab });
       const rows = topRowsForDisplay(lb.rows, LEADERBOARD_TOP);
       const html = [];
       for (let i=0;i<rows.length;i++){
         const r = rows[i];
         if (r.me && i === rows.length - 1 && r.rank > rows.length) html.push('<div class="rGap">⋯</div>');
-        html.push('<div class="rRow' + (r.me ? ' me' : '') + '">' +
+        html.push('<div class="rRow' + (r.me ? ' me' : '') + '" title="' + escapeHtml(tabSubText(r, rankTab, '')) + '">' +
           '<span class="rk">' + r.rank + '</span>' +
           '<span class="em">' + carById(r.car).emoji + '</span>' +
           '<span class="nm">' + escapeHtml(r.nick) + (r.me && r.nick !== '나' ? ' (나)' : '') + '</span>' +
-          '<span class="km">' + fmtKm(r.km) + 'km</span></div>');
+          '<span class="km">' + escapeHtml(tabValueText(r, rankTab)) + '</span></div>');
       }
       if (!rows.length) html.push('<div class="rRow"><span class="nm"> 라이벌 없음</span></div>');
       rivalListEl.innerHTML = html.join('');
+      syncRankTabs();
     }
     function escapeHtml(s){
       return String(s === undefined || s === null ? '' : s)
@@ -6363,15 +6951,18 @@ if (typeof document !== 'undefined'){
     }
 
     /* ---------- 게임오버: 전체 순위표 ---------- */
-    function renderLeaderboard(run, rivalsIn, myBest){
+    function renderLeaderboard(run, rivalsIn, myBest, keep){
       if (!lbListEl) return;
+      if (!keep) lastLbResult = { run: run, rivals: rivalsIn, best: myBest };
       const rows = [];
       const myKey = nickKey(profile.nick || '');
       const list = rivalsIn || run.rivals || [];
       for (let i=0;i<list.length;i++){
         const r = list[i];
         if (myKey && nickKey(r.nick) === myKey) continue;   /* 내 기록은 아래 me 행으로만 */
-        rows.push({ nick: r.nick, car: r.car, km: r.km, score: r.score || 0, spot: r.spot || '', me: false });
+        rows.push({ nick: r.nick, car: r.car, km: r.km, score: r.score || 0,
+          maxCombo: Math.max(0, Math.round(Number(r.maxCombo !== undefined ? r.maxCombo : r.combo) || 0)),
+          spot: r.spot || '', me: false });
       }
       const runKm = Math.round(run.dist * 10) / 10;
       const bestKm = myBest ? Math.max(0, Number(myBest.km) || 0) : 0;
@@ -6382,19 +6973,15 @@ if (typeof document !== 'undefined'){
       rows.push({
         nick: profile.nick || '나', car: profile.car,
         km: myKm, score: Math.max(run.score || 0, myBest ? (myBest.score || 0) : 0),
+        maxCombo: Math.max(0, Math.round(Math.max(run.maxCombo || 0, (myBest && myBest.maxCombo) || 0))),
         spot: mySpot, me: true
       });
-      rows.sort(function(a, b){
-        if (b.km !== a.km) return b.km - a.km;
-        if (b.score !== a.score) return b.score - a.score;
-        return a.nick < b.nick ? -1 : (a.nick > b.nick ? 1 : 0);
-      });
-      for (let i=0;i<rows.length;i++) rows[i].rank = i + 1;
+      /* 선택한 탭 기준으로 재정렬 + 순위 (통합·거리·점수·칼치기) */
+      const sorted = sortRowsByTab(rows, rankTab);
       let myRank = 0;
-      for (let i=0;i<rows.length;i++) if (rows[i].me) myRank = rows[i].rank;
+      for (let i=0;i<sorted.length;i++) if (sorted[i].me) myRank = sorted[i].rank;
 
-      const top = topRowsForDisplay(rows, LEADERBOARD_TOP);
-      const show = top;
+      const show = topRowsForDisplay(sorted, LEADERBOARD_TOP);
       const html = [];
       for (let i=0;i<show.length;i++){
         const r = show[i];
@@ -6406,22 +6993,27 @@ if (typeof document !== 'undefined'){
           '<span class="rk">' + r.rank + '</span>' +
           '<span class="em">' + carById(r.car).emoji + '</span>' +
           '<span class="nm">' + escapeHtml(r.nick) + (r.me && r.nick !== '나' ? ' · 나' : '') + '</span>' +
-          '<span class="km">' + fmtKm(r.km) + 'km</span>' +
-          '<span class="sp">' + escapeHtml(r.spot || '') + '</span></div>');
+          '<span class="km">' + escapeHtml(tabValueText(r, rankTab)) + '</span>' +
+          '<span class="sp">' + escapeHtml(tabSubText(r, rankTab, r.spot || '')) + '</span></div>');
       }
       lbListEl.innerHTML = html.join('');
+      syncRankTabs();
 
+      /* '다음 목표'는 지금 탭 기준으로 바로 앞 사람 */
       let nextTxt = '';
       let bestAhead = null;
-      for (let i=0;i<rows.length;i++){
-        if (!rows[i].me && rows[i].km > myKm + 0.05){
-          if (!bestAhead || rows[i].km < bestAhead.km) bestAhead = rows[i];
+      for (let i=0;i<sorted.length;i++){
+        if (!sorted[i].me && sorted[i].rank < myRank){
+          if (!bestAhead || sorted[i].rank > bestAhead.rank) bestAhead = sorted[i];
         }
       }
-      if (bestAhead) nextTxt = '다음 목표 ' + escapeHtml(bestAhead.nick) + ' ' + fmtKm(bestAhead.km - myKm) + 'km';
-      else nextTxt = '라이벌 전원 추월 🏆';
-      if (lbMeEl) lbMeEl.innerHTML = '내 순위 <em>' + myRank + '위</em> / ' + rows.length + '명 · ' + nextTxt;
-      return { rows: rows, myRank: myRank, total: rows.length, next: bestAhead };
+      const tabLabel = (RANK_TABS.filter(function(t){ return t.id === rankTab; })[0] || RANK_TABS[0]).label;
+      if (bestAhead){
+        nextTxt = tabLabel + ' 기준 다음 ' + escapeHtml(bestAhead.nick) + ' ' +
+          escapeHtml(tabValueText(bestAhead, rankTab));
+      } else nextTxt = tabLabel + ' 1위 🏆';
+      if (lbMeEl) lbMeEl.innerHTML = '내 순위 <em>' + myRank + '위</em> / ' + sorted.length + '명 · ' + nextTxt;
+      return { rows: sorted, myRank: myRank, total: sorted.length, next: bestAhead };
     }
 
     /* ---------- 돌발 미션 칩 (상단 중앙, 조작 방해 없음) ---------- */
@@ -6461,6 +7053,21 @@ if (typeof document !== 'undefined'){
       if (camZoneBar) camZoneBar.style.width = clamp(sim.camT / CAMERA.dur * 100, 0, 100).toFixed(0) + '%';
     }
 
+    /* HUD에 지금 걸려 있는 아이템 효과를 한 줄로 (자석·슬로우·사이렌·기름) */
+    function updateFxLine(){
+      if (!fxLineEl) return;
+      const bits = [];
+      if ((sim.magnetT || 0) > 0) bits.push('🧲 ' + sim.magnetT.toFixed(1) + 's');
+      if ((sim.slowT || 0) > 0) bits.push('⏳ ' + sim.slowT.toFixed(1) + 's');
+      if ((sim.sirenT || 0) > 0) bits.push('📣 ' + sim.sirenT.toFixed(1) + 's');
+      if ((sim.doubleT || 0) > 0) bits.push('✨ ' + sim.doubleT.toFixed(1) + 's');
+      if ((sim.nitro || 0) > 0) bits.push('🔥 ' + sim.nitro.toFixed(1) + 's');
+      if ((sim.oilT || 0) > 0) bits.push('🛢️ 미끈덩 ' + sim.oilT.toFixed(1) + 's');
+      const txt = bits.join(' · ');
+      fxLineEl.textContent = txt;
+      fxLineEl.classList.toggle('on', !!txt);
+    }
+
     function updateHUD(){
       const next = sim.landSeq[sim.landIdx];
       legName.textContent = legTitle(sim.leg);
@@ -6472,6 +7079,7 @@ if (typeof document !== 'undefined'){
       spdVal.textContent = Math.round(sim.speed);
       bestVal.textContent = '🏆 ' + (sim.rec.bestKm > 0 ? fmtKm(sim.rec.bestKm) + 'km' : '—');
       updateCamZone();
+      updateFxLine();
 
       const dg = clamp(sim.danger, 0, 1);
       dangerFill.style.width = (dg * 100).toFixed(1) + '%';
@@ -6797,7 +7405,7 @@ if (typeof document !== 'undefined'){
       }
       if (lb && lb.rows.length){
         if (lb.myRank === 1) line += '<br><em>🥇 라이벌 1위!</em> <span>도전장을 뿌려라</span>';
-        else line += '<br><em>' + lb.myRank + '위</em> <span>· ' + (lb.next ? lb.next.nick + '까지 ' + fmtKm(lb.next.km - sim.dist) + 'km' : '전원 추월') + '</span>';
+        else line += '<br><em>' + lb.myRank + '위</em> <span>· ' + (lb.next ? lb.next.nick + ' ' + tabValueText(lb.next, rankTab) : '전원 추월') + '</span>';
       }
       const srv = serverRank.state;
       if (srv.status === 'live' && srv.rows.length && lb && lb.myRank){
@@ -7185,6 +7793,33 @@ if (typeof document !== 'undefined'){
         },
         impact: function(emoji, text, color){
           return addImpact(sim, emoji, text, color);
+        },
+        /* 검증·캐처용: 아이템 효과를 바로 발동 (mystery 는 랜덤 박스 그대로) */
+        giveItem: function(id){
+          if (sim.state !== 'playing') return null;
+          const def = itemDef(id);
+          return itemPickup(sim, { id: -1, type: def.id, x: playerX(sim), y: playerY(sim), lane: Math.round(sim.lanePos) }, []);
+        },
+        oilHit: function(){
+          if (sim.state !== 'playing') return false;
+          hitOil(sim, { x: playerX(sim), y: playerY(sim) }, []);
+          return true;
+        },
+        oilSpawn: function(lane){
+          if (sim.state !== 'playing') return null;
+          return spawnOil(sim, { lane: (lane === undefined ? null : lane) });
+        },
+        siren: function(){
+          if (sim.state !== 'playing') return 0;
+          sim.sirenT = 4;
+          return sirenDodge(sim, 0, []);
+        },
+        rankTab: function(t){
+          if (t === undefined) return rankTab;
+          return pickRankTab(t);
+        },
+        tabs: function(){
+          return RANK_TABS.map(function(x){ return x.id + ':' + x.label; });
         },
         setNick: function(n){
           profile.nick = normalizeNick(n);
