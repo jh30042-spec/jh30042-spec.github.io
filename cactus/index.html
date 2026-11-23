@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#241226">
-<meta name="cactus-build" content="v1.0">
+<meta name="cactus-build" content="v2.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="선인장 대첩">
-<meta name="description" content="같은 선인장 3장을 모으면 점수! 뺏고, 뽑고, 방패 치는 5인 병맛 파티 카드게임. 1탭으로 AI 봇과 바로 한판, 친구 방 코드로 실시간 대전.">
+<meta name="description" content="같은 선인장 3장을 모으면 점수! 훔치고, 통째로 바꾸고, 얼려버리는 5인 병맛 파티 카드게임. 1탭으로 AI 봇과 바로 한판, 친구 방 코드로 실시간 대전.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="🌵 가시밭길 선인장 대첩">
-<meta property="og:description" content="같은 선인장 3장 = 점수! 🤏뺏고 🃏뽑고 🛡️방패 치는 5인 병맛 파티 카드게임. 9점 먼저 찍으면 승리!">
+<meta property="og:description" content="같은 선인장 3장 = 점수! 🤏뺏고 🎁3장뽑고 🔄손패통째로 바꾸고 🧊얼려버리는 5인 병맛 파티 카드게임. 15점 먼저 찍으면 승리, 서로 놀리는 맛!">
 <meta property="og:url" content="https://jh30042-spec.github.io/cactus/">
 <meta property="og:site_name" content="종혁의 미니게임">
 <meta property="og:locale" content="ko_KR">
@@ -81,10 +81,10 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 .tCharRow svg:nth-child(4){animation-delay:.84s}
 .tCharRow svg:nth-child(5){animation-delay:1.12s}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-6px) rotate(1.5deg)}}
-.tRule{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tRule{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .tRule div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:13px;
-  padding:7px 4px;text-align:center;font-size:11px;font-weight:800;color:#e9e0f5;line-height:1.25}
-.tRule div b{display:block;font-size:19px;margin-bottom:2px}
+  padding:6px 2px;text-align:center;font-size:10.5px;font-weight:800;color:#e9e0f5;line-height:1.2}
+.tRule div b{display:block;font-size:18px;margin-bottom:2px}
 .tRule div span{opacity:.9}
 .tPicker{display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
   border-radius:16px;padding:8px 10px}
@@ -144,9 +144,16 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 .opp .fan i:first-child{margin-left:0}
 .opp .fan i.b{background:linear-gradient(180deg,#7a3a2a,#3b1712);border-color:#180a06}
 .opp .fan .cnt{font-size:10px;font-weight:900;opacity:.75;margin-left:2px}
-.opp .prog{display:flex;gap:2.5px;margin:4px 0 5px;padding:0 3px}
-.opp .prog i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.13);display:block;transition:background .2s,box-shadow .2s}
-.opp .prog i.on{background:#ffd34d;box-shadow:0 0 6px rgba(255,211,77,.7)}
+.opp .prog{display:flex;gap:1.5px;margin:3px 0 4px;padding:0 2px}
+.opp .prog i{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.13);display:block;transition:background .2s,box-shadow .2s}
+.opp .prog i.on{background:#ffd34d;box-shadow:0 0 5px rgba(255,211,77,.7)}
+.opp .ice{display:none;position:absolute;top:22px;left:50%;margin-left:-11px;font-size:19px;z-index:3;
+  filter:drop-shadow(0 0 8px rgba(140,230,255,1)) drop-shadow(0 1px 0 rgba(0,0,0,.6));animation:iceBob 1.1s ease-in-out infinite}
+.opp.frozen .ice{display:block}
+.opp.frozen{box-shadow:0 0 0 2px rgba(120,220,255,.7),0 0 20px rgba(90,200,255,.4)}
+.opp.frozen .avWrap svg{filter:drop-shadow(0 0 9px rgba(120,220,255,.85)) saturate(.75)}
+@keyframes iceBob{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-3px) rotate(8deg)}}
+#meIce{font-size:10.5px;font-weight:800;color:#8fe6ff}
 .opp.turn{border-color:rgba(140,230,63,.85);background:linear-gradient(180deg,rgba(140,230,63,.18),rgba(140,230,63,.03));
   box-shadow:0 0 0 2px rgba(140,230,63,.25),0 0 22px rgba(140,230,63,.22)}
 .opp.turn .avWrap svg{transform:scale(1.06)}
@@ -232,12 +239,12 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 #drawBtn .sub{font-size:10.5px;font-weight:800;opacity:.8;margin-left:2px}
 #cancelBtn,#passBtn{flex:0 0 auto;padding:0 14px;font-size:14px}
 #trashBtn{flex:0 0 auto;padding:0 11px;font-size:12px}
-#taunts{height:44px;display:flex;gap:4px}
-#taunts button{flex:1;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+#taunts{height:44px;display:flex;gap:3px}
+#taunts button{flex:1;min-width:0;border-radius:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-#taunts button:active{transform:scale(.94);background:rgba(255,255,255,.18)}
-#taunts button span{font-size:18px;line-height:1}
-#taunts button i{font-style:normal;font-size:8.5px;font-weight:800;opacity:.72;white-space:nowrap}
+#taunts button:active{transform:scale(.92);background:rgba(255,90,60,.32)}
+#taunts button span{font-size:16px;line-height:1}
+#taunts button i{font-style:normal;font-size:8px;font-weight:800;opacity:.72;white-space:nowrap}
 
 /* 말풍선 / 떠다니는 효과 */
 #bubbles,#fxLayer{position:fixed;inset:0;pointer-events:none;z-index:70}
@@ -281,6 +288,36 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 .shBar{height:12px;border-radius:6px;background:rgba(255,255,255,.15);overflow:hidden}
 .shBar i{display:block;height:100%;background:linear-gradient(90deg,#8ce63f,#ffd34d,#ff5a3c);transition:width .1s linear}
 .shHint{text-align:center;font-size:11.5px;font-weight:800;color:#c9b8e0}
+
+/* ================= 대형 도발/액션 임팩트 ================= */
+#impact{position:fixed;inset:0;z-index:92;display:flex;align-items:center;justify-content:center;pointer-events:none;padding-bottom:72px}
+#impact.hidden{display:none!important}
+.impFlash{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.72),rgba(255,80,60,.34) 34%,rgba(0,0,0,0) 66%);animation:impFlash .34s ease-out both}
+@keyframes impFlash{0%{opacity:0}10%{opacity:1}45%{opacity:.45}100%{opacity:0}}
+.impWrap{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.impRing{position:absolute;left:50%;top:50%;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;
+  border:7px solid rgba(255,214,90,.9);box-shadow:0 0 30px rgba(255,180,60,.55);animation:impRing .78s cubic-bezier(.2,.7,.3,1) both}
+.impRing.r2{border-color:rgba(255,90,60,.75);animation-delay:.08s}
+@keyframes impRing{0%{transform:scale(.2);opacity:.9}100%{transform:scale(5.4);opacity:0}}
+.impSpark{position:absolute;left:50%;top:44%;width:0;height:0;z-index:3}
+.impSpark i{position:absolute;left:0;top:0;width:8px;height:8px;border-radius:2px;background:#ffd34d;
+  box-shadow:0 0 10px rgba(255,200,80,.9);animation:impSpark .68s ease-out both}
+@keyframes impSpark{0%{transform:rotate(var(--a)) translateY(0) scale(1);opacity:1}100%{transform:rotate(var(--a)) translateY(calc(-1 * var(--d))) scale(.2);opacity:0}}
+.impChar{position:relative;z-index:2;width:min(44vw,164px);filter:drop-shadow(0 12px 30px rgba(0,0,0,.65));animation:impPop .5s cubic-bezier(.18,1.7,.4,1) both}
+.impChar svg{width:100%;height:auto}
+@keyframes impPop{0%{transform:scale(2.7) rotate(-15deg);opacity:0}42%{transform:scale(.88) rotate(5deg);opacity:1}66%{transform:scale(1.1) rotate(-3deg)}100%{transform:scale(1) rotate(0)}}
+.impIcon{position:absolute;top:0;right:14%;font-size:54px;z-index:4;animation:impIcon .55s cubic-bezier(.2,1.6,.4,1) both .06s}
+@keyframes impIcon{0%{transform:scale(0) rotate(-60deg);opacity:0}60%{transform:scale(1.25) rotate(10deg);opacity:1}100%{transform:scale(1) rotate(-6deg)}}
+.impText{position:relative;z-index:4;max-width:90%;margin-top:2px;text-align:center;font-size:clamp(18px,6vw,26px);font-weight:900;letter-spacing:-.03em;line-height:1.15;
+  color:#fff;padding:4px 12px;border-radius:14px;background:rgba(12,4,18,.62);
+  text-shadow:0 2px 0 #1a0a22,0 0 18px rgba(255,90,60,.85);animation:impText .42s cubic-bezier(.2,1.6,.4,1) both .1s}
+@keyframes impText{0%{transform:scale(.3) translateY(14px);opacity:0}60%{transform:scale(1.12) translateY(0);opacity:1}100%{transform:scale(1)}}
+.impWho{position:relative;z-index:4;margin-top:4px;font-size:12px;font-weight:900;color:#ffd479;letter-spacing:.02em;
+  background:rgba(12,4,18,.7);padding:2px 10px;border-radius:999px;animation:impText .4s ease-out both .16s}
+#impact.k-freeze .impFlash{background:radial-gradient(circle at 50% 42%,rgba(200,245,255,.75),rgba(60,180,255,.32) 42%,rgba(0,0,0,0) 70%)}
+#impact.k-swapAll .impFlash{background:radial-gradient(circle at 50% 42%,rgba(200,255,160,.6),rgba(140,230,63,.28) 42%,rgba(0,0,0,0) 70%)}
+.shakeBig{animation:shakeBig .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shakeBig{0%,100%{transform:translate(0,0) rotate(0)}12%{transform:translate(-7px,4px) rotate(-.7deg)}28%{transform:translate(8px,-5px) rotate(.8deg)}44%{transform:translate(-6px,-3px) rotate(-.5deg)}60%{transform:translate(5px,4px) rotate(.4deg)}78%{transform:translate(-3px,2px) rotate(-.2deg)}}
 
 /* ================= 모달 ================= */
 #modal{position:fixed;inset:0;z-index:90;background:rgba(8,2,14,.72);display:flex;align-items:center;justify-content:center;padding:16px}
@@ -367,12 +404,13 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
         <button id="soundBtnT" class="iconBtn" aria-label="소리">🔊</button>
       </div>
       <h1 class="tTitle"><span class="kick">가시밭길</span><span class="name">선인장 대첩</span></h1>
-      <p class="tSub">같은 선인장 <b>3장</b> = 점수! <b>9점</b> 먼저 찍으면 승리</p>
+      <p class="tSub">같은 선인장 <b>3장</b> = 점수! <b>15점</b> 먼저 찍으면 승리</p>
       <div class="tCharRow" id="tChars"></div>
       <div class="tRule">
-        <div><b>🃏</b><span>뽑거나</span></div>
+        <div><b>🎁</b><span>3장 뽑기</span></div>
         <div><b>🤏</b><span>뺏거나</span></div>
-        <div><b>🎉</b><span>3장 = 점수</span></div>
+        <div><b>🔄</b><span>통째 교환</span></div>
+        <div><b>🧊</b><span>얼려버리기</span></div>
       </div>
       <div class="tPicker">
         <label>내 이름 · 캐릭터</label>
@@ -424,6 +462,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
           <span id="meScore">0점</span>
           <span id="meSets"></span>
           <span id="meBombs"></span>
+          <span id="meIce"></span>
         </div>
         <button id="setBtn" class="setBtn hidden">🎉 3장 완성! <small>+3</small></button>
       </div>
@@ -435,11 +474,13 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
         <button id="passBtn" class="btn primary hidden">다음 ▶</button>
       </div>
       <div id="taunts">
-        <button data-t="😝" data-x="메롱~"><span>😝</span><i>메롱</i></button>
-        <button data-t="💢" data-x="1등 잡아!"><span>💢</span><i>1등잡아</i></button>
-        <button data-t="😭" data-x="살려줘!"><span>😭</span><i>살려줘</i></button>
-        <button data-t="🌵" data-x="따갑지?"><span>🌵</span><i>따갑지?</i></button>
-        <button data-t="👏" data-x="킹받네"><span>👏</span><i>킹받네</i></button>
+        <button data-t="😝" data-x="메롱~ 못 잡겠지?"><span>😝</span><i>메롱</i></button>
+        <button data-t="💢" data-x="1등 다굴 가자!"><span>💢</span><i>다굴</i></button>
+        <button data-t="😭" data-x="살려줘~ 제발 ㅠㅠ"><span>😭</span><i>살려줘</i></button>
+        <button data-t="🌵" data-x="따갑지? 더 아파올걸?"><span>🌵</span><i>따갑지</i></button>
+        <button data-t="👏" data-x="킹받네 ㅋㅋㅋ"><span>👏</span><i>킹받네</i></button>
+        <button data-t="🧊" data-x="얼음 땡 ㅋㅋ"><span>🧊</span><i>얼음</i></button>
+        <button data-t="🔄" data-x="손패 잘 쓸게~"><span>🔄</span><i>손패</i></button>
       </div>
     </div>
 
@@ -464,11 +505,12 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 
   <div id="modal" class="hidden"></div>
   <div id="shield" class="hidden"></div>
+  <div id="impact" class="hidden"></div>
   <div id="toast"></div>
 </div>
 <script>
 /* ============================================================
-   🌵 가시밭길 선인장 대첩 (Cactus Party) — 게임 엔진
+   🌵 가시밭길 선인장 대첩 (Cactus Party) — 게임 엔진 v2
    브라우저에서는 window.CactusEngine, Node 테스트에서는 module.exports
    상태는 전부 JSON 직렬화 가능 (Firebase 동기화용)
    ============================================================ */
@@ -478,26 +520,29 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  var VERSION = '1.0.0';
-  var TARGET_SCORE = 9;      // 목표 점수
-  var HAND_LIMIT = 8;        // 손패 상한
+  var VERSION = '2.0.0';
+  var TARGET_SCORE = 15;     // 목표 점수 (v2: 9 → 15, 점수가 천천히)
+  var HAND_LIMIT = 12;       // 손패 상한 (v2: 8 → 12, 3장 뽑기 대응)
   var SHIELD_MS = 5000;      // 방패 반응 제한
   var BOT_SHIELD_MS = 1150;  // 봇 방패 판단 연출 시간
-  var MAX_TURNS = 400;       // 안전장치
+  var MAX_TURNS = 500;       // 안전장치
 
   var CACTUS = [
     { key: 'green', name: '민둥이', pts: 2, body: '#5cbb45', dark: '#3d8a2c', flower: null, flowerCore: null, pot: '#cf5a33', potDark: '#a8431f' },
     { key: 'pink', name: '핑크꽃', pts: 3, body: '#63c44b', dark: '#43a032', flower: '#ff8ec6', flowerCore: '#ffd23f', pot: '#e8609b', potDark: '#bd3f78' },
     { key: 'yellow', name: '노랑꽃', pts: 3, body: '#7ccb51', dark: '#55a534', flower: '#ffd23f', flowerCore: '#ff9f43', pot: '#e2b53c', potDark: '#b8901f' },
-    { key: 'red', name: '빨간가시', pts: 4, body: '#57ad3f', dark: '#3c8629', flower: '#ff5a3c', flowerCore: '#ffd23f', pot: '#cc3f2f', potDark: '#9e2a1e' }
+    { key: 'red', name: '빨간가시', pts: 3, body: '#57ad3f', dark: '#3c8629', flower: '#ff5a3c', flowerCore: '#ffd23f', pot: '#cc3f2f', potDark: '#9e2a1e' }
   ];
 
   var ACTIONS = {
-    steal: { key: 'steal', name: '슬쩍!', icon: '🤏', short: '1장 뺏기', needTarget: true },
-    demand: { key: 'demand', name: '이거 있냐?', icon: '👀', short: '종류 전부 뺏기', needTarget: true, needType: true },
-    flip: { key: 'flip', name: '판 뒤집기', icon: '🌀', short: '교환 / 돌리기' },
-    shield: { key: 'shield', name: '가시 방패', icon: '🛡️', short: '공격 막기 5초' },
-    bomb: { key: 'bomb', name: '썩은 선인장', icon: '💣', short: '떠넘기기 -1점', needTarget: true }
+    steal:   { key: 'steal',   name: '슬쩍!',       icon: '🤏', short: '1장 뺏기',       needTarget: true },
+    demand:  { key: 'demand',  name: '이거 있냐?',  icon: '👀', short: '종류 전부 뺏기', needTarget: true, needType: true },
+    draw3:   { key: 'draw3',   name: '3장 뽑기',    icon: '🎁', short: '한 번에 3장',    needTarget: false },
+    swapAll: { key: 'swapAll', name: '손패 바꾸기', icon: '🔄', short: '손패 통째 교환', needTarget: true },
+    freeze:  { key: 'freeze',  name: '정지!',       icon: '🧊', short: '다음 턴 얼리기', needTarget: true },
+    flip:    { key: 'flip',    name: '판 뒤집기',   icon: '🌀', short: '교환 / 돌리기',  needTarget: false },
+    shield:  { key: 'shield',  name: '가시 방패',   icon: '🛡️', short: '공격 막기 5초',  needTarget: false },
+    bomb:    { key: 'bomb',    name: '썩은 선인장', icon: '💣', short: '떠넘기기 -1점',   needTarget: true }
   };
 
   var CHARS = [
@@ -508,8 +553,34 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     { name: '깐족이', emoji: '🤪', tag: '약올리기 장인' }
   ];
 
-  var DECK_COUNTS = { g: 15, p: 12, y: 12, r: 12, s: 6, d: 4, f: 4, h: 5, b: 4 };
-  var PREFIX = { g: 'g', p: 'p', y: 'y', r: 'r', s: 'steal', d: 'demand', f: 'flip', h: 'shield', b: 'bomb' };
+  // v2 덱(122장): 선인장 60장 + 액션/견제 62장 → 액션이 덱의 절반 이상
+  var DECK_COUNTS = {
+    g: 15, p: 15, y: 15, r: 15,     // 선인장 60 (종류별 5세트씩 = 총 55점어치: 2·3·3·3점)
+    t: 10,                           // 🎁 3장 뽑기
+    w: 9,                            // 🔄 손패 바꾸기
+    z: 9,                            // 🧊 정지!
+    s: 8,                            // 🤏 슬쩍
+    d: 7,                            // 👀 이거 있냐?
+    h: 9,                            // 🛡️ 가시 방패
+    b: 6,                            // 💣 썩은 선인장
+    f: 4                             // 🌀 판 뒤집기
+  };
+  var PREFIX = { g: 'g', p: 'p', y: 'y', r: 'r', s: 'steal', d: 'demand', t: 'draw3', w: 'swapAll', z: 'freeze', f: 'flip', h: 'shield', b: 'bomb' };
+
+  // 도발/견제 멘트 (화면 중앙 대형 임팩트에 그대로 뜬다)
+  var TAUNT_LINES = {
+    steal: ['슬쩍~ 이거 내 거야 ㅋㅋ', '어? 카드 하나 없어졌네?', '고마워~ 잘 쓸게'],
+    demand: ['있으면 다 내놔~', '다 내 거! 메롱~', '숨겨봐야 다 내 거 ㅋㅋ'],
+    swapAll: ['손패 잘 쓸게~ ㅋㅋ', '바꿔치기 성공! 통째로 내 거~', '이게 내 패다!'],
+    freeze: ['얼음 땡 ㅋㅋ', '꽁꽁 얼었지? 한 턴 없다~', '꽝! 다음 턴 없음 ㅋㅋ'],
+    bomb: ['이거 너 줄게~', '썩은 선인장 선물!', '받아라! 냄새나 ㅋㅋ'],
+    block: ['팅! 안 뚫려 ㅋㅋ', '방패 만세~ 못 뺏지?', '가시가 더 아프지?'],
+    stealFail: ['손이 비었네? ㅋㅋㅋ', '헛손질 ㅋㅋ', '뭘 뺏어 ㅋㅋ'],
+    demandFail: ['메롱~ 없지롱!', '그거 없는데? ㅋㅋ', '없다니까~ ㅋㅋ'],
+    frozen: ['얼음 안에 잘 있지? ㅋㅋ', '꽁꽁~ 다음에 봐 ㅋㅋ'],
+    spin: ['술래 돌려버렸다 ㅋㅋ', '다 뒤섞여라~ ㅋㅋ']
+  };
+  var IMPACT_ICON = { steal: '🤏', demand: '👀', bomb: '💣', swapAll: '🔄', freeze: '🧊', block: '🛡️', stealFail: '😶', demandFail: '😝', frozen: '🧊', spin: '🌀' };
 
   /* ---------------- 유틸 ---------------- */
 
@@ -536,7 +607,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     if (!id) return null;
     var k = id.charAt(0);
     var actKey = PREFIX[k];
-    if (actKey === 'steal' || actKey === 'demand' || actKey === 'flip' || actKey === 'shield' || actKey === 'bomb') {
+    if (actKey && ACTIONS[actKey]) {
       var a = ACTIONS[actKey];
       return { id: id, kind: 'action', act: a.key, name: a.name, icon: a.icon, short: a.short };
     }
@@ -595,6 +666,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
         bot: !!p.bot,
         cid: p.cid || null,
         connected: true,
+        frozen: 0,
         hand: [],
         score: 0,
         sets: 0
@@ -611,6 +683,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     }
     st.deck = shuffle(st, st.deck);
     log(st, '🌵 ' + st.players.length + '명 입장! ' + st.targetScore + '점 먼저 모으면 승리!');
+    log(st, '😝 오늘도 서로 놀리면서 가시밭길을 걸어보자');
     log(st, '👉 ' + st.players[0].name + '부터 시작!');
     fx(st, { t: 'start' });
     return st;
@@ -628,6 +701,15 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     obj.i = st.fxSeq;
     st.fx.push(obj);
     if (st.fx.length > 16) st.fx.shift();
+  }
+
+  // 화면 중앙 대형 도발/견제 임팩트 (모든 화면에 동기화되는 fx)
+  function impactFx(st, kind, seat, text) {
+    var arr = TAUNT_LINES[kind] || ['메롱~'];
+    var line = text || arr[st.fxSeq % arr.length];
+    fx(st, { t: 'impact', kind: kind, seat: seat, icon: IMPACT_ICON[kind] || '😝', text: line });
+    if (st.players[seat]) log(st, '😝 ' + st.players[seat].name + ' "' + line + '"');
+    return line;
   }
 
   /* ---------------- 조회 ---------------- */
@@ -699,8 +781,24 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     st.waitingScore = false;
     if (st.deck.length === 0) { finishGame(st, 'deck'); return; }
     if (st.turnNo >= MAX_TURNS) { finishGame(st, 'long'); return; }
-    st.turn = (st.turn + 1) % st.players.length;
-    st.turnNo++;
+    advanceTurn(st);
+  }
+
+  // 🧊 얼음에 갇힌 사람은 차례를 통째로 건너뛴다
+  function advanceTurn(st) {
+    var n = st.players.length, guard = 0;
+    while (guard++ < n + 2) {
+      st.turn = (st.turn + 1) % n;
+      st.turnNo++;
+      var p = st.players[st.turn];
+      if (p.frozen > 0) {
+        p.frozen--;
+        fx(st, { t: 'frozenSkip', seat: st.turn, left: p.frozen });
+        log(st, '🧊 ' + p.name + ' 얼음에 갇혀 이번 턴 통째로 건너뜀!' + (p.frozen ? ' (한 번 더!)' : ''));
+        continue;
+      }
+      break;
+    }
     fx(st, { t: 'turn', seat: st.turn });
     log(st, '— ' + st.players[st.turn].name + ' 차례 —');
   }
@@ -740,7 +838,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     p.hand.push(c);
     var info = cardInfo(c);
     fx(st, { t: 'draw', seat: seat, card: c });
-    log(st, '🃏 ' + p.name + ' 덱에서 1장 뽑음' + (info.kind === 'cactus' ? ' (' + info.name + ')' : ' (' + info.name + ')'));
+    log(st, '🃏 ' + p.name + ' 덱에서 1장 뽑음' + ' (' + info.name + ')');
     finishAct(st);
     return { ok: true, card: c };
   }
@@ -788,6 +886,24 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     return { ok: true };
   }
 
+  function playDraw3(st, seat, cardId) {
+    var p = st.players[seat];
+    if (p.hand.length >= HAND_LIMIT) return { ok: false, err: '손이 꽉 찼어! 한 장 버리고 써' };
+    if (!st.deck.length) return { ok: false, err: '덱이 비었어!' };
+    removeOne(p.hand, cardId); st.discard.push(cardId);
+    var got = [];
+    for (var i = 0; i < 3; i++) {
+      if (!st.deck.length) break;
+      if (p.hand.length >= HAND_LIMIT) break;
+      var c = st.deck.pop(); p.hand.push(c); got.push(c);
+    }
+    fx(st, { t: 'draw3', seat: seat, n: got.length, cards: got });
+    log(st, '🎁 ' + p.name + ' 3장 뽑기! ' + got.length + '장 획득' +
+      (got.length < 3 ? ' (덱/손패 한계)' : '') + ' → 손 ' + p.hand.length + '장');
+    finishAct(st);
+    return { ok: true, n: got.length, cards: got };
+  }
+
   function playCard(st, seat, cardId, payload) {
     if (!isMyTurn(st, seat)) return { ok: false, err: '네 차례가 아니야' };
     if (st.acted) return { ok: false, err: '이번 턴엔 이미 행동했어' };
@@ -798,6 +914,24 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     payload = payload || {};
 
     if (info.act === 'shield') return { ok: false, err: '방패는 공격받을 때 자동으로 뜬다!' };
+
+    if (info.act === 'draw3') return playDraw3(st, seat, cardId);
+
+    if (info.act === 'freeze') {
+      var ft = payload.target;
+      if (ft == null || ft === seat || !st.players[ft]) return { ok: false, err: '얼릴 상대를 골라' };
+      removeOne(p.hand, cardId); st.discard.push(cardId);
+      beginAttack(st, seat, ft, 'freeze', {}, cardId);
+      return { ok: true, pending: true };
+    }
+
+    if (info.act === 'swapAll') {
+      var wt = payload.target;
+      if (wt == null || wt === seat || !st.players[wt]) return { ok: false, err: '바꿀 상대를 골라' };
+      removeOne(p.hand, cardId); st.discard.push(cardId);
+      beginAttack(st, seat, wt, 'swapAll', {}, cardId);
+      return { ok: true, pending: true };
+    }
 
     if (info.act === 'steal') {
       var target = payload.target;
@@ -838,6 +972,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
           st.players[to].hand.push(cid);
           moved++;
         });
+        impactFx(st, 'spin', seat);
         fx(st, { t: 'flip', seat: seat, mode: 'rotate', moved: moved });
         log(st, '🌀 ' + p.name + ' 판 뒤집기! 전원 카드 1장씩 옆으로 싹 돌았다 (' + moved + '장)');
       } else {
@@ -864,6 +999,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 
   function beginAttack(st, attacker, defender, kind, data, cardId) {
     var def = st.players[defender];
+    impactFx(st, kind, attacker);   // 공격 선언 = 화면 중앙 대형 도발
     var canShield = hasAction(def, 'shield');
     if (canShield) {
       var auto = !!def.bot;
@@ -901,10 +1037,12 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       var hid = def.hand.filter(function (id) { return cardInfo(id).act === 'shield'; })[0];
       if (hid) { removeOne(def.hand, hid); st.discard.push(hid); }
       if (pend.action === 'bomb') st.discard.push(pend.card);
+      impactFx(st, 'block', pend.defender);
       fx(st, { t: 'block', attacker: pend.attacker, defender: pend.defender, action: pend.action });
       log(st, '🛡️ 팅! ' + def.name + '의 가시 방패가 ' + atk.name + '의 공격을 튕겨냈다! ' + atk.name + ' 손해 1장');
     } else if (pend.action === 'steal') {
       if (!def.hand.length) {
+        impactFx(st, 'stealFail', pend.defender);
         fx(st, { t: 'stealFail', attacker: pend.attacker, defender: pend.defender });
         log(st, '😶 ' + def.name + ' 손이 텅 비었다… ' + atk.name + ' 헛손질!');
       } else {
@@ -926,13 +1064,22 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
         log(st, '👀 "' + cname + ' 있냐?" → ' + def.name + ' ' + got.length + '장 전부 털렸다!');
       } else {
         fx(st, { t: 'demandFail', attacker: pend.attacker, defender: pend.defender, type: want });
-        fx(st, { t: 'taunt', seat: pend.defender, text: '메롱~ 없지롱!', icon: '😝' });
+        impactFx(st, 'demandFail', pend.defender);
         log(st, '👀 "' + cname + ' 있냐?" → ' + def.name + ' "없는데? 메롱~"');
       }
     } else if (pend.action === 'bomb') {
       def.hand.push(pend.card);
       fx(st, { t: 'bomb', attacker: pend.attacker, defender: pend.defender, card: pend.card });
       log(st, '💣 ' + atk.name + '이 ' + def.name + '에게 썩은 선인장을 떠넘겼다! (끝나고 -1점)');
+    } else if (pend.action === 'swapAll') {
+      var aN = atk.hand.length, dN = def.hand.length;
+      var tmp = atk.hand; atk.hand = def.hand; def.hand = tmp;
+      fx(st, { t: 'swapAll', attacker: pend.attacker, defender: pend.defender, aN: aN, dN: dN });
+      log(st, '🔄 ' + atk.name + '이 ' + def.name + ' 손패를 통째로 바꿔치기! (' + aN + '장 ↔ ' + dN + '장)');
+    } else if (pend.action === 'freeze') {
+      def.frozen = (def.frozen || 0) + 1;
+      fx(st, { t: 'freeze', attacker: pend.attacker, defender: pend.defender, turns: def.frozen });
+      log(st, '🧊 ' + atk.name + '이 ' + def.name + '을 얼렸다! 다음 턴 통째로 건너뜀');
     }
     finishAct(st);
   }
@@ -950,6 +1097,16 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 
   /* ---------------- 봇 ---------------- */
 
+  function countsOfHand(p) {
+    var c = { bomb: 0, steal: 0, demand: 0, draw3: 0, swapAll: 0, freeze: 0, flip: 0, shield: 0 };
+    p.hand.forEach(function (id) { var i = cardInfo(id); if (i.act) c[i.act]++; });
+    return c;
+  }
+
+  function firstAction(p, act) {
+    return p.hand.filter(function (id) { return cardInfo(id).act === act; })[0];
+  }
+
   function botStep(st) {
     if (st.phase !== 'playing' || st.pending) return false;
     var seat = st.turn;
@@ -963,23 +1120,25 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     }
     if (st.acted) { endTurn(st); return true; }
     var counts = handCounts(p);
+    var ac = countsOfHand(p);
     var others = st.players.filter(function (q) { return q.seat !== seat; });
     var lead = leaderSeat(st, seat);
+    var nextSeat = (seat + 1) % st.players.length;
 
     // 손이 꽉 차면 카드부터 써야 한다
     var full = p.hand.length >= HAND_LIMIT;
 
     // 1) 썩은 선인장 떠넘기기 (가장 점수 높은 상대에게)
-    if (hasAction(p, 'bomb') && rnd(st) < (countsOfHand(p).bomb > 1 ? 0.75 : 0.35)) {
-      var bombTarget = st.players[lead] || others[0];
-      var bombCard = p.hand.filter(function (id) { return cardInfo(id).act === 'bomb'; })[0];
+    if (ac.bomb && rnd(st) < (ac.bomb > 1 ? 0.75 : 0.35)) {
+      var bombTarget = lead >= 0 ? st.players[lead] : others[0];
+      var bombCard = firstAction(p, 'bomb');
       if (bombTarget) {
         var r = playCard(st, seat, bombCard, { target: bombTarget.seat });
         if (r.ok) return true;
       }
     }
     // 2) 이거 있냐? — 2장 모인 종류가 있으면 그 종류를 가진 상대에게
-    if (hasAction(p, 'demand')) {
+    if (ac.demand) {
       var want = null, bestNeed = 0;
       CACTUS.forEach(function (c) {
         var n = counts[c.key];
@@ -991,7 +1150,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
         });
       }
       if (!want) want = pick(st, CACTUS);
-      var dcard = p.hand.filter(function (id) { return cardInfo(id).act === 'demand'; })[0];
+      var dcard = firstAction(p, 'demand');
       // 카드 많은 상대 우선
       var sortedOthers = others.slice().sort(function (a, b) { return b.hand.length - a.hand.length; });
       var dt = sortedOthers[0];
@@ -1002,43 +1161,67 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       }
     }
     // 3) 슬쩍! (점수 1등 또는 카드 많은 상대)
-    if (hasAction(p, 'steal')) {
-      var scard = p.hand.filter(function (id) { return cardInfo(id).act === 'steal'; })[0];
+    if (ac.steal) {
+      var scard = firstAction(p, 'steal');
       var starget = (rnd(st) < 0.6 && lead >= 0) ? lead : pick(st, others).seat;
       if (rnd(st) < (full ? 0.95 : 0.55)) {
         var r3 = playCard(st, seat, scard, { target: starget });
         if (r3.ok) return true;
       }
     }
-    // 4) 판 뒤집기 (지고 있을 때)
-    if (hasAction(p, 'flip')) {
-      var fcard = p.hand.filter(function (id) { return cardInfo(id).act === 'flip'; })[0];
-      var behind = lead >= 0 && st.players[lead].score > p.score;
-      if (rnd(st) < (behind ? 0.4 : 0.15)) {
-        var r4 = playCard(st, seat, fcard, { mode: behind ? 'swap' : 'rotate' });
+    // 4) 손패 바꾸기 — 내 패가 적고 상대가 부자일 때 통째로 가로채기 (또는 1등 견제)
+    if (ac.swapAll) {
+      var richest = others.slice().sort(function (a, b) { return b.hand.length - a.hand.length; })[0];
+      var wcard = firstAction(p, 'swapAll');
+      if (richest && p.hand.length + 2 < richest.hand.length && rnd(st) < 0.6) {
+        var r4 = playCard(st, seat, wcard, { target: richest.seat });
         if (r4.ok) return true;
+      } else if (lead >= 0 && st.players[lead].score >= 5 && rnd(st) < 0.3) {
+        var r4b = playCard(st, seat, wcard, { target: lead });
+        if (r4b.ok) return true;
       }
     }
-    // 5) 손이 꽉 찼으면 아무 카드나 버리고 뽑는다 (교착 방지: 버릴 게 없으면 첫 장)
+    // 5) 정지! — 1등(없으면 다음 사람)을 얼려서 한 턴 뺏기
+    if (ac.freeze) {
+      var fcard = firstAction(p, 'freeze');
+      var ftarget = (lead >= 0 && lead !== seat) ? lead : nextSeat;
+      if (ftarget !== seat && rnd(st) < (full ? 0.8 : 0.45)) {
+        var r5 = playCard(st, seat, fcard, { target: ftarget });
+        if (r5.ok) return true;
+      }
+    }
+    // 6) 3장 뽑기 — 손이 비었을 때 화끈하게
+    if (ac.draw3 && st.deck.length >= 2) {
+      var d3 = firstAction(p, 'draw3');
+      var poor = p.hand.length <= 7;
+      if (rnd(st) < (poor ? 0.75 : 0.2)) {
+        var r6 = playCard(st, seat, d3, {});
+        if (r6.ok) return true;
+      }
+    }
+    // 7) 판 뒤집기 (지고 있을 때)
+    if (ac.flip) {
+      var flcard = firstAction(p, 'flip');
+      var behind = lead >= 0 && st.players[lead].score > p.score;
+      if (rnd(st) < (behind ? 0.4 : 0.15)) {
+        var r7 = playCard(st, seat, flcard, { mode: behind ? 'swap' : 'rotate' });
+        if (r7.ok) return true;
+      }
+    }
+    // 8) 손이 꽉 찼으면 아무 카드나 버리고 뽑는다 (교착 방지: 버릴 게 없으면 첫 장)
     if (full) {
       var trashed = p.hand.filter(function (id) {
         var i = cardInfo(id);
-        if (i.kind === 'action' && i.act === 'shield') return false;
+        if (i.kind === 'action' && i.act === 'shield' && ac.shield <= 2) return false;
         if (i.kind === 'cactus' && counts[i.type] >= 2) return false;
         return true;
       })[0] || p.hand[0];
       if (trashed) { discardCard(st, seat, trashed); return true; }
     }
-    // 6) 뽑기
+    // 9) 뽑기
     if (st.deck.length) { draw(st, seat); return true; }
     endTurn(st);
     return true;
-  }
-
-  function countsOfHand(p) {
-    var c = { bomb: 0, steal: 0, demand: 0, flip: 0, shield: 0 };
-    p.hand.forEach(function (id) { var i = cardInfo(id); if (i.act) c[i.act]++; });
-    return c;
   }
 
   /* ---------------- 방 코드 ---------------- */
@@ -1061,6 +1244,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     ACTIONS: ACTIONS,
     CHARS: CHARS,
     DECK_COUNTS: DECK_COUNTS,
+    TAUNT_LINES: TAUNT_LINES,
     newGame: newGame,
     cardInfo: cardInfo,
     availSets: availSets,
@@ -1077,6 +1261,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     resolveShield: resolveShield,
     tick: tick,
     endTurn: endTurn,
+    advanceTurn: advanceTurn,
     finishGame: finishGame,
     botStep: botStep,
     makeRoomCode: makeRoomCode,
@@ -1146,6 +1331,17 @@ var Sound = {
   steal: function () { this.blip(500, 1500, 0.16, 'triangle', 0.16); this.blip(900, 1900, 0.12, 'sine', 0.1, 0.07); },
   shield: function () { this.blip(1800, 900, 0.1, 'square', 0.18); this.blip(2400, 1200, 0.16, 'sine', 0.14, 0.05); this.noise(0.12, 0.12, 4000); },
   taunt: function () { this.blip(500, 1200, 0.1, 'sine', 0.14); this.blip(1200, 600, 0.13, 'sine', 0.12, 0.09); },
+  ice: function () { this.blip(1600, 520, 0.2, 'sine', 0.17); this.blip(2300, 1100, 0.22, 'triangle', 0.1, 0.05); this.noise(0.22, 0.13, 5200); },
+  swap: function () { this.blip(280, 1500, 0.24, 'sine', 0.19); this.noise(0.18, 0.18, 3000); this.blip(1200, 700, 0.12, 'triangle', 0.1, 0.1); },
+  impact: function (kind) {
+    if (kind === 'freeze' || kind === 'frozen') { this.ice(); return; }
+    if (kind === 'block') { this.shield(); return; }
+    if (kind === 'swapAll') { this.swap(); return; }
+    this.blip(150, 52, 0.3, 'sawtooth', 0.22);
+    this.noise(0.26, 0.28, 900);
+    this.blip(760, 1320, 0.12, 'triangle', 0.15, 0.03);
+    this.blip(1180, 620, 0.14, 'sine', 0.1, 0.13);
+  },
   bomb: function () { this.blip(220, 45, 0.35, 'sawtooth', 0.2); this.noise(0.24, 0.2, 400); },
   bad: function () { this.blip(300, 140, 0.22, 'sawtooth', 0.14); },
   fanfare: function () {
@@ -1279,12 +1475,22 @@ var App = {
   targetMode: null,        // {card, act, target}
   trashMode: false,
   overShown: false,
+  tauntUntil: 0,
   busyUntil: 0,
   modalKind: null,
   botTimer: null,
   lobbyTimer: null
 };
-var BOT_TAUNTS = ['메롱~', '이거나 먹어!', '따갑지?', '난 빼줘', '킹받네', '줄 게 없냐?'];
+var BOT_TAUNTS = [
+  { icon: '😝', text: '메롱~ 못 잡겠지?' },
+  { icon: '💢', text: '1등 다굴 가자!' },
+  { icon: '🌵', text: '따갑지? 더 아파올걸?' },
+  { icon: '👏', text: '킹받네 ㅋㅋㅋ' },
+  { icon: '🧊', text: '얼음 땡 ㅋㅋ' },
+  { icon: '🔄', text: '손패 잘 쓸게~' },
+  { icon: '😭', text: '살려줘~ 제발 ㅠㅠ' },
+  { icon: '🤪', text: '네 패는 내 거 ㅋㅋ' }
+];
 
 function profile() {
   var n = ($('#nameInput') && $('#nameInput').value || '').trim().slice(0, 8);
@@ -1394,7 +1600,7 @@ function startSolo() {
   App.overShown = false;
   showScreen('game');
   render(true);
-  toast('🌵 ' + players.length + '인 테이블! 9점 먼저 모으면 승리', 2200);
+  toast('🌵 ' + players.length + '인 테이블! ' + App.st.targetScore + '점 먼저 모으면 승리', 2200);
 }
 
 /* ============================================================
@@ -1453,9 +1659,10 @@ function renderOpps(st, force) {
   if (needBuild) {
     box.innerHTML = seats.map(function (s) {
       var dots = '';
-      for (var di = 0; di < 9; di++) dots += '<i></i>';
+      for (var di = 0; di < st.targetScore; di++) dots += '<i></i>';
       return '<div class="opp" data-seat="' + s + '">' +
         '<div class="sc">0</div>' +
+        '<div class="ice">🧊</div>' +
         '<div class="avWrap"></div>' +
         '<div class="nm"></div>' +
         '<div class="fan"></div>' +
@@ -1472,6 +1679,7 @@ function renderOpps(st, force) {
     var isTarget = !!(App.targetMode && App.targetMode.needTarget && !App.targetMode.target);
     el.classList.toggle('turn', isTurn);
     el.classList.toggle('target', isTarget);
+    el.classList.toggle('frozen', (p.frozen || 0) > 0);
     var prev = el.getAttribute('data-expr') || '';
     var expr = p.score >= 6 ? 'win' : 'idle';
     if (prev !== expr) {
@@ -1504,7 +1712,11 @@ function renderTable(st) {
   var banner = $('#turnBanner');
   var txt, me = false;
   if (st.pending) txt = '🛡️ ' + st.players[st.pending.defender].name + ' 방패 판정!';
-  else if (App.targetMode) { txt = App.targetMode.act === 'steal' ? '🤏 누구한테 슬쩍? 상대를 콕!' : App.targetMode.act === 'demand' ? '👀 누구에게 물어볼까? 콕!' : '💣 누구에게 떠넘길까? 콕!'; me = true; }
+  else if (App.targetMode) {
+    var ta = E.ACTIONS[App.targetMode.act];
+    txt = ta ? (ta.icon + ' ' + ta.name + ' → 상대를 콕!') : '상대를 콕!';
+    me = true;
+  }
   else if (st.turn === App.seat) { txt = st.waitingScore ? '🎉 점수를 찍어!' : '👉 내 차례!'; me = true; }
   else txt = '😴 ' + p.name + ' 차례…';
   banner.textContent = txt;
@@ -1533,6 +1745,8 @@ function renderMe(st) {
   $('#meSets').textContent = p.sets ? '🎉 세트 ' + p.sets : '';
   var bombs = p.hand.filter(function (id) { return (E.cardInfo(id) || {}).act === 'bomb'; }).length;
   $('#meBombs').textContent = bombs ? '💣' + bombs : '';
+  var mi = $('#meIce');
+  if (mi) mi.textContent = (p.frozen || 0) > 0 ? '🧊 얼음' : '';
 }
 
 function handGroups(st, seat) {
@@ -1695,6 +1909,61 @@ function shakeSeat(seat) {
   setTimeout(function () { el.classList.remove('hit'); }, 500);
 }
 
+/* ============================================================
+   화면 중앙 대형 도발/액션 임팩트
+   ============================================================ */
+var Impact = { token: 0, hideT: null };
+var IMPACT_EXPR = { taunt: 'taunt', block: 'hit', stealFail: 'sad', demandFail: 'taunt', frozen: 'sad', freeze: 'hit' };
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function shakeBig() {
+  var app = document.getElementById('app');
+  if (!app) return;
+  app.classList.remove('shakeBig');
+  void app.offsetWidth;
+  app.classList.add('shakeBig');
+  clearTimeout(shakeBig._t);
+  shakeBig._t = setTimeout(function () { app.classList.remove('shakeBig'); }, 440);
+}
+function impact(o) {
+  var st = App.st;
+  if (!st) return;
+  var seat = o.seat == null ? App.seat : o.seat;
+  var p = st.players[seat] || { name: '?', avatar: 0 };
+  var el = $('#impact');
+  if (!el) return;
+  var tok = ++Impact.token;
+  var expr = IMPACT_EXPR[o.kind] || 'taunt';
+  var sparks = '';
+  for (var i = 0; i < 12; i++) {
+    sparks += '<i style="--a:' + ((i * 30) + 12) + 'deg;--d:' + (66 + (i % 4) * 36) + 'px;animation-delay:' + ((i % 3) * 0.02).toFixed(2) + 's"></i>';
+  }
+  el.className = 'show k-' + (o.kind || 'taunt');
+  el.innerHTML = '<div class="impFlash"></div>' +
+    '<div class="impWrap">' +
+    '<div class="impRing"></div><div class="impRing r2"></div>' +
+    '<div class="impSpark">' + sparks + '</div>' +
+    '<div class="impChar">' + cactusSVG(p.avatar, expr) + '</div>' +
+    '<div class="impIcon">' + esc(o.icon || '😝') + '</div>' +
+    '<div class="impText"></div>' +
+    '<div class="impWho"></div>' +
+    '</div>';
+  $('.impText', el).textContent = o.text || '메롱~';
+  $('.impWho', el).textContent = p.name + (o.kind === 'block' ? ' · 방패로 팅!' : '');
+  Sound.impact(o.kind);
+  vibrate(o.kind === 'freeze' ? [10, 30, 10] : [16, 40, 26]);
+  shakeBig();
+  if (Impact.hideT) clearTimeout(Impact.hideT);
+  Impact.hideT = setTimeout(function () {
+    if (Impact.token !== tok) return;
+    el.className = 'hidden';
+    el.innerHTML = '';
+  }, 1350);
+}
+
 function playFx(f) {
   var st = App.st;
   switch (f.t) {
@@ -1750,7 +2019,35 @@ function playFx(f) {
       break;
     case 'taunt':
       Sound.taunt(); vibrate(10);
-      bubble(f.seat, f.text || '메롱~', f.icon || '😝', 1900);
+      impact({ seat: f.seat, icon: f.icon, text: f.text, kind: 'taunt' });
+      break;
+    case 'impact':
+      // 내가 방금 보낸 도발이 서버에서 돌아온 메아리는 두 번 보여주지 않는다
+      if (f.by && Net.cid && f.by === Net.cid) break;
+      impact({ seat: f.seat, icon: f.icon, text: f.text, kind: f.kind });
+      break;
+    case 'draw3':
+      Sound.card(); setTimeout(function () { Sound.card(); }, 100); setTimeout(function () { Sound.fanfare(); }, 210);
+      vibrate([8, 20, 8]);
+      bubble(f.seat, '한 번에 ' + f.n + '장!', '🎁', 1600);
+      floatTxt(f.seat, '+' + f.n + '장', '#c8ff8a');
+      for (var d3 = 0; d3 < Math.min(f.n, 3); d3++) setTimeout(function () { puff(f.seat, '🃏'); }, d3 * 90);
+      break;
+    case 'swapAll':
+      Sound.swap(); vibrate([20, 40, 30]);
+      puff(f.attacker, '🔄'); puff(f.defender, '🔄');
+      bubble(f.defender, '내 패!!', '😱', 1700);
+      floatTxt(f.defender, '−' + f.dN + ' / +' + f.aN, '#ff9b8a');
+      break;
+    case 'freeze':
+      Sound.ice(); vibrate([10, 30, 10]);
+      bubble(f.defender, '얼음! 다음 턴 없다', '🧊', 1900);
+      puff(f.defender, '❄️');
+      break;
+    case 'frozenSkip':
+      Sound.ice(); vibrate(20);
+      bubble(f.seat, '꽁꽁… 이번 턴 건너뜀', '🧊', 1700);
+      puff(f.seat, '❄️');
       break;
     case 'shieldOpen':
       if (!f.auto && f.defender !== App.seat) { toast('🛡️ ' + st.players[f.defender].name + ' 방패를 들었다! 5초!', 1900); }
@@ -1783,7 +2080,8 @@ function renderShield() {
   box.setAttribute('data-p', String(pend.openedAt));
   box.classList.remove('hidden');
   var atk = st.players[pend.attacker].name;
-  var what = pend.action === 'steal' ? '🤏 슬쩍!' : pend.action === 'demand' ? '👀 이거 있냐?' : '💣 썩은 선인장!';
+  var whatMap = { steal: '🤏 슬쩍!', demand: '👀 이거 있냐?', bomb: '💣 썩은 선인장!', swapAll: '🔄 손패 바꾸기!', freeze: '🧊 정지!' };
+  var what = whatMap[pend.action] || '공격!';
   box.innerHTML = '<div class="shWrap">' +
     '<div class="shHead"><div class="who">' + atk + '의 ' + what + '</div>' +
     '<div class="warn">뺏긴다!!</div></div>' +
@@ -1906,6 +2204,8 @@ function onHandTap(e) {
   if (act === 'shield') { toast('🛡️ 방패는 공격받을 때 자동으로 뜬다! 그때 눌러!', 2000); return; }
   Sound.blip(600, 900, 0.07, 'sine', 0.1);
   if (act === 'flip') { openFlipModal(cardId); return; }
+  var def = E.ACTIONS[act];
+  if (def && def.needTarget === false) { doPlay(cardId, {}); return; }
   App.targetMode = { card: cardId, act: act, needsType: act === 'demand', target: null };
   render();
 }
@@ -1970,19 +2270,25 @@ function openFlipModal(cardId) {
 
 /* --- 도발 --- */
 function doTaunt(icon, text) {
+  var now = Date.now();
+  if (now < App.tauntUntil) { toast('연타 금지! 1초만 쉬어 ㅋㅋ', 900); return; }
+  App.tauntUntil = now + 900;
   vibrate(12); Sound.taunt();
-  bubble(App.seat, text, icon, 1800);
+  var st = App.st;
+  if (!st) return;
   if (App.mode === 'room' && !iCanAct()) {
-    // 클라이언트: 서버로 보내 모두에게
+    // 클라이언트: 내 화면엔 바로 쾅, 서버로 보내 모두에게
+    impact({ seat: App.seat, icon: icon, text: text, kind: 'taunt' });
     sendIntent({ type: 'taunt', icon: icon, text: text });
-  } else if (App.mode === 'room' && iCanAct()) {
-    // 방장: 상태에 실어 모두에게
-    var st = App.st;
-    st.fxSeq++; st.fx.push({ i: st.fxSeq, t: 'taunt', seat: App.seat, text: text, icon: icon });
-    if (st.fx.length > 16) st.fx.shift();
-    App.lastFx = st.fxSeq;
-    publish();
+    return;
   }
+  st.fxSeq++;
+  st.fx.push({ i: st.fxSeq, t: 'impact', kind: 'taunt', seat: App.seat, icon: icon, text: text });
+  if (st.fx.length > 16) st.fx.shift();
+  st.logSeq++;
+  st.log.push({ i: st.logSeq, text: '😝 ' + st.players[App.seat].name + ' "' + text + '"' });
+  if (st.log.length > 40) st.log.shift();
+  afterLocal();
 }
 
 /* ============================================================
@@ -2015,9 +2321,10 @@ function scheduleBot() {
     if (s2.pending) { render(); return; }
     if (!s2.players[s2.turn] || !s2.players[s2.turn].bot) { render(); return; }
     var acted = E.botStep(s2);
-    if (acted && Math.random() < 0.16) {
+    if (acted && Math.random() < 0.2) {
       var bp = s2.players[s2.turn] || s2.players[(s2.turn + s2.players.length - 1) % s2.players.length];
-      s2.fxSeq++; s2.fx.push({ i: s2.fxSeq, t: 'taunt', seat: bp.seat, text: BOT_TAUNTS[Math.floor(Math.random() * BOT_TAUNTS.length)], icon: '😝' });
+      var bt = BOT_TAUNTS[Math.floor(Math.random() * BOT_TAUNTS.length)];
+      s2.fxSeq++; s2.fx.push({ i: s2.fxSeq, t: 'impact', kind: 'taunt', seat: bp.seat, text: bt.text, icon: bt.icon });
       if (s2.fx.length > 16) s2.fx.shift();
     }
     publish();
@@ -2084,8 +2391,11 @@ function openGuide() {
   modal('<div class="mCard">' +
     '<h2>🌵 3초 규칙</h2>' +
     '<div class="guideRow"><div class="gi">🃏</div><div><b>내 차례엔 1번만</b><span>덱에서 뽑거나, 액션 카드 1장을 써. 끝나면 다음 사람!</span></div></div>' +
-    '<div class="guideRow"><div class="gi">🎉</div><div><b>같은 선인장 3장 = 점수</b><span>3장이 모이면 왼쪽 위 빛나는 카드나 🎉 버튼을 톡! 민둥이 2점 · 꽃 3점 · 빨간가시 4점</span></div></div>' +
-    '<div class="guideRow"><div class="gi">🤏</div><div><b>뺏어야 이긴다</b><span>슬쩍(1장 뺏기) · 이거 있냐?(지목 종류 전부) · 판 뒤집기(교환)</span></div></div>' +
+    '<div class="guideRow"><div class="gi">🎉</div><div><b>같은 선인장 3장 = 점수</b><span>3장이 모이면 빛나는 카드나 🎉 버튼을 톡! 민둥이 2점 · 꽃/빨간가시 3점</span></div></div>' +
+    '<div class="guideRow"><div class="gi">🎁</div><div><b>3장 뽑기</b><span>한 번에 3장! 손패는 12장까지. 근데 뽑기만 하면 남이 다 빼앗아 가 ㅋㅋ</span></div></div>' +
+    '<div class="guideRow"><div class="gi">🔄</div><div><b>손패 바꾸기</b><span>상대 1명 지목 → 손패를 통째로 맞바꾼다! 1등이 모아둔 패를 그대로 훔쳐오기</span></div></div>' +
+    '<div class="guideRow"><div class="gi">🧊</div><div><b>정지!</b><span>상대 1명을 지목해 다음 턴을 얼려버린다. 머리 위 🧊 배지 확인!</span></div></div>' +
+    '<div class="guideRow"><div class="gi">🤏</div><div><b>뺏고 놀리기</b><span>슬쩍(1장) · 이거 있냐?(종류 전부) · 판 뒤집기 · 썩은 선인장. 아래 도발 버튼도 마음껏!</span></div></div>' +
     '<div class="guideRow"><div class="gi">🛡️</div><div><b>공격받으면 5초</b><span>방패 카드가 있으면 화면 아래에 거대한 방패 버튼이 떠. 5초 안에 톡!</span></div></div>' +
     '<div class="guideRow"><div class="gi">🏆</div><div><b>' + E.TARGET_SCORE + '점 먼저</b><span>덱이 바닥나면 그때 최고 점수가 우승! 썩은 선인장은 끝나고 -1점</span></div></div>' +
     '<button class="btn primary" id="guideOk" style="height:50px">알겠어!</button></div>');
@@ -2282,7 +2592,7 @@ function hostStartNow() {
   showScreen('game');
   dbFetch(Net.code, '/meta', 'PATCH', { phase: 'playing', at: Date.now() }).then(pushState);
   render(true);
-  toast('🎉 시작! 9점 먼저 모으면 승리', 2000);
+  toast('🎉 시작! ' + App.st.targetScore + '점 먼저 모으면 승리', 2000);
 }
 
 var publish = function () { pushState(); };
@@ -2392,9 +2702,14 @@ function applyIntent(it) {
   var seat = it.seat;
   if (!st.players[seat]) return;
   if (it.type === 'taunt') {
-    st.fxSeq++; st.fx.push({ i: st.fxSeq, t: 'taunt', seat: seat, text: it.text, icon: it.icon });
+    st.fxSeq++;
+    st.fx.push({ i: st.fxSeq, t: 'impact', kind: 'taunt', seat: seat, icon: it.icon, text: it.text, by: it.cid });
     if (st.fx.length > 16) st.fx.shift();
+    st.logSeq++;
+    st.log.push({ i: st.logSeq, text: '😝 ' + st.players[seat].name + ' "' + it.text + '"' });
+    if (st.log.length > 40) st.log.shift();
     pushState();
+    render();
     return;
   }
   if (st.phase !== 'playing') {
