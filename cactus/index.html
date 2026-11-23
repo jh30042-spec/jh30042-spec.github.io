@@ -62,8 +62,8 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
              radial-gradient(circle at 88% 12%,rgba(255,143,192,.18),transparent 40%),
              radial-gradient(circle at 50% 62%,rgba(140,230,63,.10),transparent 55%);
   pointer-events:none}
-.tWrap{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 18px);
-  display:flex;flex-direction:column;gap:10px}
+.tWrap{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 10px);
+  display:flex;flex-direction:column;gap:8px}
 .tTop{display:flex;align-items:center;justify-content:space-between}
 .tBadge{font-size:12px;font-weight:900;letter-spacing:.06em;padding:5px 10px;border-radius:999px;
   background:rgba(140,230,63,.16);color:#c8ff8a;border:1px solid rgba(140,230,63,.35)}
@@ -74,7 +74,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
   filter:drop-shadow(0 3px 0 rgba(90,30,0,.55)) drop-shadow(0 0 22px rgba(255,170,40,.28))}
 .tSub{text-align:center;margin:0;font-size:13.5px;font-weight:700;color:#e7d8ff;opacity:.92}
 .tSub b{color:#ffd479}
-.tCharRow{display:flex;justify-content:center;align-items:flex-end;gap:2px;height:96px;margin:-2px 0 0}
+.tCharRow{display:flex;justify-content:center;align-items:flex-end;gap:2px;height:84px;margin:-2px 0 0}
 .tCharRow svg{width:19.2%;max-width:74px;animation:bob 2.4s ease-in-out infinite;transform-origin:50% 100%}
 .tCharRow svg:nth-child(2){animation-delay:.28s}
 .tCharRow svg:nth-child(3){animation-delay:.56s}
@@ -86,25 +86,25 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
   padding:7px 4px;text-align:center;font-size:11px;font-weight:800;color:#e9e0f5;line-height:1.25}
 .tRule div b{display:block;font-size:19px;margin-bottom:2px}
 .tRule div span{opacity:.9}
-.tPicker{display:flex;flex-direction:column;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  border-radius:16px;padding:9px 10px}
+.tPicker{display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;padding:8px 10px}
 .tPicker label{font-size:11px;font-weight:800;color:#c9b8e0;letter-spacing:.03em}
-#nameInput{width:100%;height:42px;border-radius:12px;border:1.5px solid rgba(255,255,255,.18);
+#nameInput{width:100%;height:40px;border-radius:12px;border:1.5px solid rgba(255,255,255,.18);
   background:rgba(0,0,0,.28);color:#fff;font-size:16px;font-weight:800;padding:0 12px;font-family:inherit}
 #nameInput::placeholder{color:#8d7ba3}
 .avatarPick{display:flex;gap:6px;justify-content:space-between}
 .avatarPick button{flex:1;min-width:0;border-radius:12px;padding:4px 2px 3px;border:2px solid transparent;
   background:rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:center;gap:1px}
-.avatarPick button svg{width:100%;max-width:40px;height:38px}
+.avatarPick button svg{width:100%;max-width:38px;height:36px}
 .avatarPick button i{font-style:normal;font-size:9.5px;font-weight:800;opacity:.85;white-space:nowrap}
 .avatarPick button.on{border-color:#ffd34d;background:rgba(255,211,77,.16);box-shadow:0 0 14px rgba(255,211,77,.3)}
 .avatarPick button:active{transform:scale(.96)}
-.tBtns{display:flex;flex-direction:column;gap:8px;margin-top:2px}
-.soloBtn{height:60px;font-size:19px;letter-spacing:-.02em}
+.tBtns{display:flex;flex-direction:column;gap:7px;margin-top:0}
+.soloBtn{height:56px;font-size:18.5px;letter-spacing:-.02em}
 .tRow2{display:flex;gap:8px}
-.tRow2 .btn{flex:1;height:48px;font-size:14px}
+.tRow2 .btn{flex:1;height:46px;font-size:13.5px}
 .linkBtn{align-self:center;font-size:12.5px;font-weight:800;color:#bda9d6;text-decoration:underline;text-underline-offset:3px;padding:4px}
-.tFoot{text-align:center;font-size:10.5px;color:#7f6b96;font-weight:700;line-height:1.5;margin-top:2px}
+.tFoot{text-align:center;font-size:10px;color:#7f6b96;font-weight:700;line-height:1.45;margin-top:0}
 
 /* ================= 게임 ================= */
 #game{display:flex;flex-direction:column;background:radial-gradient(130% 70% at 50% 32%,#3b2140 0%,#241226 55%,#120a18 100%)}
@@ -161,9 +161,11 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 
 /* 테이블 */
 #table{flex:1 1 auto;min-height:82px;display:flex;align-items:center;gap:9px;padding:0 9px;position:relative}
-#table:before{content:"";position:absolute;left:-6%;right:-6%;top:2px;bottom:2px;
-  background:radial-gradient(ellipse at 50% 50%,rgba(120,70,35,.34),rgba(90,50,24,.16) 55%,rgba(0,0,0,0) 76%);
-  pointer-events:none}
+#table:before{content:"";position:absolute;left:-8%;right:-8%;top:0;bottom:0;
+  background:
+    radial-gradient(ellipse at 50% 46%,rgba(160,96,48,.55),rgba(110,62,28,.32) 48%,rgba(70,38,16,.12) 66%,rgba(0,0,0,0) 78%),
+    repeating-linear-gradient(94deg,rgba(255,220,170,.05) 0 2px,rgba(0,0,0,.04) 2px 7px);
+  pointer-events:none;mask-image:radial-gradient(ellipse at 50% 50%,#000 60%,transparent 80%)}
 .deckWrap{position:relative;width:58px;height:72px;flex:0 0 auto}
 .deckPile{position:absolute;inset:0 2px 0 2px;border-radius:8px;background:linear-gradient(150deg,#6d3fb0,#341c58);
   border:2px solid #a97be0;box-shadow:3px 3px 0 #241033,0 0 18px rgba(170,120,255,.28)}
@@ -2542,14 +2544,22 @@ function bind() {
 
 function openJoinModal() {
   modal('<div class="mCard"><h2>🔑 코드 입장</h2>' +
-    '<p>친구에게 받은 4자리 코드를 넣어줘</p>' +
+    '<p>4자리 코드와 내 이름을 넣어줘</p>' +
+    '<input id="joinName" maxlength="8" placeholder="내 이름 (예: 종혁)" style="height:44px;border-radius:12px;background:rgba(0,0,0,.3);border:1.5px solid rgba(255,255,255,.2);color:#fff;font-size:16px;font-weight:800;padding:0 12px;font-family:inherit">' +
     '<div class="joinRow"><input id="codeInput" maxlength="4" placeholder="ABCD" inputmode="text" autocapitalize="characters"><button class="btn primary" id="codeGo">입장</button></div>' +
     '<button class="mClose" id="mCancel">취소</button></div>');
   var inp = $('#codeInput');
+  var nm = $('#joinName');
+  nm.value = LS.get('cp.name', '') || '';
   if (App.pendingRoom) inp.value = App.pendingRoom;
-  setTimeout(function () { try { inp.focus(); } catch (e) {} }, 60);
-  $('#codeGo').addEventListener('click', function () { var v = inp.value; closeModal(); joinRoom(v); });
-  inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { var v = inp.value; closeModal(); joinRoom(v); } });
+  setTimeout(function () { try { (App.pendingRoom ? inp : nm).focus(); } catch (e) {} }, 60);
+  function go() {
+    var v = inp.value;
+    if (nm.value.trim()) { $('#nameInput').value = nm.value.trim(); App.me.name = nm.value.trim(); LS.set('cp.name', App.me.name); }
+    closeModal(); joinRoom(v);
+  }
+  $('#codeGo').addEventListener('click', go);
+  inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
   $('#mCancel').addEventListener('click', closeModal);
 }
 
