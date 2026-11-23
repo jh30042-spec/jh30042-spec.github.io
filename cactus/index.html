@@ -2353,14 +2353,22 @@ function showOver() {
   if (!st) return;
   if (App.overShown) return;
   App.overShown = true;
+  // 결과 화면 위에 임팩트가 남아 있지 않도록 정리
+  var impEl = $('#impact');
+  if (impEl) { Impact.token++; if (Impact.hideT) clearTimeout(Impact.hideT); impEl.className = 'hidden'; impEl.innerHTML = ''; }
+  var appEl = document.getElementById('app');
+  if (appEl) appEl.classList.remove('shakeBig');
   showScreen('over');
   var winners = st.winners || [];
   var iWin = winners.indexOf(App.seat) >= 0;
   var w = st.players[winners[0]];
   $('#ovTitle').textContent = winners.length > 1 ? '🤝 공동 우승!' : (iWin ? '🏆 우승!!' : '😭 ' + w.name + ' 우승');
+  var byDeck = st.reason === 'deck';
   $('#ovWin').textContent = winners.length > 1
     ? winners.map(function (s) { return st.players[s].name; }).join(' · ') + ' 함께 1등!'
-    : (iWin ? '가시밭길의 왕은 바로 너! 🌵' : w.name + ' 님이 ' + st.targetScore + '점을 찍었다…');
+    : (iWin
+      ? (byDeck ? '덱이 바닥났지만 1등은 너! 🌵' : '가시밭길의 왕은 바로 너! 🌵')
+      : w.name + ' 님이 ' + (byDeck ? '최고 점수로 이겼다… (세트 ' + w.sets + '개)' : st.targetScore + '점을 찍었다…'));
   $('#ovHero').innerHTML = cactusSVG(w.avatar, 'win');
   var order = st.players.slice().sort(function (a, b) {
     if (b.score !== a.score) return b.score - a.score;
