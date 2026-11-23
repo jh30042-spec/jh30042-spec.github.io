@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v12">
+<meta name="busan-build" content="v12.1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1285,7 +1285,36 @@ function saveRivals(list, store){
     return true;
   } catch(e){ return false; }
 }
-/* 같은 닉네임은 더 높은 기록만 남긴다 */
+/* ---------------------------------------------------------
+   같은 닉네임의 기록 여러 건 → "부문별 최고 기록" 하나로 합치는 공통 규칙
+   - 거리(km) · 점수(score) · 최대 콤보(maxCombo)는 각각 Math.max 로만 커진다.
+     → 300km·5,000점·콤보 x10 뒤에 301km·2,000점·콤보 x0 으로 끝나도 점수·콤보는 깎이지 않는다.
+   - 차종·사고 지점·ts 는 가장 멀리 간 행(거리가 같으면 더 최근 행)의 것을 쓴다.
+   - ts 는 둘 중 최근 것(최고 기록은 그대로, 최근 활동 시각만 갱신).
+   --------------------------------------------------------- */
+function mergeBestRow(a, b){
+  const A = a || {}, B = b || {};
+  const aKm = Math.max(0, Number(A.km) || 0), bKm = Math.max(0, Number(B.km) || 0);
+  const aScore = Math.max(0, Math.round(Number(A.score) || 0));
+  const bScore = Math.max(0, Math.round(Number(B.score) || 0));
+  const aCombo = Math.max(0, Math.round(Number(A.maxCombo !== undefined ? A.maxCombo : A.combo) || 0));
+  const bCombo = Math.max(0, Math.round(Number(B.maxCombo !== undefined ? B.maxCombo : B.combo) || 0));
+  const aTs = Number(A.ts) || 0, bTs = Number(B.ts) || 0;
+  /* 별명 정보(차종·사고 지점)를 어느 행에서 가져올지 */
+  let meta;
+  if (bKm > aKm + 0.05) meta = B;
+  else if (aKm > bKm + 0.05) meta = A;
+  else if (bTs !== aTs) meta = (bTs > aTs) ? B : A;
+  else meta = (bScore > aScore || bCombo > aCombo) ? B : A;
+  const out = Object.assign({}, meta);
+  out.km = Math.round(Math.max(aKm, bKm) * 10) / 10;
+  out.score = Math.max(aScore, bScore);
+  out.maxCombo = Math.max(aCombo, bCombo);
+  out.ts = Math.max(aTs, bTs);
+  return out;
+}
+
+/* 같은 닉네임은 부문별 최고 기록으로 갱신한다 (낮은 점수·콤보로 덮어쓰지 않는다) */
 function mergeRival(list, r){
   const entry = sanitizeRival(r);
   const src = list ? list.slice() : [];
@@ -1296,8 +1325,9 @@ function mergeRival(list, r){
   }
   if (idx < 0){ src.push(entry); return { list: src, action: 'added', entry: entry }; }
   const old = sanitizeRival(src[idx]) || entry;
-  if (entry.km > old.km + 0.05 || (Math.abs(entry.km - old.km) <= 0.05 && entry.score > old.score)){
-    src[idx] = Object.assign({}, entry, { d: old.d, ts: entry.ts || Date.now() });
+  const merged = mergeBestRow(old, entry);
+  if (merged.km > old.km + 0.05 || merged.score > old.score || merged.maxCombo > old.maxCombo){
+    src[idx] = Object.assign({}, merged, { d: old.d, ts: merged.ts || Date.now() });
     return { list: src, action: 'updated', entry: src[idx] };
   }
   return { list: src, action: 'kept', entry: old };
@@ -1384,7 +1414,7 @@ function parseChallengeFromSearch(search){
 const SERVER_DB = 'https://busan-rush-rank-default-rtdb.asia-southeast1.firebasedatabase.app';
 const SERVER_PATH = '/busan_records.json';
 const SERVER_TIMEOUT = 3500;      /* 3.5초 응답 없으면 로컬 모드로 조용히 전환 */
-const SERVER_LIMIT = 50;          /* 서버에서 받아올 상위 기록 수 */
+const SERVER_LIMIT = 100;         /* 서버에서 받아올 상위 기록 수 */
 const SERVER_NICK_MAX = 24;       /* DB 보안 규칙: name 24자 이하 */
 const SERVER_MIN_KM = 1.0;        /* 1.0km 이상만 서버에 등록 */
 const SERVER_RIVAL_MAX = 20;      /* 순위표·라이벌에 올리는 서버 기록 최대 수 */
@@ -1420,7 +1450,7 @@ function sanitizeServerRival(raw){
   };
 }
 
-/* name 기준 중복 제거 — 같은 닉네임은 최고 km 한 건만 */
+/* name 기준 중복 제거 — 같은 닉네임은 부문별 최고 기록(km·score·maxCombo) 한 건으로 합친다 */
 function dedupeServerRivals(list){
   const by = {}, out = [];
   const src = list || [];
@@ -1429,8 +1459,8 @@ function dedupeServerRivals(list){
     if (!r) continue;
     const k = nickKey(r.nick);
     if (by[k] === undefined){ by[k] = out.length; out.push(r); continue; }
-    const cur = out[by[k]];
-    if (r.km > cur.km + 0.05 || (Math.abs(r.km - cur.km) <= 0.05 && r.score > cur.score)) out[by[k]] = r;
+    /* 예전 기록보다 거리가 조금 늘었어도 점수·콤보가 떨어지는 행으로 덮어쓰지 않는다 */
+    out[by[k]] = mergeBestRow(out[by[k]], r);
   }
   out.sort(function(a, b){
     if (b.km !== a.km) return b.km - a.km;
@@ -1456,7 +1486,7 @@ function parseServerPayload(json){
 /*
   로컬 라이벌(도전장·캐시) + 서버 기록 병합
   - 서버 유저 기록이 기본 AI 라이벌보다 우선 (서버 기록이 있으면 기본 AI는 빠진다)
-  - 같은 닉네임은 최고 km 한 건
+  - 같은 닉네임은 부문별 최고 기록 한 건 (mergeBestRow)
   - 내 닉네임 기록은 라이벌이 아니라 mine 으로 분리 (내 서버 순위용)
 */
 function mergeServerRivals(localList, serverList, opts){
@@ -1476,12 +1506,12 @@ function mergeServerRivals(localList, serverList, opts){
     const key = nickKey(e.nick);
     if (!key) return;
     if (myKey && key === myKey){
-      if (!mine || e.km > mine.km + 0.05) mine = e;
+      /* 내 기록도 여러 행이 오면 부문별 최고치로 합친다 */
+      mine = mine ? mergeBestRow(mine, e) : e;
       return;
     }
     if (idx[key] !== undefined){
-      const cur = out[idx[key]];
-      if (e.km > cur.km + 0.05 || (Math.abs(e.km - cur.km) <= 0.05 && e.score > cur.score)) out[idx[key]] = e;
+      out[idx[key]] = mergeBestRow(out[idx[key]], e);
       return;
     }
     idx[key] = out.length;
@@ -1532,13 +1562,25 @@ function normalizeServerEntry(o){
   };
 }
 
-/* 같은 닉네임으로 방금 보낸 것보다 낮거나 같은 기록은 다시 보내지 않는다 */
+/*
+  같은 닉네임으로 이미 올린 부문별 최고치(km·score·maxCombo)를
+  하나도 못 넘으면 다시 보내지 않는다.
+  → 거리가 짧아도 점수나 칼치기 콤보를 새로 세웠으면 등록한다.
+*/
 function shouldPostEntry(prev, entry){
   if (!entry || !entry.name) return false;
   const km = Number(entry.km);
   if (!isFinite(km) || km < SERVER_MIN_KM) return false;
-  if (prev && nickKey(prev.nick) === nickKey(entry.name) && km <= Number(prev.km) + 0.05) return false;
-  return true;
+  if (!prev || nickKey(prev.nick) !== nickKey(entry.name)) return true;
+  const pKm = Math.max(0, Number(prev.km) || 0);
+  const pScore = Math.max(0, Math.round(Number(prev.score) || 0));
+  const pCombo = Math.max(0, Math.round(Number(prev.maxCombo) || 0));
+  const eScore = Math.max(0, Math.round(Number(entry.score) || 0));
+  const eCombo = Math.max(0, Math.round(Number(entry.maxCombo) || 0));
+  if (km > pKm + 0.05) return true;        /* 거리 경신 */
+  if (eScore > pScore) return true;         /* 점수 경신 */
+  if (eCombo > pCombo) return true;         /* 칼치기 콤보 경신 */
+  return false;
 }
 
 function loadPostMark(store){
@@ -1547,8 +1589,19 @@ function loadPostMark(store){
     const raw = st.getItem(SERVER_POST_KEY);
     if (raw){
       const o = JSON.parse(raw);
+      /* 서버를 비우고 에포크를 올린 뒤엔 옛 마크를 신뢰하지 않는다 */
+      if (!o || Number(o.epoch) !== RECORD_EPOCH) return null;
       const nick = normalizeNick(o.nick, SERVER_NICK_MAX);
-      if (nick) return { nick: nick, km: Math.max(0, Number(o.km) || 0), ts: Number(o.ts) || 0 };
+      if (nick) return {
+        nick: nick,
+        epoch: RECORD_EPOCH,
+        km: Math.max(0, Number(o.km) || 0),
+        score: Math.max(0, Math.round(Number(o.score) || 0)),
+        maxCombo: Math.max(0, Math.round(Number(o.maxCombo) || 0)),
+        spot: typeof o.spot === 'string' ? o.spot.slice(0, 48) : '',
+        car: o.car ? carById(o.car).id : '',
+        ts: Number(o.ts) || 0
+      };
     }
   } catch(e){}
   return null;
@@ -1556,7 +1609,15 @@ function loadPostMark(store){
 function savePostMark(m, store){
   try {
     const st = store || defaultStore();
-    st.setItem(SERVER_POST_KEY, JSON.stringify({ nick: m.nick, km: m.km, ts: m.ts }));
+    st.setItem(SERVER_POST_KEY, JSON.stringify({
+      nick: m.nick, epoch: RECORD_EPOCH,
+      km: Math.max(0, Number(m.km) || 0),
+      score: Math.max(0, Math.round(Number(m.score) || 0)),
+      maxCombo: Math.max(0, Math.round(Number(m.maxCombo) || 0)),
+      spot: typeof m.spot === 'string' ? m.spot.slice(0, 48) : '',
+      car: m.car || '',
+      ts: Number(m.ts) || 0
+    }));
     return true;
   } catch(e){ return false; }
 }
@@ -1651,7 +1712,11 @@ function createServerRank(opts){
       body: JSON.stringify(entry)
     }, timeoutMs).then(function(res){
       if (!res || !res.ok) throw new Error('http ' + (res && res.status));
-      state.posted = { nick: entry.name, km: entry.km, ts: entry.ts };
+      /* 마크는 "이 기기에서 서버에 올린 부문별 최고치" — 점수만 갱신한 판이 와도 거리는 깎지 않는다 */
+      const mark = { nick: entry.name, epoch: RECORD_EPOCH, km: entry.km, score: entry.score,
+        maxCombo: entry.maxCombo, spot: entry.spot, car: entry.car, ts: entry.ts };
+      const prev = (state.posted && nickKey(state.posted.nick) === nickKey(entry.name)) ? state.posted : null;
+      state.posted = prev ? mergeBestRow(prev, mark) : mark;
       savePostMark(state.posted, store);
       state.lastPost = { ok: true, entry: entry, at: Date.now() };
       return { ok: true, entry: entry };
@@ -1792,6 +1857,55 @@ function entryForRun(sim){
     spot: sim.stopSpot || describeStop(sim.dist, sim.crashCause),
     me: true
   };
+}
+
+/* 방금 끝난 판 → 순위표 비교용 기록 후보 (0km면 null) */
+function bestOfRun(sim){
+  if (!sim) return null;
+  const km = Math.round(Math.max(0, Number(sim.dist) || 0) * 10) / 10;
+  if (km <= 0) return null;
+  const sc = (sim.score !== undefined && sim.score !== null) ? Number(sim.score) : finalScore(sim);
+  return {
+    km: km,
+    score: Math.max(0, Math.round(sc || 0)),
+    maxCombo: Math.max(0, Math.round(Number(sim.maxCombo) || 0)),
+    spot: sim.stopSpot || describeStop(sim.dist, sim.crashCause),
+    car: sim.car || '',
+    ts: 0
+  };
+}
+
+/*
+  순위표에 쓸 '내 최고 기록' — 이미 세운 최고치는 어떤 판에서도 깎이지 않는다.
+  후보를 부문별 최고치로 합치는 것(mergeBestRow):
+   · 방금 끝난 판 (항상)
+   · 서버에서 받은 내 기록 (mergeServerRivals().mine)
+   · 이 기기에서 서버에 올린 최고 마크 (state.posted) — 서버 상위 목록에 내 행이 빠져도 보완
+   · 기기 최고 기록(sim.rec) — 서버 판정 전(로딩·오프라인)에만 (live면 서버 기준)
+*/
+function myBestFor(status, sim, mine, posted, rec){
+  const myKey = nickKey(sim && sim.nick ? sim.nick : '');
+  const cand = [];
+  const run = bestOfRun(sim);
+  if (run) cand.push(run);
+  if (mine && (Number(mine.km) > 0 || Number(mine.score) > 0 || Number(mine.maxCombo) > 0)){
+    cand.push({ km: mine.km, score: mine.score, maxCombo: mine.maxCombo,
+      spot: mine.spot, car: mine.car, ts: mine.ts });
+  }
+  if (posted && Number(posted.km) > 0 && (!myKey || !posted.nick || nickKey(posted.nick) === myKey)){
+    cand.push({ km: posted.km, score: posted.score, maxCombo: posted.maxCombo,
+      spot: posted.spot, car: posted.car, ts: posted.ts });
+  }
+  if (status !== 'live' && rec){
+    cand.push({ km: rec.bestKm, score: rec.bestScore, maxCombo: rec.bestCombo,
+      spot: rec.bestSpot, car: rec.bestCar, ts: rec.updated });
+  }
+  let best = null;
+  for (let i=0;i<cand.length;i++){
+    if (!cand[i]) continue;
+    best = best ? mergeBestRow(best, cand[i]) : Object.assign({}, cand[i]);
+  }
+  return best;
 }
 function rankOfRun(sim, rivals){
   const list = rivals || sim.rivals || [];
@@ -7172,6 +7286,7 @@ const API = {
   challengeUrl: challengeUrl, parseChallengeFromSearch: parseChallengeFromSearch, challengeRecord: challengeRecord,
   buildLeaderboard: buildLeaderboard, rankRecordsFor: rankRecordsFor, topRowsForDisplay: topRowsForDisplay, LEADERBOARD_TOP: LEADERBOARD_TOP,
   entryForRun: entryForRun, rankOfRun: rankOfRun, nextTarget: nextTarget,
+  mergeBestRow: mergeBestRow, bestOfRun: bestOfRun, myBestFor: myBestFor,
   markerY: markerY, makeGhosts: makeGhosts, legProgressPct: legProgressPct,
   SERVER_DB: SERVER_DB, SERVER_PATH: SERVER_PATH, SERVER_TIMEOUT: SERVER_TIMEOUT, SERVER_LIMIT: SERVER_LIMIT,
   SERVER_NICK_MAX: SERVER_NICK_MAX, SERVER_MIN_KM: SERVER_MIN_KM, SERVER_RIVAL_MAX: SERVER_RIVAL_MAX,
@@ -7524,7 +7639,19 @@ if (typeof document !== 'undefined'){
     }
     /* 순위표의 내 순위·기록: 서버가 live면 서버 기록만, 오프라인이면 로컬 최고 기록 */
     function rankRecords(mg){
-      return rankRecordsFor(serverRank.state.status, sim.rec || loadRecords(), mg && mg.mine);
+      const st = serverRank.state;
+      let mine = mg && mg.mine;
+      /* 이 기기에서 서버에 올린 최고 마크와 부문별로 합산 — 서버 상위 목록에 내 행이 빠졌어도 순위가 깎이지 않는다 */
+      if (st.status === 'live' && st.posted && nickKey(st.posted.nick) === nickKey(profile.nick)){
+        mine = mine ? mergeBestRow(mine, st.posted) : st.posted;
+      }
+      return rankRecordsFor(st.status, sim.rec || loadRecords(), mine);
+    }
+    /* 게임오버·타이틀 순위표의 내 기록 — 부문별 최고치 합산 (최고 기록은 깎이지 않는다) */
+    function myBestNow(mine){
+      const st = serverRank.state;
+      const m = (mine === undefined) ? (rivalMerge().mine) : mine;
+      return myBestFor(st.status, sim, m, st.posted, sim.rec || loadRecords());
     }
 
     /* 서버 랭킹 상태 표시 (타이틀 · 게임오버) */
@@ -8078,7 +8205,9 @@ if (typeof document !== 'undefined'){
       oCombo.textContent = 'x' + sim.maxCombo;
 
       overCtx = { st: st };
-      const lb = renderLeaderboard(sim);
+      /* 이번 판이 낮아도 이미 세운 최고치(거리·점수·콤보)로 순위를 그린다 */
+      const mg0 = rivalMerge();
+      const lb = renderLeaderboard(sim, mg0.list, myBestNow(mg0.mine));
       applyOverBest(lb);
 
       retryBtn.textContent = '다시 달리기 🔁';
@@ -8101,7 +8230,8 @@ if (typeof document !== 'undefined'){
     function refreshOverServer(){
       if (sim.state !== 'crash' || !overCtx) return;
       const mg = rivalMerge();
-      const lb = renderLeaderboard(sim, mg.list, mg.mine);
+      /* serverRank.refresh()가 state.rows를 채운 뒤이므로 그 기준으로 다시 합산한다 */
+      const lb = renderLeaderboard(sim, mg.list, myBestNow(mg.mine));
       applyOverBest(lb);
     }
 
