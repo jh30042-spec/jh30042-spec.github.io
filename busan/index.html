@@ -194,10 +194,14 @@
     position:absolute;left:50%;top:calc(var(--u)*30);transform:translateX(-50%);z-index:26;
     display:flex;align-items:center;gap:calc(var(--u)*1.1);pointer-events:none;opacity:0;
     transition:opacity .22s;white-space:nowrap;max-width:94%;
-    padding:calc(var(--u)*1.0) calc(var(--u)*1.9);border-radius:99px;
+    padding:calc(var(--u)*1.0) calc(var(--u)*1.9) calc(var(--u)*1.6);border-radius:99px;
     background:rgba(8,14,26,.80);border:1px solid rgba(255,212,121,.42);
     box-shadow:0 2px 14px rgba(0,0,0,.45)
   }
+  #mission .mbar{position:absolute;left:calc(var(--u)*1.9);right:calc(var(--u)*1.9);bottom:calc(var(--u)*.7);
+    height:calc(var(--u)*.55);border-radius:99px;background:rgba(255,255,255,.16);overflow:hidden}
+  #mission .mbar i{display:block;height:100%;width:0%;border-radius:99px;
+    background:linear-gradient(90deg,#ffd24a,#7dffc0);transition:width .12s linear}
   #mission.on{opacity:1}
   #mission.done{border-color:rgba(125,255,192,.8)}
   #mission .mtxt{font-size:calc(var(--u)*2.35);font-weight:900;color:#ffe08a;letter-spacing:-.01em}
@@ -238,6 +242,13 @@
   /* 랜덤 박스는 보라 테 */
   #itemGuide .ig.fx{background:rgba(30,16,52,.82);box-shadow:inset 0 0 0 1px rgba(201,167,255,.55)}
   #itemGuide .ig.fx em{color:#d9c2ff}
+  /* 미션 캡슐 안내 (금색 한 줄) */
+  .missionGuide{display:flex;align-items:center;gap:calc(var(--u)*.8);width:100%;box-sizing:border-box;
+    padding:calc(var(--u)*1.0) calc(var(--u)*1.6);border-radius:calc(var(--u)*1.4);
+    margin:calc(var(--u)*.2) 0 calc(var(--u)*.6);background:rgba(52,38,6,.80);
+    box-shadow:inset 0 0 0 1px rgba(255,210,74,.55);font-size:calc(var(--u)*2.05);
+    font-weight:800;color:#e8d49a;line-height:1.28;text-align:left}
+  .missionGuide b{color:#ffd24a;font-weight:900;white-space:nowrap}
 
   /* ---------- 순위표 4종 탭 (통합 · 거리 · 점수 · 칼치기) ---------- */
   .rankTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.6);margin:calc(var(--u)*.2) 0 calc(var(--u)*.8)}
@@ -588,7 +599,7 @@
   <div id="banner"><div class="b1"></div><div class="b2"></div></div>
   <div id="record"><div class="r1">🔥 NEW RECORD!</div><div class="r2"></div></div>
   <div id="hint"></div>
-  <div id="mission"><span class="mtxt"></span><span class="mprog"></span></div>
+  <div id="mission"><span class="mtxt"></span><span class="mprog"></span><span class="mbar"><i></i></span></div>
   <div id="camZone"><span class="ctz-t">📸 80km/h 단속</span><span class="ctz-bar"><i class="ctz-fill"></i></span></div>
   <div id="flash"></div>
   <div id="toast"></div>
@@ -610,7 +621,7 @@
     <div class="tEmoji">🚗💨</div>
     <h1>서울 → 부산<em>무한 하드코어 질주</em></h1>
     <div class="tRoute">🗺️ <b>경부선 → 남해·호남선 → 강원·동해선 → 제주 환상도로</b><br>400km마다 풍경·색감·배경음이 바뀐다</div>
-    <div id="itemGuide" aria-label="도로 위 아이템 9종 안내">
+    <div id="itemGuide" aria-label="도로 위 아이템 9종 · 미션 캡슐 안내">
       <div class="ig"><b>🛡️</b><em>실드</em><span>충돌·함정 1회 방어</span></div>
       <div class="ig"><b>🔥</b><em>스피드업</em><span>3초 폭발 가속·돌파</span></div>
       <div class="ig"><b>✨</b><em>점수 2배</em><span>8초 점수 2배</span></div>
@@ -621,6 +632,7 @@
       <div class="ig bad"><b>📸</b><em>과속카메라</em><span>3.5초 80km/h</span></div>
       <div class="ig bad"><b>🛢️</b><em>기름웅덩이</em><span>1.5초 미끈덩</span></div>
     </div>
+    <div class="missionGuide"><b>🎯 미션 캡슐</b> 먹으면 미션 즉시 시작 · 진행 중엔 진행 +1 · 시간 +2초</div>
     <div class="prof">
       <div class="nickRow">
         <label for="nickInput">닉네임</label>
@@ -804,10 +816,32 @@ const ITEM_CATALOG = ITEM_TYPES.concat([MYSTERY], TRAP_TYPES);
 const ITEM_SPAWN_POOL = ['shield','nitro','double','magnet','magnet','slow','slow','siren','siren','mystery'];
 const IMPACT_LIFE = 1.0;                // 화면 중앙 임팩트 팝업 수명(초)
 const MISSION_ITEM_CD = 3.4;            // 미션 아이템 재스폰 간격(초)
+/* --- 미션 캡슐: 도로에서 직접 먹는 🎯 미션 티켓 --- */
+const MISSION_CAP = {
+  id:'missioncap', emoji:'🎯', color:'#ffd24a', label:'미션 캡슐',
+  impact:'미션 캡슐!', impactEmoji:'🎯', impactColor:'#ffd24a', hint:'먹으면 미션 시작'
+};
+const MISSION_CAP_R = 40;               // 먹는 판정 반경 (일반 아이템 30보다 살짝 넉넉)
+const MISSION_CAP_CD_MIN = 6, MISSION_CAP_CD_MAX = 10;   // 캡슐 등장 간격(초)
+const MISSION_CAP_FIRST = 4.5;          // 첫 캡슐까지(초)
+const MISSION_CAP_TIME_BONUS = 2;       // 진행 중 캡슐 → 제한 시간 +2초
+/*
+  돌발 미션 12종 — 모두 실제 주행 판정과 연결된다.
+  unit: 'count' 진행 횟수 · 'sec' 유지 시간 · 'km' 목표 거리
+*/
 const MISSION_DEFS = [
-  { kind:'kalchi', emoji:'🎯', text:'15초 내 칼치기 3회', goal:3, dur:15, bonus:300 },
-  { kind:'lane0',  emoji:'🎯', text:'10초간 1차로 질주',  goal:10, dur:15, bonus:250 },
-  { kind:'item',   emoji:'🎯', text:'아이템 1개 먹기',    goal:1, dur:15, bonus:200 }
+  { kind:'kalchi',   emoji:'🎯', text:'15초 내 칼치기 3회',   goal:3,  dur:15, bonus:300, unit:'count' },
+  { kind:'item',     emoji:'🎁', text:'15초 내 아이템 2개',   goal:2,  dur:15, bonus:250, unit:'count' },
+  { kind:'overtake', emoji:'🚗', text:'차량 8대 추월',        goal:8,  dur:15, bonus:250, unit:'count' },
+  { kind:'lane0',    emoji:'⬅️', text:'1차로에서 8초',       goal:8,  dur:14, bonus:300, unit:'sec'   },
+  { kind:'lane7',    emoji:'➡️', text:'8차로에서 8초',       goal:8,  dur:14, bonus:300, unit:'sec'   },
+  { kind:'laneMid',  emoji:'🛣️', text:'중앙 3~6차로 8초',    goal:8,  dur:14, bonus:280, unit:'sec'   },
+  { kind:'noLane',   emoji:'🚫', text:'차선 변경 없이 8초',   goal:8,  dur:14, bonus:300, unit:'sec'   },
+  { kind:'zigzag',   emoji:'↔️', text:'차선 변경 8회',        goal:8,  dur:15, bonus:250, unit:'count' },
+  { kind:'speed',    emoji:'💨', text:'고속 주행 7초',        goal:7,  dur:15, bonus:350, unit:'sec'   },
+  { kind:'safe',     emoji:'🧯', text:'함정 안 밟고 10초',    goal:10, dur:16, bonus:300, unit:'sec'   },
+  { kind:'combo',    emoji:'⚡', text:'콤보 6 달성',          goal:6,  dur:16, bonus:350, unit:'count' },
+  { kind:'dist',     emoji:'🛣️', text:'목표 거리 돌파',       goal:30, dur:15, bonus:300, unit:'km'    }
 ];
 
 /* --- v6.2 칼치기 당한 차의 분노 리액션 --- */
@@ -2018,7 +2052,7 @@ function itemPickup(sim, it, ev){
   }
   /* '아이템 1개 먹기' 미션 — 기름웅덩이·과속카메라는 함정이라 카운트하지 않는다 */
   if (sim.mission && !sim.mission.done && sim.mission.kind === 'item'){
-    sim.mission.prog += 1;
+    sim.mission.prog = Math.min(sim.mission.goal, sim.mission.prog + 1);
   }
   ev.push({ type:'item', item: def, x: it.x, y: it.y, mystery: isMystery, picked: picked });
   return def;
@@ -2076,6 +2110,7 @@ function hitCamera(sim, cam, ev){
   const dur = Math.max(1, CAMERA.dur - cut);
   sim.camT = dur;
   sim.camHits = (sim.camHits || 0) + 1;
+  missionTrapHit(sim);
   addImpact(sim, CAMERA.impactEmoji, CAMERA.impact, CAMERA.impactColor);
   evs.push({ type:'camTrap', x: cam.x, y: cam.y, dur: dur, kmh: CAMERA.limitKmh });
   return 'trapped';
@@ -2137,6 +2172,7 @@ function hitOil(sim, oil, ev){
   sim.oilT = OIL.dur;
   sim.oilPhase = 0;
   sim.oilHits = (sim.oilHits || 0) + 1;
+  missionTrapHit(sim);
   addImpact(sim, OIL.impactEmoji, OIL.impact, OIL.impactColor);
   evs.push({ type:'oilHit', x: oil.x, y: oil.y, dur: OIL.dur });
   return 'slipped';
@@ -2182,6 +2218,21 @@ function magnetPull(sim, dt){
     const step = MAGNET_PULL * (1 - far * 0.35) * dt;
     it.x += clamp(dx, -step, step);
     it.y += clamp(dy, -step, step);
+    n++;
+  }
+  /* 미션 캡슐도 끌어당긴다 (함정이 아니라 티켓) */
+  const caps = sim.mcaps || [];
+  for (let i=0;i<caps.length;i++){
+    const c = caps[i];
+    if (c.y < -120 || c.y > (sim.worldH || 1422) + 120) continue;
+    const dx = px - c.x, dy = py - c.y;
+    if (Math.abs(dy) > MAGNET_RANGE_Y) continue;
+    const far = Math.min(1, Math.abs(dy) / MAGNET_RANGE_Y);
+    const reach = MAGNET_RANGE_X * (1 - far * 0.45);
+    if (Math.abs(dx) > reach) continue;
+    const step = MAGNET_PULL * (1 - far * 0.35) * dt;
+    c.x += clamp(dx, -step, step);
+    c.y += clamp(dy, -step, step);
     n++;
   }
   return n;
@@ -2302,15 +2353,48 @@ function impactAlpha(p){
 function easeOut(t){ t = clamp(t, 0, 1); return 1 - (1 - t) * (1 - t); }
 
 /* --- 돌발 미션 --- */
-function startMission(sim, ev){
+/* 미션 종류별 진행 단위 (테스트가 직접 만든 미션 객체에도 함께 쓴다) */
+function missionUnit(kind){
+  for (let i=0;i<MISSION_DEFS.length;i++) if (MISSION_DEFS[i].kind === kind) return MISSION_DEFS[i].unit || 'count';
+  if (kind === 'lane0' || kind === 'lane7' || kind === 'laneMid' || kind === 'noLane' || kind === 'safe') return 'sec';
+  if (kind === 'dist') return 'km';
+  return 'count';
+}
+/* HUD·보고용 진행도 문구 (1/3 · 5/8초 · 12.4/20km) */
+function missionProgressText(m){
+  if (!m) return '';
+  const unit = m.unit || missionUnit(m.kind);
+  if (unit === 'sec') return Math.floor(m.prog) + '/' + Math.round(m.goal) + '초';
+  if (unit === 'km') return m.prog.toFixed(1) + '/' + m.goal + 'km';
+  return Math.floor(m.prog) + '/' + m.goal;
+}
+function startMission(sim, ev, opts){
+  const o = opts || {};
   const def = MISSION_DEFS[Math.floor(sim.rng() * MISSION_DEFS.length)];
-  sim.mission = { kind: def.kind, text: def.text, emoji: def.emoji, goal: def.goal,
-    dur: def.dur, bonus: def.bonus, prog: 0, t: 0, done: false, ok: false };
+  const m = {
+    kind: def.kind, text: def.text, emoji: def.emoji, goal: def.goal,
+    dur: def.dur, bonus: def.bonus, unit: def.unit, prog: 0, t: 0,
+    done: false, ok: false, afterT: 0, laneChanges: 0, via: o.via || 'auto',
+    startDist: sim.dist || 0, distBonus: 0, comboBonus: 0
+  };
+  /* 속도 미션: 지금 내 최고 속도의 90%를 기준으로 잡아 언제 떠도 달성 가능하게 */
+  if (def.kind === 'speed'){
+    m.minKmh = Math.max(200, Math.round((sim.maxSpeed || START_KMH) * 0.9));
+    m.text = m.minKmh + 'km/h 이상 ' + def.goal + '초';
+  }
+  /* 거리 미션: 지금 속도로 dur초 달리면 닿는 거리의 85% */
+  if (def.kind === 'dist'){
+    const perSec = (sim.speed || START_KMH) / KM_DIV;
+    m.goal = Math.max(5, Math.round(perSec * def.dur * 0.85));
+    m.text = def.dur + '초에 ' + m.goal + 'km 돌파';
+  }
+  sim.mission = m;
   /* 아이템 미션은 시작하자마자 내 차선 앞에 아이템을 띄운다 (먹을 기회 보장) */
   sim.missionItemT = 0;
   if (def.kind === 'item') spawnMissionItem(sim);
-  ev.push({ type:'missionStart', mission: sim.mission });
-  return sim.mission;
+  sim.missionTries = (sim.missionTries || 0) + 1;
+  (ev || []).push({ type:'missionStart', mission: m, via: m.via });
+  return m;
 }
 
 /* 미션용 아이템: 내 차선(좌우 1칸 여유)에 확정 스폰 — 함정이 나와 미션을 망치지 않게 좋은 아이템만 */
@@ -2323,6 +2407,72 @@ function spawnMissionItem(sim){
   if (it) sim.missionItemT = MISSION_ITEM_CD;
   return it;
 }
+
+/* =========================================================
+   미션 캡슐 (🎯) — 도로에서 직접 먹는 미션 티켓
+   - 미션이 없으면: 먹는 순간 랜덤 미션이 바로 시작된다.
+   - 미션 진행 중: 진행도 +1 · 제한 시간 +2초 (임팩트 팝업·효과음 연동).
+   - 함정이 아니라 자석(🧲)이 정상적으로 끌어당긴다.
+   ========================================================= */
+function spawnMissionCap(sim, opts){
+  const o = opts || {};
+  if (!sim.mcaps) sim.mcaps = [];
+  if (sim.mcaps.length >= 1) return null;
+  const y = (o.y === undefined) ? -220 : o.y;
+  /* 앞뒤 밴드에 차가 없는 차로 우선 (먹으러 가다 박지 않게) */
+  const free = freeInBand(sim, y - 170, y + 170);
+  let lane;
+  if (o.lane !== undefined && o.lane !== null) lane = clamp(Math.round(o.lane), 0, LANES - 1);
+  else if (free.length) lane = free[Math.floor(sim.rng() * free.length)];
+  else lane = clamp(Math.floor(sim.rng() * LANES), 0, LANES - 1);
+  const cap = { id: sim.nextId++, type: MISSION_CAP.id, x: laneCenter(lane), y: y, lane: lane, t: 0, dead: false };
+  sim.mcaps.push(cap);
+  return cap;
+}
+function collectMissionCap(sim, cap, ev){
+  const evs = ev || [];
+  sim.mcapCount = (sim.mcapCount || 0) + 1;
+  const m = sim.mission;
+  if (!m || m.done){
+    /* 미션이 없을 때: 랜덤 미션 즉시 시작 */
+    sim.mission = null;
+    const nm = startMission(sim, evs, { via: 'capsule' });
+    addImpact(sim, '🎯', '미션 시작! ' + (nm ? nm.text : ''), '#ffd24a', { key:'missioncap' });
+    evs.push({ type:'missionCapsule', mode:'start', mission: nm, x: cap.x, y: cap.y });
+    return nm;
+  }
+  /* 진행 중: 진행도 +1 · 남은 시간 +2초 */
+  if (m.kind === 'dist') m.distBonus = (m.distBonus || 0) + 1;
+  else if (m.kind === 'combo') m.comboBonus = (m.comboBonus || 0) + 1;
+  else m.prog = Math.min(m.goal, m.prog + 1);
+  m.dur += MISSION_CAP_TIME_BONUS;
+  sim.mcapBoosts = (sim.mcapBoosts || 0) + 1;
+  addImpact(sim, '🎯', '미션 보너스! +1 · +' + MISSION_CAP_TIME_BONUS + '초', '#ffd24a', { key:'missioncap' });
+  evs.push({ type:'missionCapsule', mode:'boost', mission: m, x: cap.x, y: cap.y });
+  return m;
+}
+/* 함정(과속카메라·기름웅덩이)을 밟았다 → '함정 안 밟고 버티기' 미션은 처음부터 */
+function missionTrapHit(sim){
+  const m = sim.mission;
+  if (!m || m.done || m.kind !== 'safe') return false;
+  if (m.prog < 0.4) return false;
+  m.prog = 0;
+  addImpact(sim, '💥', '함정! 미션 리셋', '#ff9c94', { key:'missionTrap' });
+  return true;
+}
+/* 차선을 바꿨다 (좌우 탭·스와이프·setLane 모두) → '차선 변경 금지'는 리셋, '지그재그'는 카운트 */
+function missionLaneChanged(sim){
+  const m = sim.mission;
+  if (!m || m.done) return false;
+  m.laneChanges = (m.laneChanges || 0) + 1;
+  if (m.kind === 'noLane'){
+    if (m.prog >= 0.4) addImpact(sim, '↔️', '차선 변경! 처음부터', '#ffb066', { key:'missionLane' });
+    m.prog = 0;
+    return true;
+  }
+  if (m.kind === 'zigzag') m.prog = Math.min(m.goal, m.prog + 1);
+  return true;
+}
 function updateMission(sim, dt, ev){
   const m = sim.mission;
   if (!m){
@@ -2330,19 +2480,38 @@ function updateMission(sim, dt, ev){
     if (sim.missionCd <= 0) startMission(sim, ev);
     return;
   }
-  if (m.done) return;
+  if (m.done){
+    /* 결과 칩을 잠깐 보여 준 뒤 비우고, 다음 미션을 준비한다 */
+    m.afterT = (m.afterT || 0) + dt;
+    if (m.afterT >= 2.2){
+      sim.mission = null;
+      sim.missionCd = 6.5 + sim.rng() * 4.5;
+    }
+    return;
+  }
   m.t += dt;
-  if (m.kind === 'lane0' && sim.lanePos < 0.4) m.prog = Math.min(m.goal, m.prog + dt);
+  const lane = sim.lanePos;
+  switch (m.kind){
+    case 'lane0':   if (lane < 0.4) m.prog = Math.min(m.goal, m.prog + dt); break;
+    case 'lane7':   if (lane > LANES - 1.4) m.prog = Math.min(m.goal, m.prog + dt); break;
+    case 'laneMid': if (lane >= 1.6 && lane <= 5.4) m.prog = Math.min(m.goal, m.prog + dt); break;
+    case 'noLane':  m.prog = Math.min(m.goal, m.prog + dt); break;
+    case 'speed':   if (sim.speed >= (m.minKmh || 300)) m.prog = Math.min(m.goal, m.prog + dt); break;
+    case 'safe':    m.prog = Math.min(m.goal, m.prog + dt); break;
+    case 'combo':   m.prog = Math.max(m.prog, Math.min(m.goal, (sim.combo || 0) + (m.comboBonus || 0))); break;
+    case 'dist':    m.prog = Math.max(0, Math.round((sim.dist - (m.startDist || 0) + (m.distBonus || 0)) * 10) / 10); break;
+    default: break;   /* 칼치기·아이템·추월·지그재그는 판정 훅에서 직접 센다 */
+  }
   if (m.prog >= m.goal){
-    m.done = true; m.ok = true;
+    m.done = true; m.ok = true; m.afterT = 0;
     const g = addBonus(sim, m.bonus);
     sim.combo = Math.min(99, sim.combo + 1);
     const sp = sim.spec || carSpec(sim.car);
     sim.comboT = COMBO_WINDOW * sp.combo + (sp.comboBonus || 0);
+    sim.missionWins = (sim.missionWins || 0) + 1;
     ev.push({ type:'missionDone', mission: m, gain: g });
   } else if (m.t >= m.dur){
-    m.done = true; m.ok = false;
-    sim.missionCd = 13 + sim.rng() * 6;
+    m.done = true; m.ok = false; m.afterT = 0;
     ev.push({ type:'missionFail', mission: m });
   }
 }
@@ -2394,6 +2563,7 @@ function newGame(opts){
     magnetT: 0, slowT: 0, sirenT: 0,
     impacts: [],
     mission: null, missionCd: 9, missionWins: 0, missionTries: 0, missionItemT: 0,
+    mcaps: [], mcapTimer: MISSION_CAP_FIRST, mcapCount: 0, mcapBoosts: 0, passes: 0,
     shield: 0, nitro: 0, doubleT: 0, invuln: 0,
     hitstop: 0, flashT: 0,
 
@@ -2436,6 +2606,7 @@ function start(sim){
   sim.impacts = [];
   sim.wx = 'clear'; sim.wxInten = 0; sim.wxLeft = 0; sim.wxNext = 12 + (sim.seed % 8);
   sim.mission = null; sim.missionCd = 9; sim.missionItemT = 0;
+  sim.mcaps = []; sim.mcapTimer = MISSION_CAP_FIRST; sim.mcapCount = 0; sim.mcapBoosts = 0; sim.passes = 0;
   sim.revived = false;
   return sim;
 }
@@ -2445,6 +2616,7 @@ function steer(sim, dir){
   const t = clamp(Math.round(sim.targetLane) + dir, 0, LANES - 1);
   if (t === sim.targetLane) return false;
   sim.targetLane = t;
+  missionLaneChanged(sim);
   return true;
 }
 function setLane(sim, lane){
@@ -2452,6 +2624,7 @@ function setLane(sim, lane){
   if (lane < 0 || lane > LANES - 1) return false;
   if (lane === sim.targetLane) return false;
   sim.targetLane = lane;
+  missionLaneChanged(sim);
   return true;
 }
 
@@ -3219,6 +3392,23 @@ function update(sim, dt){
     spawnItem(sim);
     sim.itemTimer = 6.5 + sim.rng() * 5;
   }
+  /* --- 미션 캡슐 (🎯) : 도로에 떠 있는 미션 티켓 --- */
+  sim.mcapTimer = ((sim.mcapTimer === undefined) ? MISSION_CAP_FIRST : sim.mcapTimer) - dt;
+  if (sim.mcapTimer <= 0){
+    if (spawnMissionCap(sim)) sim.mcapTimer = MISSION_CAP_CD_MIN + sim.rng() * (MISSION_CAP_CD_MAX - MISSION_CAP_CD_MIN);
+    else sim.mcapTimer = 1.2;                    /* 자리가 없으면 잠시 뒤 재시도 */
+  }
+  if (!sim.mcaps) sim.mcaps = [];
+  for (let i=sim.mcaps.length-1;i>=0;i--){
+    const cap = sim.mcaps[i];
+    cap.t += dt;
+    cap.y += sim.speed * SPD_SCALE * dt;
+    if (cap.y > sim.worldH + 150){ sim.mcaps.splice(i,1); continue; }
+    if (Math.abs(cap.x - px) < MISSION_CAP_R + PLAYER.w / 2 && Math.abs(cap.y - py) < MISSION_CAP_R + PLAYER.h / 2){
+      collectMissionCap(sim, cap, ev);
+      sim.mcaps.splice(i,1);
+    }
+  }
   /* 자석: 주변 좋은 아이템을 내 차 쪽으로 끌어당긴다 (함정은 대상 아님) */
   magnetPull(sim, dt);
   const grabR = ITEM_R * (spec.itemGrab || 1);
@@ -3314,6 +3504,12 @@ function update(sim, dt){
 
     if (!o.passed && o.y - o.h / 2 > py + PLAYER.h / 2){
       o.passed = true;
+      if (o.type !== 'cone'){
+        sim.passes = (sim.passes || 0) + 1;
+        if (sim.mission && !sim.mission.done && sim.mission.kind === 'overtake'){
+          sim.mission.prog = Math.min(sim.mission.goal, sim.mission.prog + 1);
+        }
+      }
       if (o.minGap < NEAR_MISS * (spec.kalchiGap || 1)){
         sim.kalchi++;
         sim.combo = Math.min(99, sim.combo + (spec.comboStep || 1));
@@ -5342,6 +5538,55 @@ function drawItems(ctx, sim){
   }
 }
 
+/* ---------- 미션 캡슐 (🎯) — 금색 육각 티켓 · 점선 이중 테 ---------- */
+function drawMissionCaps(ctx, sim){
+  const list = sim.mcaps || [];
+  for (let i=0;i<list.length;i++){
+    const cap = list[i];
+    const bob = Math.sin(cap.t * 5.6 + i) * 4;
+    const pulse = 0.55 + 0.45 * Math.abs(Math.sin(cap.t * 4.8 + i));
+    const y = cap.y + bob;
+    ctx.save();
+    ctx.translate(cap.x, y);
+    ctx.rotate(Math.sin(cap.t * 2.4 + i) * 0.16);
+    /* 금색 켤레 + 이중 점선 테 — 일반 아이템(둥근 원)과 한눈에 다르게 */
+    ctx.fillStyle = 'rgba(255,210,74,' + (0.16 * pulse).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(0, 0, 74, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(52,36,4,0.94)';
+    hexPath(ctx, 0, 0, 43);
+    ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(255,210,74,' + (0.80 + 0.20 * pulse).toFixed(3) + ')';
+    hexPath(ctx, 0, 0, 43);
+    ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([6, 5]);
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = 'rgba(255,248,214,' + (0.40 + 0.40 * pulse).toFixed(3) + ')';
+    hexPath(ctx, 0, 0, 34);
+    ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    /* 🎯 + MISSION 라벨 */
+    ctx.font = '700 30px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🎯', 0, -6);
+    ctx.fillStyle = '#ffe9a8';
+    ctx.font = '900 11px system-ui,sans-serif';
+    ctx.fillText('MISSION', 0, 22);
+    ctx.restore();
+  }
+}
+/* 육각형 경로 (미션 캡슐 전용) */
+function hexPath(ctx, cx, cy, r){
+  ctx.beginPath();
+  for (let k=0;k<6;k++){
+    const a = -Math.PI / 2 + k * Math.PI / 3;
+    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+    if (!k) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+
 /* ---------- 기름웅덩이 함정 (빨간 경고 테두리 · 미끈덩) ---------- */
 function drawOils(ctx, sim){
   const list = sim.oils || [];
@@ -5649,6 +5894,7 @@ function drawSim(ctx, sim, now){
     drawGhosts(ctx, sim);
     drawOils(ctx, sim);
     drawCameras(ctx, sim);
+    drawMissionCaps(ctx, sim);
     drawItems(ctx, sim);
   }
 
@@ -6101,6 +6347,13 @@ const Sfx = (function(){
       tone(784, 0.11, 'square', 0.06, null, 0.1);
       tone(1175, 0.22, 'square', 0.05, null, 0.2);
     },
+    /* 미션 캡슐: 반짝 올라가는 티켓 소리 */
+    capsule: function(){
+      tone(1046, 0.09, 'triangle', 0.055, null, 0);
+      tone(1318, 0.09, 'triangle', 0.05, null, 0.08);
+      tone(1568, 0.14, 'triangle', 0.045, null, 0.16);
+      noise(0.12, 0.06, 5200, 2600, 'bandpass');
+    },
     fail: function(){
       tone(233, 0.16, 'square', 0.05, 155, 0);
       tone(155, 0.22, 'square', 0.045, 110, 0.14);
@@ -6476,6 +6729,13 @@ const API = {
   INAPP_BAR_RATE: INAPP_BAR_RATE, INAPP_BAR_MIN: INAPP_BAR_MIN, INAPP_BAR_MAX: INAPP_BAR_MAX,
   PLAYER_GAP_RATE: PLAYER_GAP_RATE, PLAYER_GAP_MIN: PLAYER_GAP_MIN, PLAYER_GAP_MAX: PLAYER_GAP_MAX,
   MISSION_ITEM_CD: MISSION_ITEM_CD,
+  MISSION_CAP: MISSION_CAP, MISSION_CAP_R: MISSION_CAP_R,
+  MISSION_CAP_CD_MIN: MISSION_CAP_CD_MIN, MISSION_CAP_CD_MAX: MISSION_CAP_CD_MAX,
+  MISSION_CAP_FIRST: MISSION_CAP_FIRST, MISSION_CAP_TIME_BONUS: MISSION_CAP_TIME_BONUS,
+  spawnMissionCap: spawnMissionCap, collectMissionCap: collectMissionCap,
+  missionUnit: missionUnit, missionProgressText: missionProgressText,
+  missionTrapHit: missionTrapHit, missionLaneChanged: missionLaneChanged,
+  drawMissionCaps: drawMissionCaps,
   spawnMissionItem: spawnMissionItem, textWidth: textWidth, cachedGrad: cachedGrad,
   addBonus: addBonus, scoreMult: scoreMult, wxMul: wxMul, wxLabel: wxLabel,
   spawnSparks: spawnSparks, spawnItem: spawnItem, itemPickup: itemPickup, itemDef: itemDef,
@@ -6567,6 +6827,7 @@ if (typeof document !== 'undefined'){
     const missionEl = document.getElementById('mission');
     const missionTxt = missionEl ? missionEl.querySelector('.mtxt') : null;
     const missionProg = missionEl ? missionEl.querySelector('.mprog') : null;
+    const missionBar = missionEl ? missionEl.querySelector('.mbar i') : null;
     const camZoneEl = document.getElementById('camZone');
     const camZoneTxt = camZoneEl ? camZoneEl.querySelector('.ctz-t') : null;
     const camZoneBar = camZoneEl ? camZoneEl.querySelector('.ctz-fill') : null;
@@ -7045,11 +7306,9 @@ if (typeof document !== 'undefined'){
       if (!m){ missionEl.classList.remove('on'); return; }
       if (!m.done){
         const left = Math.max(0, Math.ceil(m.dur - m.t));
-        const prog = (m.kind === 'lane0')
-          ? (Math.floor(m.prog) + '/' + m.goal + 's')
-          : (m.prog + '/' + m.goal);
         if (missionTxt) missionTxt.textContent = m.emoji + ' ' + m.text;
-        if (missionProg) missionProg.textContent = prog + ' · ' + left + 's';
+        if (missionProg) missionProg.textContent = missionProgressText(m) + ' · ' + left + 's';
+        if (missionBar) missionBar.style.width = (clamp(m.prog / Math.max(0.001, m.goal), 0, 1) * 100).toFixed(0) + '%';
         missionEl.classList.remove('done');
         missionEl.classList.add('on');
         return;
@@ -7057,6 +7316,7 @@ if (typeof document !== 'undefined'){
       if (!missionHideAt) missionHideAt = sim.time + 1.8;
       if (missionTxt) missionTxt.textContent = m.ok ? ('✅ 미션 성공! +' + m.bonus) : '❌ 미션 실패';
       if (missionProg) missionProg.textContent = '';
+      if (missionBar) missionBar.style.width = m.ok ? '100%' : '0%';
       if (m.ok) missionEl.classList.add('done'); else missionEl.classList.remove('done');
       if (sim.time <= missionHideAt) missionEl.classList.add('on');
       else missionEl.classList.remove('on');
@@ -7338,6 +7598,11 @@ if (typeof document !== 'undefined'){
           Sfx.caught();
         } else if (e.type === 'missionStart'){
           Sfx.mission();
+        } else if (e.type === 'missionCapsule'){
+          Haptics.buzz(20);
+          Sfx.capsule();
+          if (e.mode === 'start') toast('🎯 미션 캡슐! 미션 시작 — ' + (e.mission ? e.mission.text : ''));
+          else toast('🎯 미션 캡슐 보너스! 진행 +1 · 시간 +' + MISSION_CAP_TIME_BONUS + '초');
         } else if (e.type === 'missionDone'){
           Haptics.buzz(25);
           Sfx.mission();
@@ -7871,6 +8136,35 @@ if (typeof document !== 'undefined'){
           return t ? { nick: t.nick, km: t.km, remain: t.km - sim.dist } : null;
         },
         challenge: function(){ return challenge; },
+        /* 검증·캐처용: 미션을 바로 띄우거나 미션 캡슐을 놓는다 */
+        mission: function(kind){
+          if (sim.state !== 'playing') return null;
+          if (!kind) return startMission(sim, [], { via: 'debug' });
+          const def = MISSION_DEFS.filter(function(d){ return d.kind === kind; })[0];
+          if (!def) return null;
+          const m = { kind: def.kind, text: def.text, emoji: def.emoji, goal: def.goal,
+            dur: def.dur, bonus: def.bonus, unit: def.unit, prog: 0, t: 0,
+            done: false, ok: false, afterT: 0, laneChanges: 0, via: 'debug',
+            startDist: sim.dist, distBonus: 0, comboBonus: 0 };
+          sim.mission = m;
+          return m;
+        },
+        missionCaps: function(){ return sim.mcaps.slice(); },
+        spawnCap: function(lane, yOff){
+          if (sim.state !== 'playing') return null;
+          return spawnMissionCap(sim, {
+            lane: (lane === undefined ? null : lane),
+            y: (yOff === undefined ? -220 : playerY(sim) + yOff)
+          });
+        },
+        collectCap: function(){
+          if (sim.state !== 'playing') return false;
+          const cap = { id: -1, x: playerX(sim), y: playerY(sim), lane: Math.round(sim.lanePos), t: 0 };
+          const ev = [];
+          collectMissionCap(sim, cap, ev);
+          handleEvents(ev);
+          return true;
+        },
         server: function(){ return serverRank; },
         serverRows: function(){ return serverRank.state.rows.slice(); },
         rivalMerge: function(){ const m = rivalMerge(); return { list: m.list, mine: m.mine, serverCount: m.serverCount, total: m.total }; },
