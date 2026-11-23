@@ -153,6 +153,22 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
   border:1px solid rgba(150,235,255,.9);border-radius:9px;padding:2px 5px;
   box-shadow:0 0 12px rgba(120,220,255,.75),0 2px 0 rgba(0,0,0,.35);animation:iceBob 1.1s ease-in-out infinite}
 .opp.frozen .ice{display:block}
+/* v3: 미리 켜둔 가시 갑옷 배지 (얼음 배지와 안 겹치게 왼쪽 구석에 작게) */
+.opp .wall{display:none;position:absolute;top:16px;left:1px;z-index:3;
+  font-size:11px;font-weight:900;color:#2a1c00;white-space:nowrap;
+  background:linear-gradient(180deg,#ffe27a,#ffb020);border:1px solid #fff3c4;border-radius:8px;padding:0 2px;line-height:16px;
+  box-shadow:0 0 10px rgba(255,200,80,.85),0 2px 0 rgba(0,0,0,.35);animation:wallBob 1.15s ease-in-out infinite}
+.opp.walled .wall{display:block}
+.opp.walled .avWrap svg{filter:drop-shadow(0 0 8px rgba(255,205,90,.85))}
+@keyframes wallBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+#meAvBox{position:relative;width:50px;height:44px;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:center}
+.wallBadge{position:absolute;left:50%;top:-10px;margin-left:-13px;z-index:5;font-size:11px;font-weight:900;white-space:nowrap;
+  color:#2a1c00;background:linear-gradient(180deg,#ffe27a,#ffb020);border:1px solid #fff3c4;border-radius:9px;padding:0 4px;line-height:17px;
+  box-shadow:0 0 12px rgba(255,200,80,.85),0 2px 0 rgba(0,0,0,.35);animation:wallBob 1.15s ease-in-out infinite}
+/* v3: 진행 방향 칩 */
+#dirChip{background:rgba(120,200,255,.16);border-color:rgba(120,200,255,.42);color:#cbf0ff;transition:transform .2s}
+#dirChip.flip{animation:dirFlip .55s ease-out}
+@keyframes dirFlip{0%{transform:rotateY(0) scale(1)}45%{transform:rotateY(180deg) scale(1.25)}100%{transform:rotateY(360deg) scale(1)}}
 .opp.frozen{box-shadow:0 0 0 2px rgba(120,220,255,.7),0 0 20px rgba(90,200,255,.4)}
 .opp.frozen .avWrap svg{filter:drop-shadow(0 0 9px rgba(120,220,255,.85)) saturate(.75)}
 @keyframes iceBob{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-3px) rotate(8deg)}}
@@ -230,6 +246,18 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 .hcard.action{background:linear-gradient(180deg,#43285e,#251537);border-color:#7b58a3;color:#f4eaff}
 .hcard.action .hcArt{font-size:30px;line-height:1}
 .hcard.action .hcName{color:#ffe27a}
+/* v3: ⚡ 즉시 카드 — 내 턴이 아니어도 항상 활성 */
+.hcard.instant{background:linear-gradient(180deg,#1b4a63,#0d2433);border-color:#7fd7ff;color:#eafcff;
+  box-shadow:0 3px 0 rgba(0,0,0,.38),0 0 0 2px rgba(120,220,255,.5),0 0 16px rgba(90,200,255,.35)}
+.hcard.instant .hcName{color:#bdf0ff}
+.hcard.instant .hcSub{opacity:.7;color:#9fe3ff}
+.hcard .instBadge{position:absolute;top:-7px;right:-3px;height:17px;padding:0 4px;border-radius:8px;
+  font-size:9px;font-weight:900;background:linear-gradient(180deg,#a8efff,#2aa7e0);color:#032432;
+  border:1.5px solid #e8fbff;display:flex;align-items:center;z-index:4;
+  animation:instPulse 1.5s ease-in-out infinite}
+@keyframes instPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 rgba(120,220,255,0)}50%{transform:scale(1.08);box-shadow:0 0 10px rgba(120,220,255,.85)}}
+.hcard.off{opacity:.42;filter:saturate(.35)}
+.hcard.off:active{transform:none}
 .hcard.ready{box-shadow:0 0 0 3px #ffd34d,0 0 22px rgba(255,211,77,.65);animation:pulseSet 1s infinite}
 .hcard.sel{transform:translateY(-9px);box-shadow:0 0 0 3px #8ce63f,0 0 22px rgba(140,230,63,.7)}
 .hcard.dots{justify-content:flex-end}
@@ -438,6 +466,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       <button id="roomChip" class="chip hidden">#</button>
       <div class="chip" id="targetChip">🏆 9점</div>
       <div class="chip" id="deckChip">🃏 44</div>
+      <div class="chip" id="dirChip" data-d="1">➡️ 시계</div>
       <div class="sp"></div>
       <button id="soundBtn" class="iconBtn" aria-label="소리">🔊</button>
       <button id="menuBtn" class="iconBtn" aria-label="메뉴">☰</button>
@@ -459,7 +488,10 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 
     <div id="thumb">
       <div id="meRow">
-        <div id="meAvatar"></div>
+        <div id="meAvBox">
+          <div id="meAvatar"></div>
+          <div id="meWall" class="wallBadge hidden">🛡️</div>
+        </div>
         <div id="meMeta">
           <b id="meName">나</b>
           <span id="meScore">0점</span>
@@ -523,11 +555,12 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  var VERSION = '2.0.0';
+  var VERSION = '3.0.0';
   var TARGET_SCORE = 15;     // 목표 점수 (v2: 9 → 15, 점수가 천천히)
   var HAND_LIMIT = 12;       // 손패 상한 (v2: 8 → 12, 3장 뽑기 대응)
   var SHIELD_MS = 5000;      // 방패 반응 제한
   var BOT_SHIELD_MS = 1150;  // 봇 방패 판단 연출 시간
+  var INSTANT_CD_MS = 500;   // v3: 즉시 카드 연타/동시입력 쿨다운
   var MAX_TURNS = 500;       // 안전장치
 
   var CACTUS = [
@@ -542,11 +575,15 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     demand:  { key: 'demand',  name: '이거 있냐?',  icon: '👀', short: '종류 전부 뺏기', needTarget: true, needType: true },
     draw3:   { key: 'draw3',   name: '3장 뽑기',    icon: '🎁', short: '한 번에 3장',    needTarget: false },
     swapAll: { key: 'swapAll', name: '손패 바꾸기', icon: '🔄', short: '손패 통째 교환', needTarget: true },
-    freeze:  { key: 'freeze',  name: '정지!',       icon: '🧊', short: '다음 턴 얼리기', needTarget: true },
+    freeze:  { key: 'freeze',  name: '정지!',       icon: '🧊', short: '언제든 얼림',    needTarget: true, instant: true },
     flip:    { key: 'flip',    name: '판 뒤집기',   icon: '🌀', short: '교환 / 돌리기',  needTarget: false },
-    shield:  { key: 'shield',  name: '가시 방패',   icon: '🛡️', short: '공격 막기 5초',  needTarget: false },
+    shield:  { key: 'shield',  name: '가시 방패',   icon: '🛡️', short: '언제든 방어',    needTarget: false, instant: true },
+    skip:    { key: 'skip',    name: '턴 넘기기',   icon: '⏭️', short: '턴 즉시 넘김',   needTarget: false, instant: true },
+    reverse: { key: 'reverse', name: '턴 반대로',   icon: '🔁', short: '방향 유턴!',     needTarget: false, instant: true },
     bomb:    { key: 'bomb',    name: '썩은 선인장', icon: '💣', short: '떠넘기기 -1점',   needTarget: true }
   };
+  // v3: 아무 때나(내 턴이 아니어도) 손패에서 톡 쓸 수 있는 즉시 카드 4종
+  var INSTANTS = ['shield', 'freeze', 'skip', 'reverse'];
 
   var CHARS = [
     { name: '메롱이', emoji: '😎', tag: '일단 메롱' },
@@ -566,9 +603,11 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     d: 7,                            // 👀 이거 있냐?
     h: 9,                            // 🛡️ 가시 방패
     b: 6,                            // 💣 썩은 선인장
-    f: 4                             // 🌀 판 뒤집기
+    f: 4,                            // 🌀 판 뒤집기
+    k: 8,                            // ⏭️ 턴 넘기기 (v3)
+    v: 8                             // 🔁 턴 반대로 (v3)
   };
-  var PREFIX = { g: 'g', p: 'p', y: 'y', r: 'r', s: 'steal', d: 'demand', t: 'draw3', w: 'swapAll', z: 'freeze', f: 'flip', h: 'shield', b: 'bomb' };
+  var PREFIX = { g: 'g', p: 'p', y: 'y', r: 'r', s: 'steal', d: 'demand', t: 'draw3', w: 'swapAll', z: 'freeze', f: 'flip', h: 'shield', b: 'bomb', k: 'skip', v: 'reverse' };
 
   // 도발/견제 멘트 (화면 중앙 대형 임팩트에 그대로 뜬다)
   var TAUNT_LINES = {
@@ -581,9 +620,13 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     stealFail: ['손이 비었네? ㅋㅋㅋ', '헛손질 ㅋㅋ', '뭘 뺏어 ㅋㅋ'],
     demandFail: ['메롱~ 없지롱!', '그거 없는데? ㅋㅋ', '없다니까~ ㅋㅋ'],
     frozen: ['얼음 안에 잘 있지? ㅋㅋ', '꽁꽁~ 다음에 봐 ㅋㅋ'],
-    spin: ['술래 돌려버렸다 ㅋㅋ', '다 뒤섞여라~ ㅋㅋ']
+    spin: ['술래 돌려버렸다 ㅋㅋ', '다 뒤섞여라~ ㅋㅋ'],
+    skip: ['네 턴은 없던 걸로~ ㅋㅋ', '쉿! 이번 턴은 내 거 ㅋㅋ', '한 칸 쉬어~ ⏭️'],
+    reverse: ['🔁 방향 유턴! 거꾸로 간다~', '거꾸로 가자~ ㅋㅋ', '뒤로 돌아! 유턴!'],
+    wall: ['🛡️ 가시 갑옷 장착!', '미리 준비했지 ㅋㅋ', '한 대는 버틴다!'],
+    wallBlock: ['🛡️ 사전 방어! 튕겼다!', '팅! 미리 켜뒀지 ㅋㅋ', '가시 갑옷이 대신 맞음 ㅋㅋ']
   };
-  var IMPACT_ICON = { steal: '🤏', demand: '👀', bomb: '💣', swapAll: '🔄', freeze: '🧊', block: '🛡️', stealFail: '😶', demandFail: '😝', frozen: '🧊', spin: '🌀' };
+  var IMPACT_ICON = { steal: '🤏', demand: '👀', bomb: '💣', swapAll: '🔄', freeze: '🧊', block: '🛡️', stealFail: '😶', demandFail: '😝', frozen: '🧊', spin: '🌀', skip: '⏭️', reverse: '🔁', wall: '🛡️', wallBlock: '🛡️' };
 
   /* ---------------- 유틸 ---------------- */
 
@@ -652,6 +695,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       startHand: opt.startHand || 6,
       phase: 'playing',
       turn: 0,
+      dir: 1,               // v3: 턴 진행 방향 (+1 시계 / -1 반시계)
       turnNo: 0,
       acted: false,
       waitingScore: false,
@@ -665,6 +709,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       fx: [],
       fxSeq: 0,
       logSeq: 0,
+      instCd: {},           // v3: 좌석별 즉시 카드 쿨다운
       pending: null,
       reason: null,
       winners: [],
@@ -680,9 +725,11 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
         cid: p.cid || null,
         connected: true,
         frozen: 0,
+        wall: 0,            // v3: 미리 켜둔 가시 갑옷 (다음 공격 1회 자동 방어)
         hand: [],
         score: 0,
-        sets: 0
+        sets: 0,
+        instTurn: -1        // v3: 봇이 이 턴에 즉시 카드를 쓴 turnNo
       };
     });
     st.deck = buildDeck(st);
@@ -797,11 +844,11 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     advanceTurn(st);
   }
 
-  // 🧊 얼음에 갇힌 사람은 차례를 통째로 건너뛴다
+  // 🧊 얼음에 갇힌 사람은 차례를 통째로 건너뛴다 (v3: 진행 방향 반영)
   function advanceTurn(st) {
-    var n = st.players.length, guard = 0;
-    while (guard++ < n + 2) {
-      st.turn = (st.turn + 1) % n;
+    var n = st.players.length, dir = st.dir === -1 ? -1 : 1, guard = 0;
+    while (guard++ < n * 2 + 2) {
+      st.turn = ((st.turn + dir) % n + n) % n;
       st.turnNo++;
       var p = st.players[st.turn];
       if (p.frozen > 0) {
@@ -814,6 +861,17 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     }
     fx(st, { t: 'turn', seat: st.turn });
     log(st, '— ' + st.players[st.turn].name + ' 차례 —');
+  }
+
+  // ⏭️ 지금 진행 중인 턴을 즉시 끝내고 다음 순서로 (스킵·즉시 정지 공용)
+  function passTurnNow(st) {
+    st.pending = null;
+    st.acted = false;
+    st.waitingScore = false;
+    if (st.phase !== 'playing') return;
+    if (st.deck.length === 0) { finishGame(st, 'deck'); return; }
+    if (st.turnNo >= MAX_TURNS) { finishGame(st, 'long'); return; }
+    advanceTurn(st);
   }
 
   function finishGame(st, reason) {
@@ -926,7 +984,8 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     if (info.kind !== 'action') return { ok: false, err: '선인장 카드는 점수로만 써' };
     payload = payload || {};
 
-    if (info.act === 'shield') return { ok: false, err: '방패는 공격받을 때 자동으로 뜬다!' };
+    if (info.act === 'shield') return { ok: false, err: '🛡️ 방패는 아무 때나 손패에서 바로 켜! (⚡ 즉시 카드)' };
+    if (info.act === 'skip' || info.act === 'reverse') return playInstant(st, seat, cardId, payload);
 
     if (info.act === 'draw3') return playDraw3(st, seat, cardId);
 
@@ -1008,10 +1067,109 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     return { ok: false, err: '몰?루' };
   }
 
+  /* ---------------- v3: ⚡ 즉시 카드 (아무 때나 사용) ---------------- */
+
+  function isInstantAct(act) { return INSTANTS.indexOf(act) >= 0; }
+
+  // 내 턴이 아니어도(방패 응답 중·게임 종료 상태 제외) 손패에서 바로 쓴다
+  function playInstant(st, seat, cardId, payload, now) {
+    if (!st || st.phase !== 'playing') return { ok: false, err: '게임은 이미 끝났어' };
+    var p = st.players[seat];
+    if (!p) return { ok: false, err: '그 자리 없어' };
+    var info = cardInfo(cardId);
+    if (!info || info.kind !== 'action' || !isInstantAct(info.act)) return { ok: false, err: '즉시 카드가 아니야' };
+    if (p.hand.indexOf(cardId) < 0) return { ok: false, err: '그 카드 없어' };
+    if (st.pending) return { ok: false, err: '방패 응답 중엔 즉시 카드 못 써!' };
+    payload = payload || {};
+    now = now || Date.now();
+    st.instCd = st.instCd || {};
+    if (st.instCd[seat] && now - st.instCd[seat] < INSTANT_CD_MS) return { ok: false, err: '너무 빨라! 잠깐만' };
+
+    // 🛡️ 미리 장착: 다음 공격 1회 자동 방어
+    if (info.act === 'shield') {
+      if ((p.wall || 0) > 0) return { ok: false, err: '이미 방어막이 켜져 있어!  (중복 낭비 금지)' };
+      removeOne(p.hand, cardId); st.discard.push(cardId);
+      st.instCd[seat] = now;
+      p.wall = 1;
+      impactFx(st, 'wall', seat, '🛡️ 가시 갑옷 장착!');
+      fx(st, { t: 'wall', seat: seat, on: true });
+      log(st, '🛡️ ' + p.name + ' 가시 갑옷 장착! 다음 공격 1회 자동 방어');
+      return { ok: true, wall: true };
+    }
+
+    // 🔁 턴 반대로: 진행 방향 즉시 유턴 (+1 ↔ -1)
+    if (info.act === 'reverse') {
+      removeOne(p.hand, cardId); st.discard.push(cardId);
+      st.instCd[seat] = now;
+      var from = st.dir === -1 ? -1 : 1;
+      st.dir = -from;
+      impactFx(st, 'reverse', seat, '🔁 방향 유턴! 거꾸로 간다~');
+      fx(st, { t: 'reverse', seat: seat, dir: st.dir, from: from });
+      log(st, '🔁 ' + p.name + ' 턴 반대로! 진행 방향 ' + (st.dir === 1 ? '➡️ 시계' : '⬅️ 반시계') + '로 유턴!');
+      return { ok: true, dir: st.dir };
+    }
+
+    // ⏭️ 턴 넘기기: 내 턴이면 패스, 남의 턴이면 기습으로 그 턴을 즉시 종료
+    if (info.act === 'skip') {
+      removeOne(p.hand, cardId); st.discard.push(cardId);
+      st.instCd[seat] = now;
+      var cur = st.turn;
+      if (cur === seat) {
+        impactFx(st, 'skip', seat, '⏭️ 내 턴 넘기기!');
+        log(st, '⏭️ ' + p.name + ' 턴을 넘겼다 (뽑기 없이 패스)');
+      } else {
+        impactFx(st, 'skip', seat, '⏭️ ' + st.players[cur].name + ' 턴 강제 종료!');
+        log(st, '⏭️ ' + p.name + '의 기습! ' + st.players[cur].name + ' 턴을 즉시 건너뛴다!');
+      }
+      passTurnNow(st);
+      return { ok: true, skipped: cur };
+    }
+
+    // 🧊 정지!: 내 턴이 아니어도 지목한 상대를 즉시 얼린다
+    if (info.act === 'freeze') {
+      var target = payload.target;
+      if (target == null || target === seat || !st.players[target]) return { ok: false, err: '얼릴 상대를 골라' };
+      removeOne(p.hand, cardId); st.discard.push(cardId);
+      st.instCd[seat] = now;
+      var def = st.players[target];
+      if ((def.wall || 0) > 0) {          // 미리 켜둔 갑옷이 얼음을 대신 맞는다
+        def.wall--;
+        impactFx(st, 'wallBlock', target, '🛡️ 사전 방어! 튕겼다!');
+        fx(st, { t: 'wallBlock', attack: 'freeze', attacker: seat, defender: target, left: def.wall });
+        log(st, '🛡️ ' + def.name + '의 가시 갑옷이 얼음을 튕겨냈다! (남은 갑옷 ' + def.wall + ')');
+        return { ok: true, blocked: true };
+      }
+      impactFx(st, 'freeze', seat);
+      def.frozen = (def.frozen || 0) + 1;
+      var nowTurn = st.phase === 'playing' && st.turn === target;
+      fx(st, { t: 'freeze', attacker: seat, defender: target, turns: def.frozen, instant: true, nowTurn: nowTurn });
+      log(st, '🧊 ' + iGa(p.name) + ' ' + eulReul(def.name) + ' 즉시 얼렸다!' +
+        (nowTurn ? ' 이번 턴 통째로 건너뛰는 중!' : ' 다음 턴 통째로 건너뜀'));
+      if (nowTurn) {
+        def.frozen = Math.max(0, def.frozen - 1);   // 이번 턴 스킵으로 소모
+        fx(st, { t: 'frozenSkip', seat: target, left: def.frozen });
+        log(st, '🧊 ' + iGa(def.name) + ' 얼음에 갇혀 이번 턴 통째로 건너뜀!');
+        passTurnNow(st);
+      }
+      return { ok: true, frozen: def.frozen };
+    }
+    return { ok: false, err: '몰?루' };
+  }
+
   /* ---------------- 공격 / 방패 ---------------- */
 
   function beginAttack(st, attacker, defender, kind, data, cardId) {
     var def = st.players[defender];
+    // 🛡️ v3: 미리 켜둔 가시 갑옷이 있으면 5초 카운터 없이 자동 방어
+    if ((def.wall || 0) > 0) {
+      def.wall--;
+      if (kind === 'bomb') st.discard.push(cardId);   // 떠넘기기 실패 → 카드 폐기
+      impactFx(st, 'wallBlock', defender, '🛡️ 사전 방어! 튕겼다!');
+      fx(st, { t: 'wallBlock', attack: kind, attacker: attacker, defender: defender, left: def.wall });
+      log(st, '🛡️ ' + def.name + '의 가시 갑옷이 ' + st.players[attacker].name + '의 공격을 자동으로 막았다! (남은 갑옷 ' + def.wall + ')');
+      finishAct(st);
+      return;
+    }
     impactFx(st, kind, attacker);   // 공격 선언 = 화면 중앙 대형 도발
     var canShield = hasAction(def, 'shield');
     if (canShield) {
@@ -1072,18 +1230,28 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       var ci = 0; CACTUS.forEach(function (c, i) { if (c.key === want) ci = i; });
       var cname = CACTUS[ci].name;
       if (got.length) {
-        got.forEach(function (id) { removeOne(def.hand, id); atk.hand.push(id); });
-        fx(st, { t: 'demand', attacker: pend.attacker, defender: pend.defender, type: want, n: got.length });
-        log(st, '👀 "' + cname + ' 있냐?" → ' + def.name + ' ' + got.length + '장 전부 털렸다!');
+        var room = Math.max(0, HAND_LIMIT - atk.hand.length);
+        var take = got.slice(0, room);
+        take.forEach(function (id) { removeOne(def.hand, id); atk.hand.push(id); });
+        fx(st, { t: 'demand', attacker: pend.attacker, defender: pend.defender, type: want, n: take.length });
+        log(st, '👀 "' + cname + ' 있냐?" → ' + def.name + ' ' + take.length + '장 전부 털렸다!' +
+          (take.length < got.length ? ' (내 손이 꽉 차 ' + (got.length - take.length) + '장은 못 챙김)' : ''));
       } else {
         fx(st, { t: 'demandFail', attacker: pend.attacker, defender: pend.defender, type: want });
         impactFx(st, 'demandFail', pend.defender);
         log(st, '👀 "' + cname + ' 있냐?" → ' + def.name + ' "없는데? 메롱~"');
       }
     } else if (pend.action === 'bomb') {
-      def.hand.push(pend.card);
-      fx(st, { t: 'bomb', attacker: pend.attacker, defender: pend.defender, card: pend.card });
-      log(st, '💣 ' + iGa(atk.name) + ' ' + def.name + '에게 썩은 선인장을 떠넘겼다! (끝나고 -1점)');
+      if (def.hand.length >= HAND_LIMIT) {
+        // 손이 꽉 찬 상대에겐 못 떠넘긴다 → 폭탄이 주인에게 되돌아온다
+        atk.hand.push(pend.card);
+        fx(st, { t: 'bombBounce', attacker: pend.attacker, defender: pend.defender, card: pend.card });
+        log(st, '💣 ' + def.name + ' 손이 꽉 차서 썩은 선인장이 ' + atk.name + '에게 되돌아왔다!');
+      } else {
+        def.hand.push(pend.card);
+        fx(st, { t: 'bomb', attacker: pend.attacker, defender: pend.defender, card: pend.card });
+        log(st, '💣 ' + iGa(atk.name) + ' ' + def.name + '에게 썩은 선인장을 떠넘겼다! (끝나고 -1점)');
+      }
     } else if (pend.action === 'swapAll') {
       var aN = atk.hand.length, dN = def.hand.length;
       var tmp = atk.hand; atk.hand = def.hand; def.hand = tmp;
@@ -1111,16 +1279,47 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
   /* ---------------- 봇 ---------------- */
 
   function countsOfHand(p) {
-    var c = { bomb: 0, steal: 0, demand: 0, draw3: 0, swapAll: 0, freeze: 0, flip: 0, shield: 0 };
+    var c = { bomb: 0, steal: 0, demand: 0, draw3: 0, swapAll: 0, freeze: 0, flip: 0, shield: 0, skip: 0, reverse: 0 };
     p.hand.forEach(function (id) { var i = cardInfo(id); if (i.act) c[i.act]++; });
     return c;
+  }
+
+  // v3: 봇의 즉시 카드 판단 (턴을 잡아먹지 않는 프리 액션)
+  function botInstant(st, seat, tnow) {
+    var p = st.players[seat];
+    var ac = countsOfHand(p);
+    if (!ac.shield && !ac.freeze && !ac.skip && !ac.reverse) return false;
+    var lead = leaderSeat(st, seat);
+    var n = st.players.length, dir = st.dir === -1 ? -1 : 1;
+    var nextSeat = ((seat + dir) % n + n) % n;
+    var now = tnow || Date.now();
+    // 1) 손이 꽉 찾으면 턴 넘기기로 한 장 비우고 바로 패스
+    if (ac.skip && p.hand.length >= HAND_LIMIT && rnd(st) < 0.85) {
+      if (playInstant(st, seat, firstAction(p, 'skip'), {}, now).ok) return true;
+    }
+    // 2) 점수 앞서 있으면 미리 방어막 (공격 표적이 되기 전에)
+    if (ac.shield >= 2 && !(p.wall > 0) && p.score >= 4 && rnd(st) < 0.6) {
+      if (playInstant(st, seat, firstAction(p, 'shield'), {}, now).ok) return true;
+    }
+    // 3) 위험한 1등은 바로 얼리기
+    if (ac.freeze && lead >= 0 && lead !== seat) {
+      var danger = st.players[lead].score >= 6 || st.players[lead].hand.length >= 8;
+      if (rnd(st) < (danger ? 0.55 : 0.25)) {
+        if (playInstant(st, seat, firstAction(p, 'freeze'), { target: lead }, now).ok) return true;
+      }
+    }
+    // 4) 바로 다음 순서가 1등이면 방향 유턴으로 순서를 튼다
+    if (ac.reverse && lead >= 0 && lead === nextSeat && st.players[lead].score >= 5 && rnd(st) < 0.5) {
+      if (playInstant(st, seat, firstAction(p, 'reverse'), {}, now).ok) return true;
+    }
+    return false;
   }
 
   function firstAction(p, act) {
     return p.hand.filter(function (id) { return cardInfo(id).act === act; })[0];
   }
 
-  function botStep(st) {
+  function botStep(st, now) {
     if (st.phase !== 'playing' || st.pending) return false;
     var seat = st.turn;
     var p = st.players[seat];
@@ -1132,6 +1331,11 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       return true;
     }
     if (st.acted) { endTurn(st); return true; }
+    // v3: ⚡ 즉시 카드는 턴을 잡아먹지 않으므로 한 턴에 한 번 먼저 써본다
+    if (p.instTurn !== st.turnNo) {
+      p.instTurn = st.turnNo;
+      if (botInstant(st, seat, now)) return true;
+    }
     var counts = handCounts(p);
     var ac = countsOfHand(p);
     var others = st.players.filter(function (q) { return q.seat !== seat; });
@@ -1194,15 +1398,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
         if (r4b.ok) return true;
       }
     }
-    // 5) 정지! — 1등(없으면 다음 사람)을 얼려서 한 턴 뺏기
-    if (ac.freeze) {
-      var fcard = firstAction(p, 'freeze');
-      var ftarget = (lead >= 0 && lead !== seat) ? lead : nextSeat;
-      if (ftarget !== seat && rnd(st) < (full ? 0.8 : 0.45)) {
-        var r5 = playCard(st, seat, fcard, { target: ftarget });
-        if (r5.ok) return true;
-      }
-    }
+    // 5) 정지! — v3부터는 즉시 카드(프리 액션)로 위에서 처리한다
     // 6) 3장 뽑기 — 손이 비었을 때 화끈하게
     if (ac.draw3 && st.deck.length >= 2) {
       var d3 = firstAction(p, 'draw3');
@@ -1252,9 +1448,11 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     HAND_LIMIT: HAND_LIMIT,
     SHIELD_MS: SHIELD_MS,
     BOT_SHIELD_MS: BOT_SHIELD_MS,
+    INSTANT_CD_MS: INSTANT_CD_MS,
     MAX_TURNS: MAX_TURNS,
     CACTUS: CACTUS,
     ACTIONS: ACTIONS,
+    INSTANTS: INSTANTS,
     CHARS: CHARS,
     DECK_COUNTS: DECK_COUNTS,
     TAUNT_LINES: TAUNT_LINES,
@@ -1271,10 +1469,13 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     discardCard: discardCard,
     scoreSet: scoreSet,
     playCard: playCard,
+    playInstant: playInstant,
+    isInstantAct: isInstantAct,
     resolveShield: resolveShield,
     tick: tick,
     endTurn: endTurn,
     advanceTurn: advanceTurn,
+    passTurnNow: passTurnNow,
     finishGame: finishGame,
     botStep: botStep,
     makeRoomCode: makeRoomCode,
@@ -1348,8 +1549,10 @@ var Sound = {
   swap: function () { this.blip(280, 1500, 0.24, 'sine', 0.19); this.noise(0.18, 0.18, 3000); this.blip(1200, 700, 0.12, 'triangle', 0.1, 0.1); },
   impact: function (kind) {
     if (kind === 'freeze' || kind === 'frozen') { this.ice(); return; }
-    if (kind === 'block') { this.shield(); return; }
+    if (kind === 'block' || kind === 'wall' || kind === 'wallBlock') { this.shield(); return; }
     if (kind === 'swapAll') { this.swap(); return; }
+    if (kind === 'reverse') { this.blip(300, 1400, 0.26, 'sine', 0.18); this.blip(1400, 320, 0.24, 'triangle', 0.13, 0.12); return; }
+    if (kind === 'skip') { this.blip(900, 260, 0.14, 'square', 0.14); this.blip(1200, 420, 0.1, 'sine', 0.1, 0.06); return; }
     this.blip(150, 52, 0.3, 'sawtooth', 0.22);
     this.noise(0.26, 0.28, 900);
     this.blip(760, 1320, 0.12, 'triangle', 0.15, 0.03);
@@ -1490,6 +1693,7 @@ var App = {
   overShown: false,
   tauntUntil: 0,
   busyUntil: 0,
+  instantUntil: 0,
   modalKind: null,
   botTimer: null,
   lobbyTimer: null
@@ -1663,6 +1867,17 @@ function renderHud(st) {
   var rc = $('#roomChip');
   if (App.net && App.net.code) { rc.classList.remove('hidden'); rc.textContent = '#' + App.net.code; }
   else rc.classList.add('hidden');
+  // v3: 진행 방향 (반전되면 화살표가 휙 뒤집힘)
+  var dc = $('#dirChip');
+  if (dc) {
+    var dir = st.dir === -1 ? -1 : 1;
+    if (dc.getAttribute('data-d') !== String(dir)) {
+      var first = dc.getAttribute('data-d') == null;
+      dc.setAttribute('data-d', String(dir));
+      dc.textContent = dir === 1 ? '➡️ 시계' : '⬅️ 반시계';
+      if (!first) { dc.classList.remove('flip'); void dc.offsetWidth; dc.classList.add('flip'); }
+    }
+  }
 }
 
 function renderOpps(st, force) {
@@ -1676,6 +1891,7 @@ function renderOpps(st, force) {
       return '<div class="opp" data-seat="' + s + '">' +
         '<div class="sc">0</div>' +
         '<div class="ice">🧊 얼음</div>' +
+        '<div class="wall">🛡️</div>' +
         '<div class="avWrap"></div>' +
         '<div class="nm"></div>' +
         '<div class="fan"></div>' +
@@ -1689,10 +1905,13 @@ function renderOpps(st, force) {
     var el = $('.opp[data-seat="' + s + '"]', box);
     if (!el) return;
     var isTurn = st.turn === s && st.phase === 'playing';
-    var isTarget = !!(App.targetMode && App.targetMode.needTarget && !App.targetMode.target);
+    var tm = App.targetMode;
+    var tmDef = tm && E.ACTIONS[tm.act];
+    var isTarget = !!(tmDef && tmDef.needTarget && !tm.target);
     el.classList.toggle('turn', isTurn);
     el.classList.toggle('target', isTarget);
     el.classList.toggle('frozen', (p.frozen || 0) > 0);
+    el.classList.toggle('walled', (p.wall || 0) > 0);
     var prev = el.getAttribute('data-expr') || '';
     var expr = p.score >= 6 ? 'win' : 'idle';
     if (prev !== expr) {
@@ -1760,6 +1979,8 @@ function renderMe(st) {
   $('#meBombs').textContent = bombs ? '💣' + bombs : '';
   var mi = $('#meIce');
   if (mi) mi.textContent = (p.frozen || 0) > 0 ? '🧊 얼음' : '';
+  var mw = $('#meWall');
+  if (mw) mw.classList.toggle('hidden', !(p.wall > 0));
 }
 
 function handGroups(st, seat) {
@@ -1770,8 +1991,14 @@ function handGroups(st, seat) {
     if (i.kind === 'cactus') (cmap[i.type] = cmap[i.type] || []).push(id);
     else (amap[i.act] = amap[i.act] || []).push(id);
   });
+  // v3: ⚡ 즉시 카드 4종을 항상 맨 앞(왼쪽 엄지)에 둔다 — 내 턴이 아니어도 바로 눌리게
+  var ORDER = ['shield', 'freeze', 'skip', 'reverse'];
+  ORDER.forEach(function (a) { if (amap[a]) out.push({ kind: 'action', act: a, n: amap[a].length, ids: amap[a] }); });
   E.CACTUS.forEach(function (c) { if (cmap[c.key]) out.push({ kind: 'cactus', type: c.key, n: cmap[c.key].length, ids: cmap[c.key] }); });
-  Object.keys(amap).forEach(function (a) { out.push({ kind: 'action', act: a, n: amap[a].length, ids: amap[a] }); });
+  Object.keys(amap).forEach(function (a) {
+    if (ORDER.indexOf(a) >= 0) return;
+    out.push({ kind: 'action', act: a, n: amap[a].length, ids: amap[a] });
+  });
   return out;
 }
 
@@ -1780,7 +2007,8 @@ function renderHand(st) {
   if (!p) return;
   var groups = handGroups(st, App.seat);
   var box = $('#hand');
-  var sig = groups.map(function (g) { return g.kind + ':' + (g.type || g.act) + ':' + g.n; }).join('|') + '|' + (myTurn() ? '1' : '0') + '|' + (App.trashMode ? 'T' : '');
+  var sig = groups.map(function (g) { return g.kind + ':' + (g.type || g.act) + ':' + g.n; }).join('|') +
+    '|' + (myTurn() ? '1' : '0') + '|' + (st.pending ? 'P' : '') + '|' + (App.trashMode ? 'T' : '');
   if (box.getAttribute('data-sig') === sig) return;
   box.setAttribute('data-sig', sig);
   if (!groups.length) {
@@ -1793,7 +2021,7 @@ function renderHand(st) {
       var ready = g.n >= 3;
       var dots = '';
       for (var i = 0; i < 3; i++) dots += '<i class="' + (i < g.n ? 'on' : '') + '"></i>';
-      return '<button class="hcard' + (ready ? ' ready' : '') + '" data-kind="cactus" data-type="' + g.type + '">' +
+      return '<button class="hcard' + (ready ? ' ready' : '') + (!myTurn() ? ' off' : '') + '" data-kind="cactus" data-type="' + g.type + '">' +
         '<span class="pts">' + c.pts + '점</span>' +
         (g.n > 1 ? '<span class="badge">×' + g.n + '</span>' : '') +
         '<span class="hcArt">' + cactusSVG(E.CACTUS.indexOf(c), ready ? 'win' : 'idle') + '</span>' +
@@ -1803,7 +2031,10 @@ function renderHand(st) {
     }
     var a = E.ACTIONS[g.act];
     var sel = !!(App.targetMode && App.targetMode.act === g.act);
-    return '<button class="hcard action' + (sel ? ' sel' : '') + '" data-kind="action" data-act="' + g.act + '">' +
+    var inst = !!a.instant;
+    var off = !inst && !myTurn();
+    return '<button class="hcard action' + (sel ? ' sel' : '') + (inst ? ' instant' : '') + (off ? ' off' : '') + '" data-kind="action" data-act="' + g.act + '">' +
+      (inst ? '<span class="instBadge">⚡ 즉시</span>' : '') +
       (g.n > 1 ? '<span class="badge">×' + g.n + '</span>' : '') +
       '<span class="hcArt">' + a.icon + '</span>' +
       '<span class="hcName">' + a.name + '</span>' +
@@ -1926,7 +2157,8 @@ function shakeSeat(seat) {
    화면 중앙 대형 도발/액션 임팩트
    ============================================================ */
 var Impact = { token: 0, hideT: null };
-var IMPACT_EXPR = { taunt: 'taunt', block: 'hit', stealFail: 'sad', demandFail: 'taunt', frozen: 'sad', freeze: 'hit' };
+var IMPACT_EXPR = { taunt: 'taunt', block: 'hit', stealFail: 'sad', demandFail: 'taunt', frozen: 'sad', freeze: 'hit',
+  skip: 'taunt', reverse: 'win', wall: 'win', wallBlock: 'hit' };
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -1965,7 +2197,7 @@ function impact(o) {
     '<div class="impWho"></div>' +
     '</div>';
   $('.impText', el).textContent = o.text || '메롱~';
-  $('.impWho', el).textContent = p.name + (o.kind === 'block' ? ' · 방패로 팅!' : '');
+  $('.impWho', el).textContent = p.name + (o.kind === 'block' ? ' · 방패로 팅!' : (o.kind === 'wallBlock' ? ' · 방어막으로 팅!' : ''));
   Sound.impact(o.kind);
   vibrate(o.kind === 'freeze' ? [10, 30, 10] : [16, 40, 26]);
   shakeBig();
@@ -2067,6 +2299,24 @@ function playFx(f) {
       else { bubble(f.defender, '?', '🛡️', 900); }
       var oe = $('.opp[data-seat="' + f.defender + '"]');
       if (oe) { oe.classList.add('shield'); setTimeout(function () { oe.classList.remove('shield'); }, 1600); }
+      break;
+    case 'wall':
+      Sound.shield(); vibrate([10, 20, 10]);
+      puff(f.seat, '🛡️');
+      if (f.seat !== App.seat) bubble(f.seat, '가시 갑옷!', '🛡️', 1500);
+      break;
+    case 'wallBlock':
+      Sound.shield(); vibrate(30);
+      puff(f.defender, '🛡️'); puff(f.attacker, '💥');
+      bubble(f.defender, '팅! 방어막!', '🛡️', 1700);
+      shakeSeat(f.attacker);
+      break;
+    case 'reverse':
+      vibrate([12, 30, 12]);
+      break;
+    case 'bombBounce':
+      Sound.bad();
+      bubble(f.attacker, '손이 꽉 찼네…', '💣', 1500);
       break;
     case 'win':
       Sound.win(); vibrate([30, 60, 30, 60, 60]);
@@ -2184,23 +2434,65 @@ function doPlay(cardId, payload) {
   afterLocal();
 }
 
+/* --- v3: ⚡ 즉시 카드 (내 턴이 아니어도 바로 사용) --- */
+function doInstant(cardId, payload) {
+  var st = App.st;
+  if (!st || st.phase !== 'playing') return;
+  if (st.pending) return toast('🛡️ 방패 판정 중엔 즉시 카드를 못 써! 방어부터!', 1900);
+  if (Date.now() < App.instantUntil) return toast('너무 빨라! 잠깐만~', 900);
+  Sound.blip(1400, 900, 0.08, 'square', 0.14); vibrate(14);
+  if (!iCanAct()) {
+    App.instantUntil = Date.now() + 500;
+    sendIntent({ type: 'instant', card: cardId, payload: payload || {} });
+    return;
+  }
+  var r = E.playInstant(st, App.seat, cardId, payload || {});
+  if (!r.ok) return toast(r.err);
+  App.instantUntil = Date.now() + 500;
+  App.targetMode = null;
+  afterLocal();
+}
+
+function tapInstant(act, p) {
+  var ids = p.hand.filter(function (id) { return (E.cardInfo(id) || {}).act === act; });
+  if (!ids.length) return;
+  var cardId = ids[0];
+  var st = App.st;
+  if (st.phase !== 'playing') return;
+  if (st.pending) { toast('🛡️ 방패 판정 중! 방어 버튼을 먼저 눌러!', 1700); return; }
+  if (act === 'freeze') {           // 지목이 필요한 유일한 즉시 카드
+    if (Date.now() < App.instantUntil) { toast('너무 빨라! 잠깐만~', 800); return; }
+    App.targetMode = { card: cardId, act: 'freeze', needTarget: true, target: null, instant: true };
+    toast('🧊 얼릴 상대를 톡!', 1400);
+    render();
+    return;
+  }
+  doInstant(cardId, {});
+}
+
 /* --- 손패 탭 --- */
 function onHandTap(e) {
   var btn = e.target.closest('.hcard');
   if (!btn) return;
   var st = App.st;
+  if (!st) return;
   var p = st.players[App.seat];
-  if (!myTurn()) { toast('지금은 네 차례가 아니야!'); return; }
+  if (!p) return;
+  var kind = btn.getAttribute('data-kind');
+  var actAttr = kind === 'action' ? btn.getAttribute('data-act') : null;
+  var actDef = actAttr ? E.ACTIONS[actAttr] : null;
+  // ⚡ 즉시 카드는 남의 턴에도 활성
+  if (actDef && actDef.instant) { tapInstant(actAttr, p); return; }
+  if (!myTurn()) { toast('지금은 네 차례가 아니야! (⚡ 즉시 카드는 아무 때나 써)', 1800); return; }
   if (App.trashMode) {
-    var kind = btn.getAttribute('data-kind');
     var groups = handGroups(st, App.seat);
     var g = groups.filter(function (x) {
-      return kind === 'cactus' ? (x.kind === 'cactus' && x.type === btn.getAttribute('data-type')) : (x.kind === 'action' && x.act === btn.getAttribute('data-act'));
+      return kind === 'cactus' ? (x.kind === 'cactus' && x.type === btn.getAttribute('data-type')) : (x.kind === 'action' && x.act === actAttr);
     })[0];
     if (g) doDiscard(g.ids[0]);
     return;
   }
-  if (btn.getAttribute('data-kind') === 'cactus') {
+  if (kind === 'cactus') {
     var type = btn.getAttribute('data-type');
     var n = E.countType(p, type);
     var c = E.CACTUS.filter(function (x) { return x.key === type; })[0];
@@ -2209,12 +2501,10 @@ function onHandTap(e) {
     bubble(App.seat, c.name + ' ' + n + '/3 · +' + c.pts + '점', '🌵', 1400);
     return;
   }
-  // 액션 카드
-  var act = btn.getAttribute('data-act');
+  var act = actAttr;
   var ids = p.hand.filter(function (id) { return (E.cardInfo(id) || {}).act === act; });
   if (!ids.length) return;
   var cardId = ids[0];
-  if (act === 'shield') { toast('🛡️ 방패는 공격받을 때 자동으로 뜬다! 그때 눌러!', 2000); return; }
   Sound.blip(600, 900, 0.07, 'sine', 0.1);
   if (act === 'flip') { openFlipModal(cardId); return; }
   var def = E.ACTIONS[act];
@@ -2229,14 +2519,16 @@ function onOppTap(e) {
   if (!App.targetMode) return;
   var seat = +el.getAttribute('data-seat');
   var act = App.targetMode.act;
+  var instant = !!App.targetMode.instant;
+  var card = App.targetMode.card;
   if (act === 'demand') {
     App.targetMode.target = seat;
     openTypeModal(App.targetMode.card, seat);
     return;
   }
-  var card = App.targetMode.card;
   App.targetMode = null;
-  doPlay(card, { target: seat });
+  if (instant) doInstant(card, { target: seat });
+  else doPlay(card, { target: seat });
 }
 
 /* --- 타입 선택 모달 --- */
@@ -2415,7 +2707,10 @@ function openGuide() {
     '<div class="guideRow"><div class="gi">🎉</div><div><b>같은 선인장 3장 = 점수</b><span>3장이 모이면 빛나는 카드나 🎉 버튼을 톡! 민둥이 2점 · 꽃/빨간가시 3점</span></div></div>' +
     '<div class="guideRow"><div class="gi">🎁</div><div><b>3장 뽑기</b><span>한 번에 3장! 손패는 12장까지. 근데 뽑기만 하면 남이 다 빼앗아 가 ㅋㅋ</span></div></div>' +
     '<div class="guideRow"><div class="gi">🔄</div><div><b>손패 바꾸기</b><span>상대 1명 지목 → 손패를 통째로 맞바꾼다! 1등이 모아둔 패를 그대로 훔쳐오기</span></div></div>' +
-    '<div class="guideRow"><div class="gi">🧊</div><div><b>정지!</b><span>상대 1명을 지목해 다음 턴을 얼려버린다. 머리 위 🧊 배지 확인!</span></div></div>' +
+    '<div class="guideRow"><div class="gi">⚡</div><div><b>아무 때나! 즉시 카드 4종</b><span>🛡️방패 · 🧊정지 · ⏭️턴 넘기기 · 🔁턴 반대로는 <b>남의 턴에도</b> 손패에서 톡! 턴을 안 쓸어먹는다.</span></div></div>' +
+    '<div class="guideRow"><div class="gi">⏭️</div><div><b>턴 넘기기 · 턴 반대로</b><span>턴 넘기기는 남의 턴을 기습으로 끝내버리고, 턴 반대로는 진행 방향을 뒤집는다. 상단 ➡️/⬅️ 확인!</span></div></div>' +
+    '<div class="guideRow"><div class="gi">🛡️</div><div><b>미리 켜두는 방어막</b><span>방패를 평소에 톡 쓰면 머리 위에 🛡️가 켜져 다음 공격 1회를 자동으로 막는다.</span></div></div>' +
+    '<div class="guideRow"><div class="gi">🧊</div><div><b>정지!</b><span>상대 1명을 지목해 얼려버린다. 지금 그 사람 턴이면 즉시 턴 종료! 머리 위 🧊 배지 확인.</span></div></div>' +
     '<div class="guideRow"><div class="gi">🤏</div><div><b>뺏고 놀리기</b><span>슬쩍(1장) · 이거 있냐?(종류 전부) · 판 뒤집기 · 썩은 선인장. 아래 도발 버튼도 마음껏!</span></div></div>' +
     '<div class="guideRow"><div class="gi">🛡️</div><div><b>공격받으면 5초</b><span>방패 카드가 있으면 화면 아래에 거대한 방패 버튼이 떠. 5초 안에 톡!</span></div></div>' +
     '<div class="guideRow"><div class="gi">🏆</div><div><b>' + E.TARGET_SCORE + '점 먼저</b><span>덱이 바닥나면 그때 최고 점수가 우승! 썩은 선인장은 끝나고 -1점</span></div></div>' +
@@ -2742,6 +3037,7 @@ function applyIntent(it) {
   else if (it.type === 'score') r = E.scoreSet(st, seat, it.ctype);
   else if (it.type === 'discard') r = E.discardCard(st, seat, it.card);
   else if (it.type === 'play') r = E.playCard(st, seat, it.card, it.payload || {});
+  else if (it.type === 'instant') r = E.playInstant(st, seat, it.card, it.payload || {});
   else if (it.type === 'shield') r = E.resolveShield(st, seat, !!it.use);
   else if (it.type === 'pass') { if (st.turn === seat) { E.endTurn(st); r = { ok: true }; } }
   if (!r.ok) {
