@@ -5260,11 +5260,16 @@ function drawPlayer(ctx, sim, now){
     ctx.globalCompositeOperation = 'lighter';
     const fl = 0.72 + 0.28 * Math.sin(now * 34);
     const hot = (sim.boostT || 0) > 0 ? 1 : 0.6;
-    const len = (190 + 170 * hot) * fl;
+    const len = (200 + 210 * hot) * fl;
     ctx.translate(x, y + h/2 - 3);
     ctx.scale(1, len / 300);
+    /* 바깥 글로우 (넓고 옅은 불꽃) */
+    ctx.fillStyle = 'rgba(120,220,255,0.22)';
+    ctx.beginPath();
+    ctx.moveTo(-40, 0); ctx.lineTo(40, 0); ctx.lineTo(0, 300);
+    ctx.closePath(); ctx.fill();
     for (let i=0;i<2;i++){
-      const sx = (i === 0 ? -1 : 1) * 17;
+      const sx = (i === 0 ? -1 : 1) * 19;
       const g2 = cachedGrad('v12flame|' + i, function(){
         const gg = ctx.createLinearGradient(0, 0, 0, 300);
         if (i === 0){
@@ -5280,15 +5285,15 @@ function drawPlayer(ctx, sim, now){
       });
       ctx.fillStyle = g2;
       ctx.beginPath();
-      ctx.moveTo(sx - 16, 0);
-      ctx.lineTo(sx + 16, 0);
-      ctx.lineTo(sx + (i === 0 ? -4 : 4), 300);
+      ctx.moveTo(sx - 24, 0);
+      ctx.lineTo(sx + 24, 0);
+      ctx.lineTo(sx + (i === 0 ? -6 : 6), 300);
       ctx.closePath(); ctx.fill();
     }
     /* 심지(하얀 코어) */
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillStyle = 'rgba(255,255,255,0.62)';
     ctx.beginPath();
-    ctx.moveTo(-9, 0); ctx.lineTo(9, 0); ctx.lineTo(0, 120);
+    ctx.moveTo(-12, 0); ctx.lineTo(12, 0); ctx.lineTo(0, 150);
     ctx.closePath(); ctx.fill();
     ctx.restore();
     /* 차 뒤 잔상 스트릭 */
@@ -6096,30 +6101,34 @@ function drawBoostFx(ctx, sim){
   const g = cachedGrad('boost|edge|' + Math.round(p * 5), function(){
     const gg = ctx.createRadialGradient(W / 2, H * 0.5, Math.min(W, H) * 0.22, W / 2, H * 0.5, Math.max(W, H) * 0.66);
     gg.addColorStop(0, 'rgba(40,170,255,0)');
-    gg.addColorStop(0.60, 'rgba(60,190,255,0.13)');
-    gg.addColorStop(1, 'rgba(130,240,255,0.46)');
+    gg.addColorStop(0.58, 'rgba(60,190,255,0.18)');
+    gg.addColorStop(1, 'rgba(135,245,255,0.66)');
     return gg;
   });
-  ctx.globalAlpha = a * 0.95;
+  ctx.globalAlpha = a * 0.98;
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = a * 0.75;
+  ctx.strokeStyle = 'rgba(150,240,255,0.9)';
+  ctx.lineWidth = 7;
+  ctx.strokeRect(5, 5, W - 10, H - 10);
   /* 2) 내 차에서 사방으로 터지는 굵은 워프 라인 (한 경로로 묶어 stroke 1회) */
   ctx.globalAlpha = a;
   ctx.globalCompositeOperation = 'lighter';
   ctx.beginPath();
-  for (let i=0;i<24;i++){
-    const ang = (i / 24) * Math.PI * 2 + p * 1.4;
-    const r0 = 70 + ((i * 137 + p * 1400) % 300);
-    const r1 = r0 + 300 + (i % 3) * 150;
+  for (let i=0;i<30;i++){
+    const ang = (i / 30) * Math.PI * 2 + p * 1.4;
+    const r0 = 60 + ((i * 137 + p * 1400) % 300);
+    const r1 = r0 + 340 + (i % 3) * 170;
     const dx = Math.cos(ang), dy = Math.sin(ang) * 0.82;
     ctx.moveTo(cx + dx * r0, cy + dy * r0);
     ctx.lineTo(cx + dx * r1, cy + dy * r1);
   }
-  ctx.strokeStyle = 'rgba(200,245,255,' + (0.40 * a).toFixed(3) + ')';
-  ctx.lineWidth = 7;
+  ctx.strokeStyle = 'rgba(210,248,255,' + (0.46 * a).toFixed(3) + ')';
+  ctx.lineWidth = 11;
   ctx.stroke();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = 'rgba(255,190,120,' + (0.34 * a).toFixed(3) + ')';
+  ctx.lineWidth = 4.5;
+  ctx.strokeStyle = 'rgba(255,190,120,' + (0.40 * a).toFixed(3) + ')';
   ctx.stroke();
   /* 3) 화면을 가로지르는 가로 스피드라인 */
   ctx.beginPath();
