@@ -595,6 +595,16 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
   function randInt(st, n) { return Math.floor(rnd(st) * n) % n; }
   function pick(st, arr) { return arr[randInt(st, arr.length)]; }
   function removeOne(arr, val) { var i = arr.indexOf(val); if (i >= 0) { arr.splice(i, 1); return true; } return false; }
+  // 받침 유무에 맞는 조사 (로그 가독성)
+  function josa(word, withBatchim, withoutBatchim) {
+    var w = String(word || '');
+    var ch = w.charCodeAt(w.length - 1);
+    var has = (ch >= 0xAC00 && ch <= 0xD7A3) ? ((ch - 0xAC00) % 28) !== 0 : true;
+    return has ? withBatchim : withoutBatchim;
+  }
+  function iGa(name) { return name + josa(name, '이', '가'); }
+  function eulReul(name) { return name + josa(name, '을', '를'); }
+  function eunNeun(name) { return name + josa(name, '은', '는'); }
   function shuffle(st, arr) {
     for (var i = arr.length - 1; i > 0; i--) {
       var j = randInt(st, i + 1);
@@ -794,7 +804,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       if (p.frozen > 0) {
         p.frozen--;
         fx(st, { t: 'frozenSkip', seat: st.turn, left: p.frozen });
-        log(st, '🧊 ' + p.name + ' 얼음에 갇혀 이번 턴 통째로 건너뜀!' + (p.frozen ? ' (한 번 더!)' : ''));
+        log(st, '🧊 ' + iGa(p.name) + ' 얼음에 갇혀 이번 턴 통째로 건너뜀!' + (p.frozen ? ' (한 번 더!)' : ''));
         continue;
       }
       break;
@@ -879,7 +889,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       st.finalScores = st.players.map(function (q) { return { seat: q.seat, score: q.score, sets: q.sets }; });
       st.pending = null;
       fx(st, { t: 'win', winners: [seat], reason: 'score' });
-      log(st, '🏆 ' + p.name + ' 님이 ' + st.targetScore + '점 달성! 우승!!');
+      log(st, '🏆 ' + p.name + ' 님' + josa(p.name, '이', '이') + ' ' + st.targetScore + '점 달성! 우승!!');
       return { ok: true, win: true };
     }
     if (st.acted && availSets(st, seat).length === 0) endTurn(st);
@@ -1039,19 +1049,19 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
       if (pend.action === 'bomb') st.discard.push(pend.card);
       impactFx(st, 'block', pend.defender);
       fx(st, { t: 'block', attacker: pend.attacker, defender: pend.defender, action: pend.action });
-      log(st, '🛡️ 팅! ' + def.name + '의 가시 방패가 ' + atk.name + '의 공격을 튕겨냈다! ' + atk.name + ' 손해 1장');
+      log(st, '🛡️ 팅! ' + def.name + '의 가시 방패가 ' + atk.name + '의 공격을 튕겨냈다! ' + iGa(atk.name) + ' 손해 1장');
     } else if (pend.action === 'steal') {
       if (!def.hand.length) {
         impactFx(st, 'stealFail', pend.defender);
         fx(st, { t: 'stealFail', attacker: pend.attacker, defender: pend.defender });
-        log(st, '😶 ' + def.name + ' 손이 텅 비었다… ' + atk.name + ' 헛손질!');
+        log(st, '😶 ' + def.name + ' 손이 텅 비었다… ' + iGa(atk.name) + ' 헛손질!');
       } else {
         var idx = randInt(st, def.hand.length);
         var cid = def.hand[idx];
         removeOne(def.hand, cid);
         atk.hand.push(cid);
         fx(st, { t: 'steal', attacker: pend.attacker, defender: pend.defender, card: cid });
-        log(st, '🤏 ' + atk.name + '이 ' + def.name + '에게서 ' + cardInfo(cid).name + ' 1장 슬쩍!');
+        log(st, '🤏 ' + iGa(atk.name) + ' ' + def.name + '에게서 ' + cardInfo(cid).name + ' 1장 슬쩍!');
       }
     } else if (pend.action === 'demand') {
       var want = pend.data.type;
@@ -1070,16 +1080,16 @@ button{font-family:inherit;color:inherit;background:none;border:0;padding:0;curs
     } else if (pend.action === 'bomb') {
       def.hand.push(pend.card);
       fx(st, { t: 'bomb', attacker: pend.attacker, defender: pend.defender, card: pend.card });
-      log(st, '💣 ' + atk.name + '이 ' + def.name + '에게 썩은 선인장을 떠넘겼다! (끝나고 -1점)');
+      log(st, '💣 ' + iGa(atk.name) + ' ' + def.name + '에게 썩은 선인장을 떠넘겼다! (끝나고 -1점)');
     } else if (pend.action === 'swapAll') {
       var aN = atk.hand.length, dN = def.hand.length;
       var tmp = atk.hand; atk.hand = def.hand; def.hand = tmp;
       fx(st, { t: 'swapAll', attacker: pend.attacker, defender: pend.defender, aN: aN, dN: dN });
-      log(st, '🔄 ' + atk.name + '이 ' + def.name + ' 손패를 통째로 바꿔치기! (' + aN + '장 ↔ ' + dN + '장)');
+      log(st, '🔄 ' + iGa(atk.name) + ' ' + def.name + ' 손패를 통째로 바꿔치기! (' + aN + '장 ↔ ' + dN + '장)');
     } else if (pend.action === 'freeze') {
       def.frozen = (def.frozen || 0) + 1;
       fx(st, { t: 'freeze', attacker: pend.attacker, defender: pend.defender, turns: def.frozen });
-      log(st, '🧊 ' + atk.name + '이 ' + def.name + '을 얼렸다! 다음 턴 통째로 건너뜀');
+      log(st, '🧊 ' + iGa(atk.name) + ' ' + eulReul(def.name) + ' 얼렸다! 다음 턴 통째로 건너뜀');
     }
     finishAct(st);
   }
