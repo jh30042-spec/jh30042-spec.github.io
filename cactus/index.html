@@ -2142,12 +2142,26 @@ function createRoom() {
         })
         .then(function () {
           App.mode = 'room';
+          cleanupOldRooms();
           openLobby(true);
           startNetPoll();
         });
     });
   }
   attempt();
+}
+
+// 6시간 지난 방은 조용히 정리 (활성 방은 건드리지 않음)
+function cleanupOldRooms() {
+  fetch(FB_ROOT + '.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (all) {
+    var now = Date.now();
+    Object.keys(all || {}).forEach(function (k) {
+      var m = all[k] && all[k].meta;
+      if (m && m.createdAt && now - m.createdAt > 6 * 3600 * 1000) {
+        fetch(FB_ROOT + '/' + k + '.json', { method: 'DELETE' }).catch(function () {});
+      }
+    });
+  }).catch(function () {});
 }
 
 function joinRoom(codeInput) {
