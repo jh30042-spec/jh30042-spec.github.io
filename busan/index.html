@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v12.1">
+<meta name="busan-build" content="v14.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -254,17 +254,18 @@
     font-weight:800;color:#e8d49a;line-height:1.28;text-align:left}
   .missionGuide b{color:#ffd24a;font-weight:900;white-space:nowrap}
 
-  /* ---------- 순위표 4종 탭 (통합 · 거리 · 점수 · 칼치기) ---------- */
-  .rankTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.6);margin:calc(var(--u)*.2) 0 calc(var(--u)*.8)}
+  /* ---------- 순위표 5종 탭 (통합 · 거리 · 점수 · 칼치기 · 누적거리) ---------- */
+  .rankTabs{display:grid;grid-template-columns:repeat(5,1fr);gap:calc(var(--u)*.5);margin:calc(var(--u)*.2) 0 calc(var(--u)*.8)}
   .rankTabs .rt{
     min-width:0;border:none;cursor:pointer;font-family:inherit;
-    padding:calc(var(--u)*1.0) calc(var(--u)*.3);border-radius:calc(var(--u)*1.5);
-    background:rgba(255,255,255,.09);color:#a8bdd8;font-size:calc(var(--u)*2.15);font-weight:900;
+    padding:calc(var(--u)*1.0) calc(var(--u)*.25);border-radius:calc(var(--u)*1.5);
+    background:rgba(255,255,255,.09);color:#a8bdd8;font-size:calc(var(--u)*1.95);font-weight:900;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;touch-action:manipulation;
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)
   }
   .rankTabs .rt.on{background:linear-gradient(180deg,#7ce0ff,#39a9ff);color:#04121f;
     box-shadow:0 calc(var(--u)*.5) 0 rgba(0,60,110,.55),0 0 calc(var(--u)*1.6) rgba(60,170,255,.45)}
+  .rankTabs .rt[data-tab="earth"].on{background:linear-gradient(180deg,#b6f27a,#4fc95a)}
   .rankNote{font-size:calc(var(--u)*2.05);font-weight:800;color:#a9bfda;line-height:1.3;
     padding:0 0 calc(var(--u)*.7);letter-spacing:-.01em}
   .rankNote.hidden{display:none}
@@ -383,6 +384,10 @@
   .rRow .em{width:calc(var(--u)*3.6);font-size:calc(var(--u)*2.5)}
   .rRow .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .rRow .km{color:#ffd479;font-variant-numeric:tabular-nums;white-space:nowrap}
+  /* v14: 누적거리 탭 — 지구 기준 돌파 지점 배지 */
+  .rRow .eb{flex:0 0 auto;font-size:calc(var(--u)*1.7);font-weight:900;color:#bdefff;
+    background:rgba(70,180,255,.16);box-shadow:inset 0 0 0 1px rgba(120,215,255,.3);
+    border-radius:99px;padding:calc(var(--u)*.15) calc(var(--u)*.7);white-space:nowrap}
   .rRow.me{background:rgba(125,255,192,.12);border-radius:calc(var(--u)*1.4);padding-left:calc(var(--u)*.6);padding-right:calc(var(--u)*.6)}
   .rRow.me .nm{color:#7dffc0}
   /* TOP 10 — 화면이 좁아도 넘치지 않게 순위표만 스크롤 */
@@ -673,6 +678,7 @@
         <button class="rt" data-tab="dist" role="tab" aria-selected="false">🛣️ 거리</button>
         <button class="rt" data-tab="score" role="tab" aria-selected="false">💯 점수</button>
         <button class="rt" data-tab="combo" role="tab" aria-selected="false">⚡ 칼치기</button>
+        <button class="rt" data-tab="earth" role="tab" aria-selected="false" title="지금까지 달린 누적 거리">🌍 누적거리</button>
       </div>
       <div class="rankNote" id="rNote">통합 = 거리×10 + 점수×0.5 + 최대콤보×300</div>
       <div id="rivalList"></div>
@@ -700,6 +706,7 @@
         <button class="rt" data-tab="dist" role="tab" aria-selected="false">🛣️ 거리</button>
         <button class="rt" data-tab="score" role="tab" aria-selected="false">💯 점수</button>
         <button class="rt" data-tab="combo" role="tab" aria-selected="false">⚡ 칼치기</button>
+        <button class="rt" data-tab="earth" role="tab" aria-selected="false" title="지금까지 달린 누적 거리">🌍 누적거리</button>
       </div>
       <div class="rankNote" id="lbNote">통합 = 거리×10 + 점수×0.5 + 최대콤보×300</div>
       <div id="lbList"></div>
@@ -1064,7 +1071,8 @@ function defaultStore(){
   return MemStore;
 }
 function blankRecords(){
-  return { epoch:RECORD_EPOCH, bestKm:0, bestScore:0, bestSpeed:0, bestCombo:0, runs:0, totalKm:0, updated:0,
+  /* v14: totalKm = totalDist — 지금까지 달린 누적 거리(km). 두 이름을 같은 값으로 유지한다. */
+  return { epoch:RECORD_EPOCH, bestKm:0, bestScore:0, bestSpeed:0, bestCombo:0, runs:0, totalKm:0, totalDist:0, updated:0,
            bestSpot:'', bestCar:'', bestNick:'' };
 }
 function loadRecords(store){
@@ -1085,7 +1093,8 @@ function loadRecords(store){
       r.bestSpeed = Math.max(0, Number(o.bestSpeed) || 0);
       r.bestCombo = Math.max(0, Number(o.bestCombo) || 0);
       r.runs = Math.max(0, Number(o.runs) || 0);
-      r.totalKm = Math.max(0, Number(o.totalKm) || 0);
+      r.totalKm = Math.max(0, Number(o.totalKm) || 0, Number(o.totalDist) || 0);
+      r.totalDist = r.totalKm;
       r.updated = Number(o.updated) || 0;
       r.bestSpot = typeof o.bestSpot === 'string' ? o.bestSpot.slice(0, 48) : '';
       r.bestCar = o.bestCar ? carById(o.bestCar).id : '';
@@ -1106,21 +1115,40 @@ function saveRecords(r, store){
     return true;
   } catch(e){ return false; }
 }
+/* 이번 판에서 누적 거리에 더할 구간.
+   이어달리기(보상형 광고)로 한 판이 두 번 끝나도 이미 합산한 지점(bankedDist) 이후만 새로 센다.
+   commitRun 이 방금 계산한 구간(runDelta)이 있으면 그 값을 그대로 쓴다(같은 지점을 두 번 저장해도 0). */
+function runDistOf(sim){
+  if (sim && sim.runDelta !== undefined && sim.runDelta !== null && isFinite(Number(sim.runDelta))){
+    return Math.round(Math.max(0, Number(sim.runDelta)) * 10) / 10;
+  }
+  const d = Math.round(Math.max(0, Number(sim && sim.dist) || 0) * 10) / 10;
+  const base = Math.max(0, Number(sim && sim.bankedDist) || 0);
+  return Math.round(Math.max(0, d - base) * 10) / 10;
+}
 function commitRun(sim, store){
   const r = Object.assign(blankRecords(), sim.rec || {});
   const prevBest = r.bestKm || 0;
+  const prevTotal = Math.max(0, Number(r.totalKm) || 0, Number(r.totalDist) || 0);
+  const dNow = Math.round(Math.max(0, Number(sim.dist) || 0) * 10) / 10;
+  const prevBanked = Math.max(0, Number(sim.bankedDist) || 0);
+  const runDelta = Math.round(Math.max(0, dNow - prevBanked) * 10) / 10;
   r.bestKm = Math.max(prevBest, sim.dist);
   r.bestScore = Math.max(r.bestScore || 0, finalScore(sim));
   r.bestSpeed = Math.max(r.bestSpeed || 0, Math.round(sim.topSpeed));
   r.bestCombo = Math.max(r.bestCombo || 0, sim.maxCombo);
   r.runs = (r.runs || 0) + 1;
-  r.totalKm = (r.totalKm || 0) + sim.dist;
+  r.totalKm = Math.round((prevTotal + runDelta) * 10) / 10;
+  r.totalDist = r.totalKm;                  /* 누적 거리는 줄어들지 않는다 */
   if (sim.dist >= prevBest - 0.001 && sim.dist > 0){
     r.bestSpot = sim.stopSpot || describeStop(sim.dist, sim.crashCause) || r.bestSpot || '';
     r.bestCar = sim.car || r.bestCar || 'sport';
     r.bestNick = normalizeNick(sim.nick) || r.bestNick || '';
   }
   saveRecords(r, store);
+  sim.bankedDist = dNow;
+  sim.bankedDelta = runDelta;
+  sim.runDelta = runDelta;                  /* 이번 저장에서 합산한 구간 (서버 누적 등록용) */
   sim.rec = r;
   return r;
 }
@@ -1262,12 +1290,27 @@ function describeStop(km, cause){
 
 /* --- 기본 라이벌 (처음부터 경쟁감) --- */
 function defaultRivals(){
+  /* totalDist: 이들이 지금까지 달린 누적 거리(오프라인에서도 누적거리 탭이 비지 않게) */
   return [
-    { nick:'김부장', car:'taxi',    km:118.4, score:2380, maxCombo:4,  spot:'천안 병목', d:true },
-    { nick:'박대리', car:'porter',  km:242.0, score:5120, maxCombo:7,  spot:'대전 칼치기', d:true },
-    { nick:'이과장', car:'police',  km:389.5, score:8940, maxCombo:12, spot:'부산 10km 전 가드레일', d:true },
-    { nick:'최기사', car:'tractor', km:61.2,  score:1190, maxCombo:2,  spot:'수원 톨게이트 경운기 참변', d:true }
+    { nick:'김부장', car:'taxi',    km:118.4, score:2380, maxCombo:4,  totalDist:1246.7, spot:'천안 병목', d:true },
+    { nick:'박대리', car:'porter',  km:242.0, score:5120, maxCombo:7,  totalDist:831.5,  spot:'대전 칼치기', d:true },
+    { nick:'이과장', car:'police',  km:389.5, score:8940, maxCombo:12, totalDist:1504.2, spot:'부산 10km 전 가드레일', d:true },
+    { nick:'최기사', car:'tractor', km:61.2,  score:1190, maxCombo:2,  totalDist:402.8,  spot:'수원 톨게이트 경운기 참변', d:true }
   ];
+}
+/* 누적 거리의 시작점 — totalDist 가 없는 예전 기록은 최고 거리(km)에서 시작한다 */
+function totalDistBase(row){
+  const r = row || {};
+  const td = Number(r.totalDist);
+  if (isFinite(td) && td >= 0) return Math.round(clamp(td, 0, 9999999) * 10) / 10;
+  const km = Number(r.km);
+  return isFinite(km) && km > 0 ? Math.round(clamp(km, 0, 9999999) * 10) / 10 : 0;
+}
+/* 이번 판을 더한 새 누적 거리 (역전 없음: 항상 base 이상으로만 커진다) */
+function nextTotalDist(prev, runDist){
+  const base = totalDistBase(prev);
+  const run = Math.max(0, Number(runDist) || 0);
+  return Math.round((base + run) * 10) / 10;
 }
 function sanitizeRival(r){
   if (!r || typeof r !== 'object') return null;
@@ -1275,10 +1318,13 @@ function sanitizeRival(r){
   if (!nick) return null;
   const km = Number(r.km);
   if (!isFinite(km) || km < 0) return null;
+  const kmR = Math.round(clamp(km, 0, 99999) * 10) / 10;
   return {
     nick: nick,
     car: carById(r.car).id,
-    km: Math.round(clamp(km, 0, 99999) * 10) / 10,
+    km: kmR,
+    /* v14: 누적 거리 — 없으면 최고 거리를 시작점으로 채운다 */
+    totalDist: totalDistBase({ totalDist: r.totalDist, km: kmR }),
     score: Math.max(0, Math.round(Number(r.score) || 0)),
     maxCombo: Math.max(0, Math.round(Number(r.maxCombo !== undefined ? r.maxCombo : r.combo) || 0)),
     spot: String(r.spot === undefined || r.spot === null ? '' : r.spot).slice(0, 48),
@@ -1326,6 +1372,11 @@ function mergeBestRow(a, b){
   const aCombo = Math.max(0, Math.round(Number(A.maxCombo !== undefined ? A.maxCombo : A.combo) || 0));
   const bCombo = Math.max(0, Math.round(Number(B.maxCombo !== undefined ? B.maxCombo : B.combo) || 0));
   const aTs = Number(A.ts) || 0, bTs = Number(B.ts) || 0;
+  /* v14: 누적 거리도 부문별 최고치처럼 '더 큰 값'만 남긴다 (역전 없음) */
+  const aHasT = A.totalDist !== undefined && A.totalDist !== null && isFinite(Number(A.totalDist));
+  const bHasT = B.totalDist !== undefined && B.totalDist !== null && isFinite(Number(B.totalDist));
+  const aTotal = aHasT ? Math.max(0, Number(A.totalDist)) : -1;
+  const bTotal = bHasT ? Math.max(0, Number(B.totalDist)) : -1;
   /* 별명 정보(차종·사고 지점)를 어느 행에서 가져올지 */
   let meta;
   if (bKm > aKm + 0.05) meta = B;
@@ -1336,6 +1387,8 @@ function mergeBestRow(a, b){
   out.km = Math.round(Math.max(aKm, bKm) * 10) / 10;
   out.score = Math.max(aScore, bScore);
   out.maxCombo = Math.max(aCombo, bCombo);
+  const topTotal = Math.max(aTotal, bTotal);
+  if (topTotal >= 0) out.totalDist = Math.round(topTotal * 10) / 10;
   out.ts = Math.max(aTs, bTs);
   return out;
 }
@@ -1352,7 +1405,8 @@ function mergeRival(list, r){
   if (idx < 0){ src.push(entry); return { list: src, action: 'added', entry: entry }; }
   const old = sanitizeRival(src[idx]) || entry;
   const merged = mergeBestRow(old, entry);
-  if (merged.km > old.km + 0.05 || merged.score > old.score || merged.maxCombo > old.maxCombo){
+  if (merged.km > old.km + 0.05 || merged.score > old.score || merged.maxCombo > old.maxCombo ||
+      totalDistBase(merged) > totalDistBase(old) + 0.05){
     src[idx] = Object.assign({}, merged, { d: old.d, ts: merged.ts || Date.now() });
     return { list: src, action: 'updated', entry: src[idx] };
   }
@@ -1462,10 +1516,13 @@ function sanitizeServerRival(raw){
   if (!isFinite(km) || km < 0) return null;
   const spot = (raw.spot === undefined || raw.spot === null || raw.spot === '')
     ? (raw.reason || '') : raw.spot;
+  const kmR = Math.round(clamp(km, 0, 50000) * 10) / 10;
   return {
     nick: nick,
     car: carById(raw.car).id,
-    km: Math.round(clamp(km, 0, 50000) * 10) / 10,
+    km: kmR,
+    /* v14: 누적 거리 — v14 이전 기록에는 없으므로 최고 거리를 시작점으로 본다 */
+    totalDist: totalDistBase({ totalDist: raw.totalDist, km: kmR }),
     score: Math.max(0, Math.round(Number(raw.score !== undefined && raw.score !== null ? raw.score : raw.totalScore) || 0)),
     /* 예전 기록에는 maxCombo가 없다 → 0으로 안전하게 호환 */
     maxCombo: Math.max(0, Math.round(Number(raw.maxCombo !== undefined ? raw.maxCombo : raw.combo) || 0)),
@@ -1574,7 +1631,7 @@ function normalizeServerEntry(o){
   if (!name) return null;
   const km = Number(o.km);
   if (!isFinite(km) || km < 0) return null;
-  return {
+  const out = {
     name: name,
     km: Math.round(clamp(km, 0, 50000) * 10) / 10,
     score: Math.max(0, Math.round(Number(o.score) || 0)),
@@ -1586,12 +1643,45 @@ function normalizeServerEntry(o){
     spot: String(o.spot || '').slice(0, 60),
     ts: Number(o.ts) || Date.now()
   };
+  const td = Number(o.totalDist);
+  if (isFinite(td) && td >= 0) out.totalDist = Math.round(clamp(td, 0, 9999999) * 10) / 10;
+  return out;
+}
+
+/* 같은 닉네임의 서버 기록과 이번 본문을 합칠 때 — 거리·점수·콤보는 높은 쪽,
+   누적 거리는 이미 계산된 누적값을 그대로 쓴다(두 번 더하지 않는다). */
+function mergeEntryForPost(prev, entry){
+  if (!entry) return null;
+  const p = (prev && nickKey(prev.nick) === nickKey(entry.name)) ? prev : null;
+  const out = Object.assign({}, entry);
+  if (p){
+    const pKm = Math.max(0, Number(p.km) || 0);
+    const pScore = Math.max(0, Math.round(Number(p.score) || 0));
+    const pCombo = Math.max(0, Math.round(Number(p.maxCombo !== undefined ? p.maxCombo : p.combo) || 0));
+    out.km = Math.round(Math.max(pKm, entry.km) * 10) / 10;
+    out.score = Math.max(pScore, entry.score);
+    out.totalScore = out.score;
+    out.maxCombo = Math.max(pCombo, entry.maxCombo);
+    /* 더 멀리 간 기록이 따로 있으면 그 판의 차종·사고 지점을 남긴다 */
+    if (pKm > entry.km + 0.05){
+      out.spot = p.spot || entry.spot;
+      out.reason = p.reason || entry.reason;
+      out.car = p.car || entry.car;
+    }
+    const pTotal = Number(p.totalDist);
+    const eTotal = Number(entry.totalDist);
+    let td = null;
+    if (isFinite(eTotal)) td = eTotal;
+    if (isFinite(pTotal)) td = (td === null) ? pTotal : Math.max(td, pTotal);
+    if (td !== null) out.totalDist = Math.round(clamp(td, 0, 9999999) * 10) / 10;
+  }
+  return out;
 }
 
 /*
-  같은 닉네임으로 이미 올린 부문별 최고치(km·score·maxCombo)를
-  하나도 못 넘으면 다시 보내지 않는다.
-  → 거리가 짧아도 점수나 칼치기 콤보를 새로 세웠으면 등록한다.
+  같은 닉네임으로 이미 올린 부문별 최고치(km·score·maxCombo)와 누적 거리를
+  하나도 못 넣으면 다시 보내지 않는다.
+  → 거리가 짧아도 점수·칼치기 콤보를 새로 세웠거나 누적 거리가 늘었으면 등록한다.
 */
 function shouldPostEntry(prev, entry){
   if (!entry || !entry.name) return false;
@@ -1606,6 +1696,8 @@ function shouldPostEntry(prev, entry){
   if (km > pKm + 0.05) return true;        /* 거리 경신 */
   if (eScore > pScore) return true;         /* 점수 경신 */
   if (eCombo > pCombo) return true;         /* 칼치기 콤보 경신 */
+  const eTotal = Number(entry.totalDist);
+  if (isFinite(eTotal) && eTotal > totalDistBase(prev) + 0.05) return true;   /* 누적 거리 증가 */
   return false;
 }
 
@@ -1622,10 +1714,12 @@ function loadPostMark(store){
         nick: nick,
         epoch: RECORD_EPOCH,
         km: Math.max(0, Number(o.km) || 0),
+        totalDist: Math.max(0, Number(o.totalDist) || 0),
         score: Math.max(0, Math.round(Number(o.score) || 0)),
         maxCombo: Math.max(0, Math.round(Number(o.maxCombo) || 0)),
         spot: typeof o.spot === 'string' ? o.spot.slice(0, 48) : '',
         car: o.car ? carById(o.car).id : '',
+        key: typeof o.key === 'string' ? o.key.slice(0, 120) : '',
         ts: Number(o.ts) || 0
       };
     }
@@ -1638,10 +1732,12 @@ function savePostMark(m, store){
     st.setItem(SERVER_POST_KEY, JSON.stringify({
       nick: m.nick, epoch: RECORD_EPOCH,
       km: Math.max(0, Number(m.km) || 0),
+      totalDist: Math.max(0, Number(m.totalDist) || 0),
       score: Math.max(0, Math.round(Number(m.score) || 0)),
       maxCombo: Math.max(0, Math.round(Number(m.maxCombo) || 0)),
       spot: typeof m.spot === 'string' ? m.spot.slice(0, 48) : '',
       car: m.car || '',
+      key: typeof m.key === 'string' ? m.key.slice(0, 120) : '',
       ts: Number(m.ts) || 0
     }));
     return true;
@@ -1693,6 +1789,15 @@ function createServerRank(opts){
     posted: loadPostMark(store), lastPost: null, inflight: null
   };
 
+  function fetchRows(query){
+    return fetchWithTimeout(fetchImpl, query, { method: 'GET', cache: 'no-store' }, timeoutMs)
+      .then(function(res){
+        if (!res || !res.ok) throw new Error('http ' + (res && res.status));
+        return res.json();
+      })
+      .then(function(json){ return parseServerPayload(json); });
+  }
+
   function refresh(){
     if (!fetchImpl){
       state.status = 'offline';
@@ -1700,57 +1805,83 @@ function createServerRank(opts){
       return Promise.resolve(state);
     }
     state.status = 'loading';
-    const q = url + '?orderBy="km"&limitToLast=' + limit;
-    const job = fetchWithTimeout(fetchImpl, q, { method: 'GET', cache: 'no-store' }, timeoutMs)
-      .then(function(res){
-        if (!res || !res.ok) throw new Error('http ' + (res && res.status));
-        return res.json();
-      })
-      .then(function(json){
-        state.rows = parseServerPayload(json);
-        state.status = 'live';
-        state.error = '';
-        state.lastAt = Date.now();
-        state.inflight = null;
-        return state;
-      }, function(err){
-        state.status = 'offline';
-        state.error = String((err && err.message) || err || 'error');
-        state.rows = [];
-        state.inflight = null;
-        return state;
-      });
+    /* v14: 누적거리는 km 와 다른 축 — 두 축을 한꺼번에 받아 닉네임 기준으로 합핍다.
+       totalDist 조회가 실패해도(인덱스 없음·구버전 DB) km 순위는 그대로 살린다. */
+    const qKm = url + '?orderBy="km"&limitToLast=' + limit;
+    const qTotal = url + '?orderBy="totalDist"&limitToLast=' + limit;
+    const job = Promise.all([
+      fetchRows(qKm),
+      fetchRows(qTotal).catch(function(){ return null; })
+    ]).then(function(res){
+      state.rows = dedupeServerRivals((res[0] || []).concat(res[1] || []));
+      state.status = 'live';
+      state.error = '';
+      state.lastAt = Date.now();
+      state.inflight = null;
+      return state;
+    }, function(err){
+      state.status = 'offline';
+      state.error = String((err && err.message) || err || 'error');
+      state.rows = [];
+      state.inflight = null;
+      return state;
+    });
     state.inflight = job;
     return job;
   }
 
-  function post(raw){
-    const entry = normalizeServerEntry(raw);
-    if (!entry) return Promise.resolve({ ok: false, reason: 'invalid' });
-    if (!shouldPostEntry(state.posted, entry)) return Promise.resolve({ ok: false, reason: 'skip', entry: entry });
+  /* 서버 등록 — 같은 닉네임의 기존 항목 키를 알면 그 항목을 PUT 으로 갱신해
+     누적 거리가 늘 때마다 같은 사람 행이 새로 쌓이지 않게 한다(실패 시 POST 로 복구). */
+  function post(raw, opts){
+    const o = opts || {};
+    const entry0 = normalizeServerEntry(raw);
+    if (!entry0) return Promise.resolve({ ok: false, reason: 'invalid' });
+    const prevMark = (state.posted && nickKey(state.posted.nick) === nickKey(entry0.name)) ? state.posted : null;
+    const prev = o.prev || prevMark;
+    if (!shouldPostEntry(prev, entry0)) return Promise.resolve({ ok: false, reason: 'skip', entry: entry0 });
     if (!fetchImpl){
       state.status = 'offline';
-      return Promise.resolve({ ok: false, reason: 'offline', entry: entry });
+      return Promise.resolve({ ok: false, reason: 'offline', entry: entry0 });
     }
-    return fetchWithTimeout(fetchImpl, url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(entry)
-    }, timeoutMs).then(function(res){
-      if (!res || !res.ok) throw new Error('http ' + (res && res.status));
-      /* 마크는 "이 기기에서 서버에 올린 부문별 최고치" — 점수만 갱신한 판이 와도 거리는 깎지 않는다 */
-      const mark = { nick: entry.name, epoch: RECORD_EPOCH, km: entry.km, score: entry.score,
-        maxCombo: entry.maxCombo, spot: entry.spot, car: entry.car, ts: entry.ts };
-      const prev = (state.posted && nickKey(state.posted.nick) === nickKey(entry.name)) ? state.posted : null;
-      state.posted = prev ? mergeBestRow(prev, mark) : mark;
-      savePostMark(state.posted, store);
-      state.lastPost = { ok: true, entry: entry, at: Date.now() };
-      return { ok: true, entry: entry };
-    }, function(err){
-      const msg = String((err && err.message) || err || 'error');
-      state.lastPost = { ok: false, reason: 'error', error: msg, entry: entry, at: Date.now() };
-      return { ok: false, reason: 'error', error: msg, entry: entry };
-    });
+    const entry = mergeEntryForPost(prev, entry0);
+    const keyRaw = String((o.key !== undefined ? o.key : (raw && raw.key)) || '');
+    const key = /^[A-Za-z0-9_:.-]{1,120}$/.test(keyRaw) ? keyRaw : '';
+    const putUrl = key ? url.replace(/\.json$/, '/' + key + '.json') : '';
+    function send(target, method){
+      return fetchWithTimeout(fetchImpl, target, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      }, timeoutMs).then(function(res){
+        if (!res || !res.ok) throw new Error('http ' + (res && res.status));
+        /* Firebase POST 응답 { name: '<pushKey>' } — 다음 판부터는 같은 항목을 PUT 으로 갱신 */
+        if (method === 'POST' && typeof res.json === 'function'){
+          return res.json().then(function(j){ return j; }, function(){ return null; });
+        }
+        return null;
+      });
+    }
+    const job = (putUrl ? send(putUrl, 'PUT').catch(function(){ return send(url, 'POST'); }) : send(url, 'POST'))
+      .then(function(json){
+        const newKey = (json && typeof json.name === 'string' && json.name) ? json.name
+          : (key || (state.posted && state.posted.key) || '');
+        /* 마크는 "이 기기에서 서버에 올린 부문별 최고치 + 누적 거리" — 낮은 판이 와도 깎지 않는다 */
+        const mark = { nick: entry.name, epoch: RECORD_EPOCH, km: entry.km, score: entry.score,
+          maxCombo: entry.maxCombo, totalDist: entry.totalDist, spot: entry.spot, car: entry.car,
+          key: newKey, ts: entry.ts };
+        const merged = prevMark ? mergeBestRow(prevMark, mark) : Object.assign({}, mark);
+        merged.key = newKey;
+        merged.nick = entry.name;
+        state.posted = merged;
+        savePostMark(state.posted, store);
+        state.lastPost = { ok: true, entry: entry, key: newKey, at: Date.now() };
+        return { ok: true, entry: entry, key: newKey };
+      }, function(err){
+        const msg = String((err && err.message) || err || 'error');
+        state.lastPost = { ok: false, reason: 'error', error: msg, entry: entry, at: Date.now() };
+        return { ok: false, reason: 'error', error: msg, entry: entry };
+      });
+    return job;
   }
 
   return { state: state, refresh: refresh, post: post, db: db, url: url };
@@ -1765,6 +1896,8 @@ function createServerRank(opts){
 */
 function rankRecordsFor(status, localRecords, mine){
   const r = Object.assign(blankRecords(), localRecords || {});
+  r.totalKm = Math.max(0, Number(r.totalKm) || 0, Number(r.totalDist) || 0);
+  r.totalDist = r.totalKm;
   if (status !== 'live') return r;          /* 로컬 모드 폴백 */
   if (mine && Number(mine.km) > 0){
     r.bestKm = Math.max(0, Number(mine.km) || 0);
@@ -1772,8 +1905,12 @@ function rankRecordsFor(status, localRecords, mine){
     r.bestCombo = Math.max(0, Number(mine.maxCombo) || 0);
     r.bestSpot = typeof mine.spot === 'string' ? mine.spot : '';
     r.runs = Math.max(1, Number(r.runs) || 0);
+    /* 누적 거리는 서버 항목과 기기 기록 중 큰 쪽 (줄어들지 않는다) */
+    r.totalKm = Math.round(Math.max(r.totalKm, totalDistBase(mine)) * 10) / 10;
+    r.totalDist = r.totalKm;
   } else {
     r.bestKm = 0; r.bestScore = 0; r.bestCombo = 0; r.bestSpot = ''; r.runs = 0;
+    r.totalKm = 0; r.totalDist = 0;
   }
   return r;
 }
@@ -1786,7 +1923,7 @@ function buildLeaderboard(profile, records, rivals, opts){
   for (let i=0;i<list.length;i++){
     const s = sanitizeRival(list[i]);
     if (!s) continue;
-    rows.push({ nick:s.nick, car:s.car, km:s.km, score:s.score, maxCombo:s.maxCombo || 0, spot:s.spot, me:false, d:s.d });
+    rows.push({ nick:s.nick, car:s.car, km:s.km, totalDist: totalDistBase(s), score:s.score, maxCombo:s.maxCombo || 0, spot:s.spot, me:false, d:s.d });
   }
   const mine = normalizeNick(p.nick) || '나';
   const myKm = Math.max(0, Number(r.bestKm) || 0);
@@ -1795,6 +1932,7 @@ function buildLeaderboard(profile, records, rivals, opts){
     myRow = {
       nick: mine, car: carById(p.car).id,
       km: Math.round(myKm * 10) / 10,
+      totalDist: totalDistBase({ totalDist: (r.totalDist !== undefined ? r.totalDist : r.totalKm), km: myKm }),
       score: Math.max(0, Math.round(Number(r.bestScore) || 0)),
       maxCombo: Math.max(0, Math.round(Number(r.bestCombo) || 0)),
       spot: r.bestSpot || '', me: true, d:false
@@ -1815,11 +1953,79 @@ const RANK_TABS = [
   { id:'total', label:'🏆 통합', unit:'점', key:'합산' },
   { id:'dist',  label:'🛣️ 거리', unit:'km', key:'거리' },
   { id:'score', label:'💯 점수', unit:'점', key:'점수' },
-  { id:'combo', label:'⚡ 칼치기', unit:'콤보', key:'콤보' }
+  { id:'combo', label:'⚡ 칼치기', unit:'콤보', key:'콤보' },
+  { id:'earth', label:'🌍 누적거리', unit:'km', key:'누적' }
 ];
-const RANK_TAB_IDS = ['total','dist','score','combo'];
+const RANK_TAB_IDS = RANK_TABS.map(function(t){ return t.id; });
 const COMBO_POINT = 300;                /* 통합 점수에서 최대 콤보 1회 = 300점 */
 const RANK_NOTE = '통합 = 거리×10 + 점수×0.5 + 최대콤보×300';
+const RANK_NOTE_EARTH = '누적거리 = 지금까지 달린 합계 · 🌍 지구 기준 돌파 지점';
+
+/* =========================================================
+   v14: 누적 거리(Total Distance) — 지구 기준 돌파 지점
+   서울에서 출발해 그 거리만큼 달렸을 때 도착하는 곳.
+   ========================================================= */
+const EARTH_MILESTONES = [
+  { km:0,     name:'국내 주행',  short:'국내',     emoji:'🚗' },
+  { km:400,   name:'부산 돌파',  short:'부산',     emoji:'🌊' },
+  { km:1160,  name:'도쿄',      short:'도쿄',     emoji:'🗼' },
+  { km:2090,  name:'홍콩',      short:'홍콩',     emoji:'🥟' },
+  { km:3720,  name:'방콕',      short:'방콕',     emoji:'🐘' },
+  { km:4050,  name:'콜카타',    short:'콜카타',   emoji:'🚃' },
+  { km:4680,  name:'뉴델리',    short:'뉴델리',   emoji:'🛺' },
+  { km:6740,  name:'두바이',    short:'두바이',   emoji:'🐪' },
+  { km:8970,  name:'파리',      short:'파리',     emoji:'🥐' },
+  { km:11050, name:'뉴욕',      short:'뉴욕',     emoji:'🗽' },
+  { km:40075, name:'지구 1바퀴', short:'지구 1바퀴', emoji:'🌍' }
+];
+const EARTH_KM = EARTH_MILESTONES[EARTH_MILESTONES.length - 1].km;
+function fmtKmComma(v){
+  const n = Math.round((Number(v) || 0) * 10) / 10;
+  const s = (Math.round(n * 10) % 10 === 0) ? String(Math.round(n)) : n.toFixed(1);
+  return s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+/* 그 거리에서 이미 돌파한 마지막 지점 (0 이하는 국내 주행) */
+function earthMilestoneAt(km){
+  const k = Math.max(0, Number(km) || 0);
+  if (k >= EARTH_KM + 0.05){
+    const laps = Math.max(1, Math.floor(k / EARTH_KM));
+    return { km: Math.round(EARTH_KM * laps * 10) / 10, name:'지구 ' + laps + '바퀴',
+      short:'지구 ' + laps + '바퀴', emoji:'🌍', laps: laps };
+  }
+  let m = EARTH_MILESTONES[0];
+  for (let i=0;i<EARTH_MILESTONES.length;i++){
+    if (EARTH_MILESTONES[i].km <= k + 0.05) m = EARTH_MILESTONES[i];
+  }
+  return m;
+}
+/* 다음 돌파 지점 (지구 한 바퀴를 넘으면 바퀴 단위로 이어진다) */
+function earthNextAt(km){
+  const k = Math.max(0, Number(km) || 0);
+  for (let i=0;i<EARTH_MILESTONES.length;i++){
+    if (EARTH_MILESTONES[i].km > k + 0.05) return EARTH_MILESTONES[i];
+  }
+  const laps = Math.max(1, Math.floor(k / EARTH_KM)) + 1;
+  return { km: Math.round(EARTH_KM * laps * 10) / 10, name:'지구 ' + laps + '바퀴',
+    short:'지구 ' + laps + '바퀴', emoji:'🌍', laps: laps };
+}
+/* 행 옆에 붙는 짧은 배지 (예: "🌊 부산") */
+function earthTagText(km){
+  const m = earthMilestoneAt(km);
+  return m.emoji + ' ' + m.short;
+}
+/* "🌊 지구 기준 400km 부산 돌파!" */
+function earthBreakText(km){
+  const m = earthMilestoneAt(km);
+  if (!m || m.km <= 0) return '🚗 아직 국내 주행 중 · 400km에서 부산 돌파!';
+  return m.emoji + ' 지구 기준 ' + fmtKmComma(m.km) + 'km ' + m.name + ' 돌파!';
+}
+/* "다음 1,160km 도쿄까지 760km" */
+function earthNextText(km){
+  const k = Math.max(0, Number(km) || 0);
+  const n = earthNextAt(k);
+  if (!n) return '';
+  return '다음 ' + fmtKmComma(n.km) + 'km ' + n.name + '까지 ' + fmtKmComma(Math.max(0, n.km - k)) + 'km';
+}
 /* 통합 점수: 거리·점수·최대 칼치기 콤보를 한 숫자로 */
 function combinedScore(km, score, combo){
   const k = Math.max(0, Number(km) || 0);
@@ -1838,6 +2044,7 @@ function rankValue(row, tab){
   if (t === 'dist') return Math.max(0, Number(r.km) || 0);
   if (t === 'score') return Math.max(0, Number(r.score) || 0);
   if (t === 'combo') return Math.max(0, Math.round(Number(r.maxCombo) || 0));
+  if (t === 'earth') return totalDistBase(r);
   return combinedScore(r.km, r.score, r.maxCombo);
 }
 /* 해당 탭 기준으로 재정렬 + 1..N 순위 (원본 행은 건드리지 않는다) */
@@ -2934,6 +3141,8 @@ function newGame(opts){
     shake: 0, crashT: 0, crashCause: null, endInfo: null, endStats: null,
     gantry: null, horn: 0,
     newRec: { km:false, score:false, speed:false, combo:false },
+    /* v14: 누적 거리 합산 지점 — 이어달리기로 같은 판이 두 번 끝나도 중복 합산 없음 */
+    bankedDist: 0, bankedDelta: 0, runDelta: undefined,
     revived: false,
     god: false
   };
@@ -7790,6 +7999,12 @@ const API = {
   drawFeverFx: drawFeverFx, heliLift: heliLift,
   drawOils: drawOils, drawItemAuras: drawItemAuras,
   RANK_TABS: RANK_TABS, RANK_TAB_IDS: RANK_TAB_IDS, RANK_NOTE: RANK_NOTE, COMBO_POINT: COMBO_POINT,
+  /* v14: 누적 거리 · 지구 기준 돌파 지점 */
+  RANK_NOTE_EARTH: RANK_NOTE_EARTH, EARTH_MILESTONES: EARTH_MILESTONES, EARTH_KM: EARTH_KM,
+  fmtKmComma: fmtKmComma, earthMilestoneAt: earthMilestoneAt, earthNextAt: earthNextAt,
+  earthTagText: earthTagText, earthBreakText: earthBreakText, earthNextText: earthNextText,
+  totalDistBase: totalDistBase, nextTotalDist: nextTotalDist, runDistOf: runDistOf,
+  mergeEntryForPost: mergeEntryForPost,
   combinedScore: combinedScore, rankTabId: rankTabId, rankValue: rankValue, sortRowsByTab: sortRowsByTab,
   CAMERA: CAMERA, CAMERA_R: CAMERA_R, CAMERA_CD_MIN: CAMERA_CD_MIN, CAMERA_CD_MAX: CAMERA_CD_MAX,
   CAMERA_FIRST: CAMERA_FIRST, IMPACT_LIFE: IMPACT_LIFE,
@@ -8004,8 +8219,8 @@ if (typeof document !== 'undefined'){
           btns[j].setAttribute('aria-selected', on ? 'true' : 'false');
         }
       }
-      if (rNoteEl) rNoteEl.classList.toggle('hidden', rankTab !== 'total');
-      if (lbNoteEl) lbNoteEl.classList.toggle('hidden', rankTab !== 'total');
+      if (rNoteEl){ rNoteEl.classList.toggle('hidden', !(rankTab === 'total' || rankTab === 'earth')); rNoteEl.textContent = (rankTab === 'earth') ? RANK_NOTE_EARTH : RANK_NOTE; }
+      if (lbNoteEl){ lbNoteEl.classList.toggle('hidden', !(rankTab === 'total' || rankTab === 'earth')); lbNoteEl.textContent = (rankTab === 'earth') ? RANK_NOTE_EARTH : RANK_NOTE; }
     }
     function pickRankTab(tab){
       const t = rankTabId(tab);
@@ -8037,12 +8252,14 @@ if (typeof document !== 'undefined'){
       if (t === 'dist') return fmtKm(row.km) + 'km';
       if (t === 'score') return fmtNum(row.score || 0) + '점';
       if (t === 'combo') return 'x' + Math.round(row.maxCombo || 0);
+      if (t === 'earth') return fmtKm(totalDistBase(row)) + 'km';
       return fmtNum(combinedScore(row.km, row.score, row.maxCombo)) + '점';
     }
     /* 다른 탭에서도 참고할 수 있게 남은 수치를 작게 붙인다 */
     function tabSubText(row, tab, spot){
       const t = rankTabId(tab);
       const bits = [];
+      if (t === 'earth') bits.push(earthBreakText(totalDistBase(row)));
       if (t !== 'dist') bits.push(fmtKm(row.km) + 'km');
       if (t !== 'score') bits.push(fmtNum(row.score || 0) + '점');
       if (t !== 'combo' && (row.maxCombo || 0) > 0) bits.push('⚡x' + Math.round(row.maxCombo));
@@ -8236,11 +8453,40 @@ if (typeof document !== 'undefined'){
       });
     }
 
+    /* 이 기기·서버에서 확인된 내 최고 기록(부문별) + 누적 거리 시작점 */
+    function myServerBase(){
+      const st = serverRank.state;
+      const myKey = nickKey(profile.nick || '');
+      const mg = rivalMerge();
+      const cands = [];
+      if (mg && mg.mine && (!myKey || nickKey(mg.mine.nick) === myKey)) cands.push(mg.mine);
+      if (st.posted && (!myKey || nickKey(st.posted.nick) === myKey)) cands.push(st.posted);
+      let base = null;
+      for (let i=0;i<cands.length;i++){
+        if (!cands[i]) continue;
+        base = base ? mergeBestRow(base, cands[i]) : Object.assign({}, cands[i]);
+      }
+      return base;
+    }
+    /* 화면에 보여줄 내 누적 거리 — 기기 기록·서버 기록 중 큰 쪽 (역전 없음) */
+    function myTotalDistNow(){
+      const st = serverRank.state;
+      const rec = sim.rec || loadRecords();
+      let t = Math.max(0, Number(rec.totalKm) || 0, Number(rec.totalDist) || 0);
+      const mine = rivalMerge().mine;
+      if (mine) t = Math.max(t, totalDistBase(mine));
+      if (st.posted) t = Math.max(t, totalDistBase(st.posted));
+      return Math.round(t * 10) / 10;
+    }
+
     /* 게임오버 → 서버 등록(1km 이상) → 최신 랭킹 재조회 */
     function submitRunToServer(run){
       const nick = normalizeNick(profile.nick, SERVER_NICK_MAX);
       const km = Math.round(run.dist * 10) / 10;
       if (!nick || km < SERVER_MIN_KM) return Promise.resolve({ ok: false, reason: 'too-short' });
+      /* v14: 이번 판까지 더한 누적 거리 — 기존 기록이 totalDist 없이 있으면 최고 거리에서 이어진다 */
+      const base = myServerBase();
+      const totalDist = nextTotalDist(base, runDistOf(run));
       return serverRank.post({
         name: nick, km: km,
         score: Math.round(run.score || finalScore(run)),
@@ -8248,8 +8494,9 @@ if (typeof document !== 'undefined'){
         car: run.car,
         reason: run.crashCause || 'car',
         spot: run.stopSpot || describeStop(run.dist, run.crashCause),
+        totalDist: totalDist,
         ts: Date.now()
-      });
+      }, { key: (base && base.key) ? base.key : '', prev: base });
     }
 
     function renderRivals(){
@@ -8261,10 +8508,11 @@ if (typeof document !== 'undefined'){
       for (let i=0;i<rows.length;i++){
         const r = rows[i];
         if (r.me && i === rows.length - 1 && r.rank > rows.length) html.push('<div class="rGap">⋯</div>');
-        html.push('<div class="rRow' + (r.me ? ' me' : '') + '" title="' + escapeHtml(tabSubText(r, rankTab, '')) + '">' +
+        html.push('<div class="rRow' + (r.me ? ' me' : '') + '" title="' + escapeHtml(tabSubText(r, rankTab, r.spot || '')) + '">' +
           '<span class="rk">' + r.rank + '</span>' +
           '<span class="em">' + carById(r.car).emoji + '</span>' +
           '<span class="nm">' + escapeHtml(r.nick) + (r.me && r.nick !== '나' ? ' (나)' : '') + '</span>' +
+          (rankTab === 'earth' ? '<i class="eb" title="누적 ' + escapeHtml(fmtKm(totalDistBase(r)) + 'km') + '">' + escapeHtml(earthTagText(totalDistBase(r))) + '</i>' : '') +
           '<span class="km">' + escapeHtml(tabValueText(r, rankTab)) + '</span></div>');
       }
       if (!rows.length) html.push('<div class="rRow"><span class="nm"> 라이벌 없음</span></div>');
@@ -8278,11 +8526,12 @@ if (typeof document !== 'undefined'){
 
     function updateTitle(){
       const r = sim.rec || loadRecords();
+      const total = myTotalDistNow();
       if (r.bestKm > 0){
         tBest.innerHTML = '🏆 최고 <b>' + fmtKm(r.bestKm) + 'km</b> · ' + fmtNum(r.bestScore) + '점 · ' +
           Math.round(r.bestSpeed) + 'km/h';
         tSub.textContent = (r.bestCombo > 0 ? '최고 콤보 x' + r.bestCombo + ' · ' : '') +
-          r.runs + '번 주행 · 총 ' + fmtKm(r.totalKm) + 'km';
+          r.runs + '번 주행 · 누적 ' + fmtKm(total) + 'km · ' + earthBreakText(total);
       } else {
         tBest.innerHTML = '아직 기록 없음 <span>· 첫 주행이 곧 기록</span>';
         tSub.textContent = '갈수록 빨라진다 · 갈수록 막힌다 · 스치면 끝';
@@ -8335,7 +8584,7 @@ if (typeof document !== 'undefined'){
       for (let i=0;i<list.length;i++){
         const r = list[i];
         if (myKey && nickKey(r.nick) === myKey) continue;   /* 내 기록은 아래 me 행으로만 */
-        rows.push({ nick: r.nick, car: r.car, km: r.km, score: r.score || 0,
+        rows.push({ nick: r.nick, car: r.car, km: r.km, totalDist: totalDistBase(r), score: r.score || 0,
           maxCombo: Math.max(0, Math.round(Number(r.maxCombo !== undefined ? r.maxCombo : r.combo) || 0)),
           spot: r.spot || '', me: false });
       }
@@ -8347,7 +8596,7 @@ if (typeof document !== 'undefined'){
         : ((myBest && myBest.spot) || run.stopSpot || describeStop(run.dist, run.crashCause));
       rows.push({
         nick: profile.nick || '나', car: profile.car,
-        km: myKm, score: Math.max(run.score || 0, myBest ? (myBest.score || 0) : 0),
+        km: myKm, totalDist: myTotalDistNow(), score: Math.max(run.score || 0, myBest ? (myBest.score || 0) : 0),
         maxCombo: Math.max(0, Math.round(Math.max(run.maxCombo || 0, (myBest && myBest.maxCombo) || 0))),
         spot: mySpot, me: true
       });
@@ -8822,6 +9071,10 @@ if (typeof document !== 'undefined'){
       } else if (srv.lastPost && !srv.lastPost.ok && srv.lastPost.reason === 'error'){
         line += '<br><span>⚠️ 서버 등록 실패 · 기록은 이 기기에 남았어</span>';
       }
+      /* v14: 내 누적 거리 · 지구 기준 돌파 지점 */
+      const total = myTotalDistNow();
+      line += '<br><span>🛣️ 누적 </span><em>' + fmtKm(total) + 'km</em><span> · ' + earthBreakText(total) + '</span>' +
+        '<br><span>' + earthNextText(total) + '</span>';
       oBest.innerHTML = line;
     }
 
