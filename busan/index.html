@@ -6440,7 +6440,8 @@ function ghostDrawList(sim){
   return out;
 }
 
-function drawGhosts(ctx, sim){
+function drawGhosts(ctx, sim, opts){
+  const showTags = !(opts && opts.tags === false);
   const list = ghostDrawList(sim);
   for (let i=0;i<list.length;i++){
     const g = list[i].g, y = list[i].y;
@@ -6468,7 +6469,7 @@ function drawGhosts(ctx, sim){
     ctx.restore();
 
     /* 3) 컴팩트한 반투명 이름표 (차·도로를 가리지 않게) */
-    smallTag(ctx, x, y - PLAYER.h/2 - 10,
+    if (showTags) smallTag(ctx, x, y - PLAYER.h/2 - 10,
       shortName(g.nick, 6), '#b9dcff', 0.40);
   }
 }
@@ -7449,8 +7450,9 @@ function drawSim(ctx, sim, now){
   if (sim.state !== 'title'){
     /* 게임오버 화면이 떠 있으면 라이벌 푯말(닉네임·km·'여기서 멈춤')은 그리지 않는다.
        오버레이 위쪽은 배경이 비쳐 보여서, 캔버스 글자가 게임오버 안내 문구와 겹쳐 뭉개진다. */
-    if (!(sim.state === 'crash' && overScreenUp())) drawRivalMarkers(ctx, sim);
-    drawGhosts(ctx, sim);
+    const overChill = (sim.state === 'crash' && overScreenUp());
+    if (!overChill) drawRivalMarkers(ctx, sim);
+    drawGhosts(ctx, sim, { tags: !overChill });
     drawOils(ctx, sim);
     drawCameras(ctx, sim);
     drawMissionCaps(ctx, sim);
