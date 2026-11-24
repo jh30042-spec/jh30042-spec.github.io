@@ -218,23 +218,27 @@
   #hint b{color:#ffe08a}
 
   /* ---------- toast ---------- */
-  /* ---------- 아이템 안내 (타이틀 · 3×3 컴팩트 9종) ---------- */
+  /* ---------- 아이템 안내 (타이틀 · 4×4 컴팩트 13종) ---------- */
   #itemGuide{
-    display:grid;grid-template-columns:1fr 1fr 1fr;gap:calc(var(--u)*.6);
-    width:100%;box-sizing:border-box;margin:calc(var(--u)*1.4) 0 calc(var(--u)*.4);
+    display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.5);
+    width:100%;box-sizing:border-box;margin:calc(var(--u)*1.2) 0 calc(var(--u)*.3);
   }
   #itemGuide .ig{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.15);min-width:0;
-    padding:calc(var(--u)*.7) calc(var(--u)*.4);border-radius:calc(var(--u)*1.4);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.1);min-width:0;
+    padding:calc(var(--u)*.5) calc(var(--u)*.3);border-radius:calc(var(--u)*1.3);
     background:rgba(11,18,31,.74);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
     text-align:center;overflow:hidden;
   }
-  #itemGuide .ig b{flex:0 0 auto;font-size:calc(var(--u)*3.0);line-height:1;
+  #itemGuide .ig b{flex:0 0 auto;font-size:calc(var(--u)*2.6);line-height:1;
     filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
-  #itemGuide .ig span{display:block;min-width:0;width:100%;font-size:calc(var(--u)*2.05);font-weight:800;color:#9db1c9;line-height:1.12;
+  #itemGuide .ig span{display:block;min-width:0;width:100%;font-size:calc(var(--u)*1.85);font-weight:800;color:#9db1c9;line-height:1.1;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #itemGuide .ig em{display:block;font-style:normal;font-size:calc(var(--u)*2.45);font-weight:900;color:#fff;
-    letter-spacing:-.03em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+  #itemGuide .ig em{display:block;font-style:normal;font-size:calc(var(--u)*2.1);font-weight:900;color:#fff;
+    letter-spacing:-.03em;line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+  /* 신규 아이템(무적 범퍼·유령·올클리어·헬기·피버)은 민트·보라 틴트 */
+  #itemGuide .ig.new{background:rgba(10,30,34,.80);box-shadow:inset 0 0 0 1px rgba(111,214,255,.55)}
+  #itemGuide .ig.new em{color:#9ce8ff}
+  #itemGuide .ig.new span{color:#8fb6c8}
   /* 함정은 빨간 테로 한눈에 구분 */
   #itemGuide .ig.bad{background:rgba(44,7,11,.80);box-shadow:inset 0 0 0 1px rgba(255,59,71,.58)}
   #itemGuide .ig.bad em{color:#ff9c94}
@@ -621,13 +625,17 @@
     <div class="tEmoji">🚗💨</div>
     <h1>서울 → 부산<em>무한 하드코어 질주</em></h1>
     <div class="tRoute">🗺️ <b>경부선 → 남해·호남선 → 강원·동해선 → 제주 환상도로</b><br>400km마다 풍경·색감·배경음이 바뀐다</div>
-    <div id="itemGuide" aria-label="도로 위 아이템 9종 · 미션 캡슐 안내">
+    <div id="itemGuide" aria-label="도로 위 아이템 13종 · 미션 캡슐 안내">
       <div class="ig"><b>🛡️</b><em>실드</em><span>충돌·함정 1회 방어</span></div>
       <div class="ig"><b>🔥</b><em>스피드업</em><span>5초 폭발 가속·돌파</span></div>
       <div class="ig"><b>✨</b><em>점수 2배</em><span>10초 점수 2배</span></div>
       <div class="ig"><b>🧲</b><em>자석</em><span>8초 아이템 흡인</span></div>
-      <div class="ig"><b>⏳</b><em>슬로우모션</em><span>6초 차량 0.55배</span></div>
       <div class="ig"><b>📣</b><em>사이렌</em><span>6초 앞차 양보</span></div>
+      <div class="ig new"><b>🛡️</b><em>무적 범퍼</em><span>5초 무적·들이받기</span></div>
+      <div class="ig new"><b>👻</b><em>유령 모드</em><span>6초 차·꼬깔 통과</span></div>
+      <div class="ig new"><b>💥</b><em>전방 올클리어</em><span>앞차 일제 폭파</span></div>
+      <div class="ig new"><b>🚁</b><em>헬기 공수</em><span>무적 +10km 점프</span></div>
+      <div class="ig new"><b>🪙</b><em>피버 타임</em><span>6초 코인 펑펑</span></div>
       <div class="ig fx"><b>🎲</b><em>랜덤 박스</em><span>좋은 것/함정 랜덤</span></div>
       <div class="ig bad"><b>📸</b><em>과속카메라</em><span>3.5초 80km/h</span></div>
       <div class="ig bad"><b>🛢️</b><em>기름웅덩이</em><span>1.5초 미끈덩</span></div>
@@ -756,8 +764,8 @@ const HIT = 0.88;                       // 충돌 판정 배율 (약 88%)
 const NEAR_MISS = 30;                   // 칼치기 판정 시각 간격 (world units)
 const LEG_KM = 400;                     // 서울→부산 한 회차
 const COMBO_WINDOW = 4.2;               // 칼치기 콤보 유지 시간
-const START_KMH = 190;                  // 초반부터 빠르게
-const TOP_KMH = 470;
+const START_KMH = 210;                  // v13: 190 → 210 (난이도 한 단계 위)
+const TOP_KMH = 560;                    // v13: 470 → 560 (가속 곡선의 점근선 540보다 위)
 const DAY_LEN = 150;                    // 낮→노을→한밤중→새벽 한 바퀴(초)
 
 /* --- v6.0 신규: 날씨 · 아이템 · 돌발 미션 · 경찰 추격 --- */
@@ -768,19 +776,23 @@ const WX_TYPES = {
 };
 const WX_FIRST_KM = 34;                 // 첫 비/눈이 오는 거리
 const WX_CLEAR_KM = 26;                 // 비/눈 사이 맑은 구간
-/* 좋은 아이템 6종 (먹으면 이득) */
+/* 좋은 아이템 10종 (먹으면 이득) — v13: 감속 아이템 제거 · 신규 5종 추가 */
 const ITEM_TYPES = [
   { id:'shield', emoji:'🛡️', color:'#6fc9ff', label:'실드',       dur:0,   impact:'실드 ON!',      impactEmoji:'🛡️', impactColor:'#8fe3ff', hint:'충돌·함정 1회 방어' },
   { id:'nitro',  emoji:'🔥', color:'#ff8c42', label:'스피드업',   dur:5.0, impact:'스피드업!',     impactEmoji:'🔥', impactColor:'#ffb066', hint:'5초 폭발 가속·돌파' },
   { id:'double', emoji:'✨', color:'#ffd479', label:'점수 2배',   dur:10.0, impact:'점수 2배!',     impactEmoji:'✨', impactColor:'#ffe08a', hint:'10초 점수 2배' },
   { id:'magnet', emoji:'🧲', color:'#ff7bd5', label:'자석',       dur:8.0, impact:'자석 ON!',      impactEmoji:'🧲', impactColor:'#ffb3ea', hint:'8초 아이템 흡인' },
-  { id:'slow',   emoji:'⏳', color:'#8fd3ff', label:'슬로우모션', dur:6.0, impact:'슬로우모션!',   impactEmoji:'⏳', impactColor:'#a9e2ff', hint:'6초 차량 0.55배 감속' },
-  { id:'siren',  emoji:'📣', color:'#ffd479', label:'사이렌',     dur:6.0, impact:'사이렌!',       impactEmoji:'📣', impactColor:'#ffe08a', hint:'6초 앞차 양보' }
+  { id:'siren',  emoji:'📣', color:'#ffd479', label:'사이렌',     dur:6.0, impact:'사이렌!',       impactEmoji:'📣', impactColor:'#ffe08a', hint:'6초 앞차 양보' },
+  { id:'bumper', emoji:'🛡️', color:'#ffa33d', label:'무적 범퍼',  dur:5.0, impact:'무적 범퍼!',    impactEmoji:'🛡️', impactColor:'#ffc46b', hint:'5초 무적·들이받아 튕김' },
+  { id:'ghost',  emoji:'👻', color:'#b8a8ff', label:'유령 모드',  dur:6.0, impact:'유령 모드!',    impactEmoji:'👻', impactColor:'#d3c8ff', hint:'6초 차·꼬깔 통과' },
+  { id:'clear',  emoji:'💥', color:'#ff7a4d', label:'전방 올클리어', dur:0, impact:'올클리어!',    impactEmoji:'💥', impactColor:'#ffb08a', hint:'전방 차량 일제 폭파' },
+  { id:'heli',   emoji:'🚁', color:'#6fd6ff', label:'헬기 공수',  dur:0,   impact:'헬기 공수!',    impactEmoji:'🚁', impactColor:'#9ce8ff', hint:'무적 +10km 공중 점프' },
+  { id:'fever',  emoji:'🪙', color:'#ffcf3d', label:'피버 타임',  dur:6.0, impact:'피버 타임!',    impactEmoji:'🪙', impactColor:'#ffe07a', hint:'6초 코인 폭탄·점수 폭발' }
 ];
-/* 랜덤 박스: 좋은 아이템 6종 + 함정 2종 중 하나가 무작위로 터진다 */
+/* 랜덤 박스: 좋은 아이템 10종 + 함정 2종 중 하나가 무작위로 터진다 */
 const MYSTERY = { id:'mystery', emoji:'🎲', color:'#c9a7ff', label:'랜덤 박스', dur:0,
   impact:'랜덤 박스!', impactEmoji:'🎲', impactColor:'#d9c2ff', hint:'? 좋은 것/함정 랜덤' };
-const GOOD_IDS = ['shield','nitro','double','magnet','slow','siren'];
+const GOOD_IDS = ['shield','nitro','double','magnet','siren','bumper','ghost','clear','heli','fever'];
 const ITEM_R = 30;                      // 아이템 픽업 반경
 /* 추월 보너스 기본점 (리무진은 +15%) */
 const OVERTAKE_BONUS = 150;
@@ -805,7 +817,6 @@ const OIL_FIRST = 14;                   // 첫 기름웅덩이까지
 const MAGNET_PULL = 760;                // 자석 흡인 속도 (world/s)
 const MAGNET_RANGE_Y = 620;             // 자석이 잡는 앞뒤 거리
 const MAGNET_RANGE_X = LANE_W * 4.2;    // 자석이 잡는 좌우 폭
-const SLOW_REL = 0.55;                  // 슬로우모션 상대 속도 배율
 const SIREN_RANGE_Y = 920;              // 사이렌이 닿는 앞쪽 거리
 const SIREN_DODGE_DUR = 0.42;           // 비켜주는 차선 변경 시간(초)
 const SIREN_BLINK_TAIL = 0.7;           // 비켜준 뒤 깜빡이 유지(초)
@@ -813,7 +824,22 @@ const SIREN_BLINK_TAIL = 0.7;           // 비켜준 뒤 깜빡이 유지(초)
 const TRAP_TYPES = [CAMERA, OIL];
 /* 타이틀 아이템 안내·검증용 9종 카탈로그 */
 const ITEM_CATALOG = ITEM_TYPES.concat([MYSTERY], TRAP_TYPES);
-const ITEM_SPAWN_POOL = ['shield','nitro','double','magnet','magnet','slow','slow','siren','siren','mystery'];
+/* v13: 신규 5종을 포함한 16칸 가중 풀 (아이템이 더 자주 나온다) */
+const ITEM_SPAWN_POOL = ['shield','nitro','double','magnet','magnet','siren','siren',
+  'bumper','bumper','ghost','ghost','clear','heli','fever','fever','mystery'];
+/* v13: 아이템 스폰 주기 (v12 6.5~11.5초 → 4.6~8.0초, 화면 동시 2 → 3개) */
+const ITEM_SPAWN_MIN = 4.6, ITEM_SPAWN_RND = 3.4, ITEM_MAX_ON_ROAD = 3; 
+/* --- v13 신규 아이템 수치 --- */
+const BUMPER_SMASH_BONUS = 40;          // 무적 범퍼로 앞차·꼬깔을 날린 보너스
+const GHOST_ALPHA_CAR = 0.42;           // 유령 모드 차체 투명도
+const CLEAR_BONUS = 55;                 // 전방 올클리어 — 제거 1대당 점수
+const HELI_KM = 10;                     // 헬기 공수 — 순간 이동 거리(km)
+const HELI_DUR = 1.05;                  // 공중 점프 연출 시간(초)
+const HELI_LAND_INVULN = 1.6;           // 착지 뒤 무적 보호(초)
+const HELI_BONUS = 250;                 // 헬기 공수 기본 보너스
+const FEVER_COIN_BONUS = 40;            // 피버 코인 1개 점수
+const FEVER_COIN_EVERY = 0.085;         // 피버 코인 스폰 간격(초)
+const FEVER_COIN_MAX = 64;              // 화면에 동시에 뜨는 코인 상한
 const IMPACT_LIFE = 1.15;               // 화면 중앙 임팩트 팝업 수명(초)
 /* --- v12: 아이템 획득 임팩트 · 스피드업 속도 연출 --- */
 const PICK_FX_LIFE = 0.46;              // 먹은 자리 → 내 차로 빨려오는 아이콘 수명(초)
@@ -1954,26 +1980,32 @@ function legProgressPct(dist){
    difficulty / speed ramp
    ========================================================= */
 function maxSpeedAt(dist){
-  /* v12: 초·중반 가속 커브를 조금 더 세게 (190 → 275 상승분, 시정수 215km) */
-  return Math.min(TOP_KMH, START_KMH + 275 * (1 - Math.exp(-dist / 215)));
+  /* v13: v12보다 한 단계(약 15~17%) 더 조인 가속 곡선
+     — 시작 210km/h · 상승분 330(점근선 540km/h) · 시정수 200km */
+  return Math.min(TOP_KMH, START_KMH + 330 * (1 - Math.exp(-dist / 200)));
 }
 function difficulty(sim){
-  const t = 1 - Math.exp(-sim.dist / 300);            // 0 → 1 (v12: 조금 더 빨리 조여든다)
-  const truckW = lerp(0.20, 0.28, t);
-  const coneW  = lerp(0.12, 0.17, t);
-  const cutW   = lerp(0.13, 0.34, t);
-  const zigW   = lerp(0.05, 0.16, t);
+  const t = 1 - Math.exp(-sim.dist / 250);            // 0 → 1 (v13: v12 300km보다 빨리 조여든다)
+  const truckW = lerp(0.20, 0.30, t);
+  const coneW  = lerp(0.13, 0.19, t);
+  const cutW   = lerp(0.15, 0.38, t);
+  const zigW   = lerp(0.06, 0.18, t);
+  /* 웨이브 종류는 가중치 합으로 정규화한다 — v12처럼 누적 경계가 1을 넘어
+     마지막 종류가 굶는 일이 없고, 모든 웨이브가 의도한 비중으로 나온다. */
+  const others = truckW + coneW + cutW + zigW;
+  const packW = Math.max(0.06, 1 - others);
+  const sumW = packW + others;
   return {
     t: t,
-    blockMax: clamp(Math.round(2 + 4 * t), 2, 6),
+    blockMax: clamp(Math.round(2 + 5 * t), 2, 6),
     coneMax:  clamp(1 + Math.round(2 * t), 1, 3),
-    coneLen:  clamp(3 + Math.round(2 * t), 3, 5),
-    gapScale: clamp(1 - 0.58 * t, 0.40, 1),
+    coneLen:  clamp(3 + Math.round(2.6 * t), 3, 6),
+    gapScale: clamp(1 - 0.66 * t, 0.34, 1),
     truckMax: clamp(1 + Math.round(2 * t), 1, 3),
     blinker:  lerp(0.32, 0.05, t),
-    cutDur:   lerp(0.30, 0.17, t),
-    weights:  { pack: Math.max(0.08, 1 - truckW - coneW - cutW - zigW), truck: truckW, cone: coneW, cut: cutW, zig: zigW },
-    dangerRate: 0.12 + 0.16 * t
+    cutDur:   lerp(0.28, 0.15, t),
+    weights:  { pack: packW / sumW, truck: truckW / sumW, cone: coneW / sumW, cut: cutW / sumW, zig: zigW / sumW },
+    dangerRate: 0.13 + 0.19 * t
   };
 }
 
@@ -2149,16 +2181,93 @@ function applyItemEffect(sim, typeId, ev){
     sim.doubleT = Math.max(sim.doubleT || 0, dur);
   } else if (typeId === 'magnet'){
     sim.magnetT = Math.max(sim.magnetT || 0, dur);
-  } else if (typeId === 'slow'){
-    sim.slowT = Math.max(sim.slowT || 0, dur);
   } else if (typeId === 'siren'){
     sim.sirenT = Math.max(sim.sirenT || 0, dur);
+  } else if (typeId === 'bumper'){
+    sim.bumperT = Math.max(sim.bumperT || 0, dur);
+  } else if (typeId === 'ghost'){
+    sim.ghostT = Math.max(sim.ghostT || 0, dur);
+  } else if (typeId === 'fever'){
+    sim.feverT = Math.max(sim.feverT || 0, dur);
+    sim.coinT = 0;
+  } else if (typeId === 'clear'){
+    waveClear(sim, evs);
+  } else if (typeId === 'heli'){
+    heliJump(sim, evs);
   } else if (typeId === CAMERA.id){
     hitCamera(sim, { id: -1, x: playerX(sim), y: playerY(sim) }, evs);
   } else if (typeId === OIL.id){
     hitOil(sim, { id: -1, x: playerX(sim), y: playerY(sim) }, evs);
   }
   return def;
+}
+
+/* --- v13: 폭발 파티클 (올클리어·범퍼 공용) --- */
+function explosionAt(sim, x, y, n, big){
+  if (!sim.particles) sim.particles = [];
+  const rng = sim.rng;
+  for (let i=0;i<n;i++){
+    const a = rng() * Math.PI * 2, sp = (big ? 150 : 90) + rng() * (big ? 560 : 380);
+    sim.particles.push({
+      x: x, y: y,
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 100,
+      life: 0.32 + rng() * 0.7, max: 1.05,
+      size: (big ? 5 : 3) + rng() * (big ? 14 : 9),
+      color: ['#fff2c0','#ffd166','#ff8c42','#ff5252','#ffffff'][Math.floor(rng() * 5)]
+    });
+  }
+  if (sim.particles.length > 280) sim.particles.splice(0, sim.particles.length - 280);
+  return n;
+}
+
+/* --- v13: 💥 전방 올클리어 — 화면 안 모든 차량·꼬깔을 일제히 폭발시킨다 --- */
+function waveClear(sim, ev){
+  const evs = ev || [];
+  const H = sim.worldH || 1400;
+  let n = 0;
+  const killed = [];
+  for (let i=0;i<sim.obstacles.length;i++){
+    const o = sim.obstacles[i];
+    if (o.dead) continue;
+    if (o.y < -380 || o.y > H + 200) continue;      /* 화면 밖 앞뒤는 건드리지 않는다 */
+    o.dead = true;
+    n++;
+    if (killed.length < 16) killed.push(o);
+  }
+  for (let k=0;k<killed.length;k++){
+    explosionAt(sim, killed[k].x, killed[k].y, 14, true);
+  }
+  sim.clearKills = (sim.clearKills || 0) + n;
+  const gain = n > 0 ? addBonus(sim, CLEAR_BONUS * n) : 0;
+  sim.shake = Math.max(sim.shake || 0, 0.95);
+  sim.flashT = Math.max(sim.flashT || 0, 0.22);
+  sim.hitstop = Math.max(sim.hitstop || 0, 0.06);
+  evs.push({ type:'waveClear', count: n, gain: gain });
+  return n;
+}
+
+/* --- v13: 🚁 헬기 공수 — 무적 상태로 +10km 공중 점프 후 안전 착지 --- */
+function heliJump(sim, ev){
+  const evs = ev || [];
+  const from = sim.dist || 0;
+  sim.dist = from + HELI_KM;
+  sim.heliT = HELI_DUR;
+  sim.heliDur = HELI_DUR;
+  sim.safeT = HELI_DUR + HELI_LAND_INVULN;
+  sim.invuln = Math.max(sim.invuln || 0, HELI_DUR + HELI_LAND_INVULN);
+  const gain = addBonus(sim, HELI_BONUS);  sim.shake = Math.max(sim.shake || 0, 0.55);
+  sim.flashT = Math.max(sim.flashT || 0, 0.18);
+  /* 착지 지점 앞뒤는 비워 둔다 — 내려앉자마자 부딪혀 죽는 일이 없게 */
+  const py = playerY(sim);
+  const clear = 520;
+  sim.obstacles = (sim.obstacles || []).filter(function(o){
+    return o.dead || o.y < py - clear - 260 || o.y > py + clear + 260;
+  });
+  sim.cams = (sim.cams || []).filter(function(c){ return c.y < py - clear || c.y > py + clear; });
+  sim.oils = (sim.oils || []).filter(function(o){ return o.y < py - clear || o.y > py + clear; });
+  sim.heliJumps = (sim.heliJumps || 0) + 1;
+  evs.push({ type:'heliJump', km: HELI_KM, gain: gain, from: from, to: sim.dist });
+  return sim.dist;
 }
 
 function itemPickup(sim, it, ev){
@@ -2336,8 +2445,54 @@ function oilLabel(sim){
   return '🛢️ 미끈덩 ' + sim.oilT.toFixed(1) + 's';
 }
 
+/* --- v13: 🪙 피버 타임 — 코인·별 밭이 쏟아져 점수가 폭발한다 --- */
+function spawnFeverCoins(sim, n){
+  if (!sim.coins) sim.coins = [];
+  const rng = sim.rng;
+  for (let i=0;i<n;i++){
+    const lane = Math.floor(rng() * LANES);
+    sim.coins.push({ x: laneCenter(lane), y: -40 - rng() * 280, lane: lane, t: 0, star: rng() < 0.3 });
+  }
+  while (sim.coins.length > FEVER_COIN_MAX) sim.coins.shift();
+  return n;
+}
+function updateFever(sim, dt, ev){
+  if (!sim.coins) sim.coins = [];
+  if ((sim.feverT || 0) <= 0){
+    if (sim.coins.length) sim.coins.length = 0;   /* 피버가 끝나면 남은 코인은 사라진다 */
+    return 0;
+  }
+  const evs = ev || [];
+  sim.coinT = (sim.coinT || 0) - dt;
+  if (sim.coinT <= 0 && sim.coins.length < FEVER_COIN_MAX){
+    spawnFeverCoins(sim, 2 + Math.floor(sim.rng() * 2));
+    sim.coinT = FEVER_COIN_EVERY;
+  }
+  const px = playerX(sim), py = playerY(sim);
+  let got = 0;
+  for (let i=sim.coins.length-1;i>=0;i--){
+    const c = sim.coins[i];
+    c.t += dt;
+    c.y += sim.speed * SPD_SCALE * dt;
+    if (c.y > (sim.worldH || 1422) + 90){ sim.coins.splice(i,1); continue; }
+    if (Math.abs(c.x - px) < 42 + PLAYER.w / 2 && Math.abs(c.y - py) < 42 + PLAYER.h / 2){
+      const g = addBonus(sim, FEVER_COIN_BONUS);
+      sim.feverCoins = (sim.feverCoins || 0) + 1;
+      got++;
+      evs.push({ type:'coin', x: c.x, y: c.y, gain: g, total: sim.feverCoins });
+      sim.coins.splice(i,1);
+    }
+  }
+  return got;
+}
+/* 피버 남은 시간 표기 (HUD·테스트 공용) */
+function feverLabel(sim){
+  if (!sim || !(sim.feverT > 0)) return '';
+  return '🪙 피버 ' + sim.feverT.toFixed(1) + 's';
+}
+
 /* =========================================================
-   슬로우모션 · 자석 · 사이렌
+   자석 · 사이렌 · 피버 타임
    ========================================================= */
 /* 자석: 주변 '좋은 아이템'만 끌어당긴다. 함정(과속카메라·기름웅덩이)은 절대 끌어당기지 않는다. */
 function magnetPull(sim, dt){
@@ -2439,11 +2594,6 @@ function updateSirenBlink(o, dt){
     o.sirenBlink = false;
     o.blinker = false;
   }
-}
-/* 슬로우모션 남은 시간 표기 (HUD·테스트 공용) */
-function slowLabel(sim){
-  if (!sim || !(sim.slowT > 0)) return '';
-  return '⏳ 슬로우 ' + sim.slowT.toFixed(1) + 's';
 }
 
 /* =========================================================
@@ -2763,7 +2913,10 @@ function newGame(opts){
     items: [], itemTimer: 5.5, itemCount: 0,
     cams: [], camTimer: CAMERA_FIRST, camT: 0, camHits: 0, camBlocks: 0,
     oils: [], oilTimer: OIL_FIRST, oilT: 0, oilPhase: 0, oilHits: 0, oilBlocks: 0,
-    magnetT: 0, slowT: 0, sirenT: 0,
+    magnetT: 0, sirenT: 0,
+    /* v13: 신규 아이템 상태 */
+    bumperT: 0, ghostT: 0, feverT: 0, heliT: 0, heliDur: 0, safeT: 0,
+    coins: [], coinT: 0, feverCoins: 0, bumperSmash: 0, clearKills: 0, heliJumps: 0,
     impacts: [],
     mission: null, missionCd: 9, missionWins: 0, missionTries: 0, missionItemT: 0,
     mcaps: [], mcapTimer: MISSION_CAP_FIRST, mcapCount: 0, mcapBoosts: 0, passes: 0,
@@ -2805,7 +2958,9 @@ function start(sim){
   sim.items = []; sim.itemTimer = 5.5;
   sim.cams = []; sim.camTimer = CAMERA_FIRST; sim.camT = 0; sim.camHits = 0; sim.camBlocks = 0;
   sim.oils = []; sim.oilTimer = OIL_FIRST; sim.oilT = 0; sim.oilPhase = 0; sim.oilHits = 0; sim.oilBlocks = 0;
-  sim.magnetT = 0; sim.slowT = 0; sim.sirenT = 0;
+  sim.magnetT = 0; sim.sirenT = 0;
+  sim.bumperT = 0; sim.ghostT = 0; sim.feverT = 0; sim.heliT = 0; sim.heliDur = 0; sim.safeT = 0;
+  sim.coins = []; sim.coinT = 0; sim.feverCoins = 0; sim.bumperSmash = 0; sim.clearKills = 0; sim.heliJumps = 0;
   sim.impacts = [];
   /* v12 아이템 획득 임팩트 상태 */
   sim.pickFx = []; sim.pulseT = 0; sim.pulseColor = '#ffffff';
@@ -3427,10 +3582,16 @@ function update(sim, dt){
   sim.flashT = Math.max(0, (sim.flashT || 0) - dt);
   sim.camT = Math.max(0, (sim.camT || 0) - dt);
   sim.magnetT = Math.max(0, (sim.magnetT || 0) - dt);
-  sim.slowT = Math.max(0, (sim.slowT || 0) - dt);
   sim.sirenT = Math.max(0, (sim.sirenT || 0) - dt);
+  sim.bumperT = Math.max(0, (sim.bumperT || 0) - dt);
+  sim.ghostT = Math.max(0, (sim.ghostT || 0) - dt);
+  sim.feverT = Math.max(0, (sim.feverT || 0) - dt);
+  sim.heliT = Math.max(0, (sim.heliT || 0) - dt);
+  sim.safeT = Math.max(0, (sim.safeT || 0) - dt);
   sim.oilT = Math.max(0, (sim.oilT || 0) - dt);
-  const slowOn = (sim.slowT || 0) > 0;
+  const ghostOn = (sim.ghostT || 0) > 0;
+  const bumperOn = (sim.bumperT || 0) > 0;
+  const heliOn = (sim.heliT || 0) > 0;
   updateImpacts(sim, dt);
   updateItemFx(sim, dt);
   if (sim.state === 'playing') sim.shake = Math.max(0, (sim.shake || 0) - dt * 2.2);
@@ -3475,15 +3636,19 @@ function update(sim, dt){
   const py = playerY(sim);
 
   /* --- blocking (길막) --- */
+  /* v13: 유령·무적 범퍼·헬기 공수 중에는 앞차가 길을 막지 않는다 */
+  const passThrough = ghostOn || bumperOn || heliOn;
   let blocker = null;
-  for (let i=0;i<sim.obstacles.length;i++){
-    const o = sim.obstacles[i];
-    if (o.dead || o.type === 'cone') continue;
-    const dy = py - o.y;
-    if (dy < 30 || dy > 640) continue;
-    const latGap = Math.abs(o.x - px) - (o.w + PLAYER.w) / 2 * 0.55;
-    if (latGap > 0) continue;
-    if (!blocker || o.y > blocker.y) blocker = o;
+  if (!passThrough){
+    for (let i=0;i<sim.obstacles.length;i++){
+      const o = sim.obstacles[i];
+      if (o.dead || o.type === 'cone') continue;
+      const dy = py - o.y;
+      if (dy < 30 || dy > 640) continue;
+      const latGap = Math.abs(o.x - px) - (o.w + PLAYER.w) / 2 * 0.55;
+      if (latGap > 0) continue;
+      if (!blocker || o.y > blocker.y) blocker = o;
+    }
   }
   sim.blocked = !!blocker;
   let goal = sim.maxSpeed;
@@ -3604,9 +3769,7 @@ function update(sim, dt){
   const stuck = !!blocker && (sim.speed < sim.maxSpeed * 0.86 || blocker.speed < sim.maxSpeed * 0.55);
   /* 단속 중 감속은 억울하게 위험 게이지를 채우지 않는다 (80km/h 제한은 벌칙이 아니라 시간 제한) */
   const crawling = (sim.camT || 0) <= 0 && sim.speed < sim.maxSpeed * 0.55;
-  /* 슬로우모션 중에는 위험 게이지가 차오르지 않고 오히려 줄어든다 (틈새 칼치기 지원) */
-  if (slowOn) sim.danger = Math.max(0, sim.danger - dt * 1.15);
-  else if (stuck || crawling) sim.danger = Math.min(1, sim.danger + dt * d.dangerRate * spec.danger);
+  if (stuck || crawling) sim.danger = Math.min(1, sim.danger + dt * d.dangerRate * spec.danger);
   else sim.danger = Math.max(0, sim.danger - dt * 0.70);
   if (sim.danger > sim.dangerMax) sim.dangerMax = sim.danger;
   if (blocker && sim.blockT > 2.0 && sim.combo > 0){
@@ -3627,7 +3790,7 @@ function update(sim, dt){
   }
 
   /* --- obstacles --- */
-  const relK = slowOn ? SLOW_REL : 1;      /* 슬로우모션: 주변 차량의 상대 속도 0.55배 */
+  const relK = 1;                           /* v13: 감속 아이템 폐지 — 주변 차량도 항상 정상 속도 */
   /* v12: 가까워지는 뒤차는 앞차 속도로 따라간다 (추돌·겹침 방지) */
   computeFollowLimits(sim);
   for (let i=0;i<sim.obstacles.length;i++){
@@ -3700,9 +3863,9 @@ function update(sim, dt){
       if (!spawnMissionItem(sim)) sim.missionItemT = 0.4;   /* 자리가 없으면 잠시 후 재시도 */
     }
   }
-  if (sim.itemTimer <= 0 && sim.items.length < 2){
+  if (sim.itemTimer <= 0 && sim.items.length < ITEM_MAX_ON_ROAD){
     spawnItem(sim);
-    sim.itemTimer = 6.5 + sim.rng() * 5;
+    sim.itemTimer = ITEM_SPAWN_MIN + sim.rng() * ITEM_SPAWN_RND;
   }
   /* --- 미션 캡슐 (🎯) : 도로에 떠 있는 미션 티켓 --- */
   sim.mcapTimer = ((sim.mcapTimer === undefined) ? MISSION_CAP_FIRST : sim.mcapTimer) - dt;
@@ -3736,6 +3899,9 @@ function update(sim, dt){
     }
   }
 
+  /* --- v13: 🪙 피버 타임 — 코인·별이 쏟아지며 점수가 폭발한다 --- */
+  updateFever(sim, dt, ev);
+
   /* --- 과속카메라 함정 (피해야 하는 나쁜 아이템) --- */
   sim.camTimer = ((sim.camTimer === undefined) ? CAMERA_FIRST : sim.camTimer) - dt;
   if (sim.camTimer <= 0 && sim.dist > 0.4){
@@ -3747,7 +3913,7 @@ function update(sim, dt){
     cam.t += dt;
     cam.y += sim.speed * SPD_SCALE * dt;
     if (cam.y > sim.worldH + 160){ sim.cams.splice(i,1); continue; }
-    if (Math.abs(cam.x - px) < CAMERA_R + PLAYER.w / 2 && Math.abs(cam.y - py) < CAMERA_R + PLAYER.h / 2){
+    if (!ghostOn && !heliOn && Math.abs(cam.x - px) < CAMERA_R + PLAYER.w / 2 && Math.abs(cam.y - py) < CAMERA_R + PLAYER.h / 2){
       hitCamera(sim, cam, ev);
       sim.cams.splice(i,1);
     }
@@ -3765,7 +3931,7 @@ function update(sim, dt){
     oil.t += dt;
     oil.y += sim.speed * SPD_SCALE * dt * relK;
     if (oil.y > sim.worldH + 160){ sim.oils.splice(i,1); continue; }
-    if (Math.abs(oil.x - px) < OIL_R + PLAYER.w / 2 && Math.abs(oil.y - py) < OIL_R + PLAYER.h / 2){
+    if (!ghostOn && !heliOn && Math.abs(oil.x - px) < OIL_R + PLAYER.w / 2 && Math.abs(oil.y - py) < OIL_R + PLAYER.h / 2){
       hitOil(sim, oil, ev);
       sim.oils.splice(i,1);
     }
@@ -3789,8 +3955,25 @@ function update(sim, dt){
     const gap = Math.max(gx, gy);
     if (gap < o.minGap) o.minGap = gap;
 
-    if (!sim.god && dx < (o.w + PLAYER.w) / 2 * HIT * spec.hitbox && dy < (o.h + PLAYER.h) / 2 * HIT * spec.hitbox){
-      /* 어떤 차량도 꼬깔콘을 무시하거나 분쇄하지 못한다 (12종 공통 규칙) */
+    const contact = dx < (o.w + PLAYER.w) / 2 * HIT * spec.hitbox && dy < (o.h + PLAYER.h) / 2 * HIT * spec.hitbox;
+    /* 👻 유령 모드: 차체를 그대로 통과한다 (사고 없음) */
+    if (contact && ghostOn) continue;
+    if (!sim.god && contact){
+      /* 🚁 헬기 공수·착지 보호: 공중·착지 직후에는 어떤 충돌도 통과 */
+      if (heliOn || (sim.safeT || 0) > 0) continue;
+      /* 어떤 차량도 꼬깔콘을 무시하거나 분쇄하지 못한다 (단, 무적 범퍼는 예외) */
+      /* 🛡️ 무적 범퍼: 앞차·꼬깔을 시원하게 튕겨내고 보너스 점수 */
+      if (bumperOn){
+        o.dead = true;
+        const isCone = o.type === 'cone';
+        const g = addBonus(sim, BUMPER_SMASH_BONUS);
+        sim.bumperSmash = (sim.bumperSmash || 0) + 1;
+        sim.shake = Math.max(sim.shake || 0, isCone ? 0.30 : 0.52);
+        sim.flashT = Math.max(sim.flashT || 0, 0.10);
+        explosionAt(sim, o.x, o.y, isCone ? 8 : 12, false);
+        ev.push({ type:'bumperSmash', x: o.x, y: o.y, gain: g, cone: isCone, obs: o });
+        continue;
+      }
       /* 니트로: 무적 돌진 — 앞차를 튕겨냄 */
       if (sim.nitro > 0){
         o.dead = true;
@@ -4321,20 +4504,50 @@ function drawCar(ctx, o){
   ctx.fill();
 
   if (o.type === 'cone'){
+    /* v13: 밤에도 멀리서 보이게 — 경관등 하우징 · 반사 띠 · 바닥 빛무리 강화 */
+    const night = SCENE.night;
+    const ph = (o.id || 0) * 1.7;
+    const blink = 0.5 + 0.5 * Math.sin(SCENE.t * 9.0 + ph);
+    /* 바닥에 번지는 주황 빛 (밤에 더 넓고 진하게) */
+    ctx.fillStyle = 'rgba(255,150,40,' + (0.08 + 0.20 * night).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y + h * 0.1, 16 + 18 * night, 0, 7); ctx.fill();
     ctx.fillStyle = '#2b2b30';
     rr(ctx, x - w/2, y + h/2 - 5, w, 6, 2); ctx.fill();
+    /* 몸통 — 위로 갈수록 살짝 밝은 주황 */
     ctx.fillStyle = '#ff7a1a';
     ctx.beginPath();
     ctx.moveTo(x, y - h/2);
     ctx.lineTo(x + w/2, y + h/2 - 4);
     ctx.lineTo(x - w/2, y + h/2 - 4);
     ctx.closePath(); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.fillStyle = 'rgba(255,190,120,' + (0.30 + 0.20 * night).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.moveTo(x, y - h/2);
+    ctx.lineTo(x + w*0.16, y - h*0.18);
+    ctx.lineTo(x - w*0.16, y - h*0.18);
+    ctx.closePath(); ctx.fill();
+    /* 반사 띠 2줄 (불빛을 되돌려 밤에도 테두리가 보인다) */
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.90 + 0.1 * night).toFixed(3) + ')';
     ctx.beginPath();
     ctx.moveTo(x, y - h*0.12);
     ctx.lineTo(x + w*0.26, y + h*0.16);
     ctx.lineTo(x - w*0.26, y + h*0.16);
     ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.62 + 0.24 * night).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.moveTo(x, y + h*0.22);
+    ctx.lineTo(x + w*0.18, y + h*0.40);
+    ctx.lineTo(x - w*0.18, y + h*0.40);
+    ctx.closePath(); ctx.fill();
+    /* 상단 경관등 하우징 */
+    ctx.fillStyle = '#1b1b20';
+    rr(ctx, x - 7, y - h/2 - 8, 14, 10, 3); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,190,120,0.55)';
+    ctx.lineWidth = 1.2;
+    rr(ctx, x - 7, y - h/2 - 8, 14, 10, 3); ctx.stroke();
+    /* 랜프 (밝기는 전용 등화 패스에서 더해진다) */
+    ctx.fillStyle = blink > 0.5 ? '#ffd27a' : '#ff3a20';
+    ctx.beginPath(); ctx.arc(x, y - h/2 - 3, 4.2, 0, 7); ctx.fill();
     return;
   }
 
@@ -4469,17 +4682,7 @@ function drawCar(ctx, o){
 /* 차량 등화 (야간 가시성) */
 function drawCarLights(ctx, o, strength){
   const x = o.x, y = o.y, w = o.w, h = o.h;
-  if (o.type === 'cone'){
-    if (strength < 0.6) return;
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.fillStyle = 'rgba(255,150,60,' + (0.14 * strength) + ')';
-    ctx.beginPath(); ctx.arc(x, y, 18, 0, 7); ctx.fill();
-    ctx.fillStyle = 'rgba(255,240,200,' + (0.5 * strength) + ')';
-    ctx.beginPath(); ctx.arc(x, y - h*0.05, 4, 0, 7); ctx.fill();
-    ctx.restore();
-    return;
-  }
+  if (o.type === 'cone') return;          /* 경관등은 drawConeLights 가 전담 */
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   const ry = y + h/2 - 6;
@@ -4505,6 +4708,54 @@ function drawCarLights(ctx, o, strength){
   ctx.beginPath(); ctx.arc(0, 0, gr, 0, 7); ctx.fill();
   ctx.restore();
   ctx.restore();
+}
+
+/* ---------- v13: 라바콘 경관등 — 밤에도 멀리서 번쩍이는 주황/적색 LED ----------
+   검은 밤 안개(drawVeil) 뒤에 그려야 빛이 묻히지 않는다. */
+function drawConeLights(ctx, sim){
+  const list = sim.obstacles || [];
+  if (!list.length) return;
+  const night = clamp((sim.theme && sim.theme.night) || 0, 0, 1);
+  const t = SCENE.t || 0;
+  const H = sim.worldH || 1400;
+  const k = 0.52 + 0.48 * night;              /* 낮에도 보이게, 밤에는 최대로 */
+  for (let i=0;i<list.length;i++){
+    const o = list[i];
+    if (o.dead || o.type !== 'cone') continue;
+    if (o.y < -90 || o.y > H + 90) continue;
+    const ph = (o.id || 0) * 1.7;
+    const blink = 0.5 + 0.5 * Math.sin(t * 9.0 + ph);
+    const on = blink * blink;                 /* 밝은 구간을 짧게 — 또렷하게 깜박임 */
+    const x = o.x, y = o.y - o.h / 2 - 3;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    /* 넓게 번지는 후광 */
+    ctx.fillStyle = 'rgba(255,128,26,' + (0.10 * k + 0.20 * k * on).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y, 20 + 12 * on, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,176,60,' + (0.10 * k).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y, 34, 0, 7); ctx.fill();
+    /* 위로 솟는 빛기둥 — 멀리서도 쫓아온다 */
+    ctx.fillStyle = 'rgba(255,150,50,' + (0.05 * k + 0.13 * k * on).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.moveTo(x - 5, y);
+    ctx.lineTo(x + 5, y);
+    ctx.lineTo(x + 15, y - 120 - 40 * on);
+    ctx.lineTo(x - 15, y - 120 - 40 * on);
+    ctx.closePath(); ctx.fill();
+    /* LED 코알 — on이면 주황-흰색, off면 적색 */
+    ctx.fillStyle = on > 0.45
+      ? 'rgba(255,236,180,' + (0.85 * k).toFixed(3) + ')'
+      : 'rgba(255,64,36,' + (0.62 * k).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y, 5.2, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.5 * k * on).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y, 2.4, 0, 7); ctx.fill();
+    /* 바닥에 굴러떨어진 주황 빛 */
+    if (night > 0.25){
+      ctx.fillStyle = 'rgba(255,140,40,' + (0.06 + 0.10 * on).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(x, o.y + 16, 26, 0, 7); ctx.fill();
+    }
+    ctx.restore();
+  }
 }
 
 function drawVeil(ctx, sim){
@@ -5264,8 +5515,18 @@ function drawExhaust(ctx, w, h, t, boost, pipes){
 }
 
 /* ---------- 내 차 ---------- */
+/* v13: 헬기 공수 중 차체가 떠오르는 높이(px) — 양 끝은 0, 중간이 가장 높다 */
+function heliLift(sim){
+  if (!(sim.heliT > 0)) return 0;
+  const dur = sim.heliDur || HELI_DUR;
+  const p = clamp(1 - sim.heliT / dur, 0, 1);
+  return Math.sin(Math.PI * p) * 150;
+}
 function drawPlayer(ctx, sim, now){
-  const x = playerX(sim), y = playerY(sim);
+  const x = playerX(sim), yBase = playerY(sim);
+  const lift = heliLift(sim);
+  const y = yBase - lift;
+  const ghostOn = (sim.ghostT || 0) > 0;
   const spec = sim.spec || carSpec(sim.car);
   const tilt = clamp(-(sim.laneVel || 0) * 0.16 * (1 + 0.3 * (spec.laneHeavy || 0)), -0.4, 0.4);
   const car = carById(sim.car);
@@ -5307,6 +5568,10 @@ function drawPlayer(ctx, sim, now){
   ctx.translate(x, y);
   ctx.rotate(tilt);
   if (sim.invuln > 0 && Math.floor(now * 16) % 2 === 0) ctx.globalAlpha = 0.55;
+  /* 👻 유령 모드: 차체가 반투명 유령 이펙트로 변한다 */
+  if (ghostOn){
+    ctx.globalAlpha = Math.min(ctx.globalAlpha === 1 ? 1 : ctx.globalAlpha, GHOST_ALPHA_CAR + 0.07 * Math.sin(now * 8.4));
+  }
   const w = PLAYER.w, h = PLAYER.h;
   /* v12: 아이템을 먹은 순간 내 차가 ‘통’ 튀는 스쿼시/스트레치 */
   if ((sim.pickBounce || 0) > 0){
@@ -5350,6 +5615,82 @@ function drawPlayer(ctx, sim, now){
 
   /* 차종 장식: 경찰차 사이렌 반짝임은 drawVehicle 안에서 */
   ctx.restore();
+
+  /* 👻 유령 모드: 차체 둘레를 떠도는 보랏빛 잔상 */
+  if (ghostOn){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = 'rgba(196,182,255,0.55)';
+    ctx.lineWidth = 2.4;
+    rr(ctx, x - w/2 - 3, y - h/2 - 3, w + 6, h + 6, w * 0.26);
+    ctx.stroke();
+    for (let k = 1; k <= 3; k++){
+      ctx.globalAlpha = 0.22 - k * 0.05;
+      ctx.fillStyle = '#b8a8ff';
+      rr(ctx, x - w/2 + 4, y + h/2 + k * 26, w - 8, 8 - k, 4);
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  /* 🚁 헬기 공수: 로프에 매달려 공중으로 +10km */
+  if (lift > 1){
+    /* 땅에 남는 차 그림자 — 점점 작아진다 */
+    ctx.save();
+    ctx.globalAlpha = clamp(1 - lift / 190, 0.08, 0.4);
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.ellipse ? ctx.ellipse(x, yBase + h/2 - 6, w * 0.46, 9, 0, 0, 7) : ctx.arc(x, yBase + h/2 - 6, w * 0.40, 0, 7);
+    ctx.fill();
+    ctx.restore();
+    const hy = y - h/2 - 118;
+    ctx.save();
+    /* 로프 */
+    ctx.strokeStyle = 'rgba(230,240,255,0.85)';
+    ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(x, hy + 24); ctx.lineTo(x, y - h/2 + 2); ctx.stroke();
+    /* 동체 */
+    ctx.fillStyle = '#243447';
+    rr(ctx, x - 44, hy - 16, 88, 44, 16); ctx.fill();
+    ctx.fillStyle = '#3d5b7a';
+    rr(ctx, x - 34, hy - 8, 52, 26, 10); ctx.fill();
+    /* 꼬리 */
+    ctx.fillStyle = '#243447';
+    rr(ctx, x + 38, hy - 4, 44, 9, 4); ctx.fill();
+    rr(ctx, x + 74, hy - 18, 8, 32, 3); ctx.fill();
+    /* 조종실 유리 */
+    ctx.fillStyle = 'rgba(150,220,255,0.9)';
+    rr(ctx, x - 40, hy - 10, 22, 20, 7); ctx.fill();
+    /* 회전하는 로터 (잔상 2장) */
+    const spin = now * 26;
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = '#d7e7ff';
+    ctx.lineWidth = 3;
+    for (let k = 0; k < 2; k++){
+      const a = spin + k * Math.PI / 2;
+      ctx.beginPath();
+      ctx.moveTo(x - Math.cos(a) * 62, hy - 22 - Math.sin(a) * 8);
+      ctx.lineTo(x + Math.cos(a) * 62, hy - 22 + Math.sin(a) * 8);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#8fd3ff';
+    ctx.beginPath(); ctx.arc(x, hy - 22, 4.5, 0, 7); ctx.fill();
+    /* 하강 기류 이펙트 */
+    ctx.globalAlpha = 0.30;
+    ctx.strokeStyle = '#bfe6ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let k = 0; k < 5; k++){
+      const yy = hy + 46 + ((now * 900 + k * 53) % 120);
+      ctx.moveTo(x - 40 + k * 20, yy);
+      ctx.lineTo(x - 40 + k * 20 + 6, yy + 22);
+    }
+    ctx.stroke();
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
 
   /* 뒷바퀴 연기 (고속) */
   if (sim.state === 'playing' && sim.speed > 150){
@@ -5835,7 +6176,8 @@ function drawStreaks(ctx, sim){
 }
 
 const ITEM_GLOW = { shield:'111,201,255', nitro:'255,140,66', double:'255,212,121',
-  magnet:'255,123,213', slow:'143,211,255', siren:'255,212,121', mystery:'201,167,255' };
+  magnet:'255,123,213', siren:'255,212,121', mystery:'201,167,255',
+  bumper:'255,163,61', ghost:'184,168,255', clear:'255,122,77', heli:'111,214,255', fever:'255,207,61' };
 
 /* ---------- 도로 위 아이템 (반짝이는 아이콘) ---------- */
 function drawItems(ctx, sim){
@@ -5887,6 +6229,88 @@ function drawItems(ctx, sim){
     }
     ctx.restore();
   }
+}
+
+/* ---------- v13: 🪙 피버 타임 코인/별 — 도로에 쏟아진다 ---------- */
+function drawCoins(ctx, sim){
+  const list = sim.coins || [];
+  if (!list.length) return;
+  for (let i=0;i<list.length;i++){
+    const c = list[i];
+    const spin = Math.cos(c.t * 6.2 + i * 0.7);
+    const sx = 0.45 + 0.55 * Math.abs(spin);
+    /* 금빛 글로우 (가벼운 원 1개) */
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = 'rgba(255,207,61,' + (0.16 + 0.12 * Math.abs(spin)).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(c.x, c.y, 28, 0, 7); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.scale(sx, 1);
+    if (c.star){
+      /* 별 — 발작하는 금빛 5각별 */
+      ctx.fillStyle = '#fff0a8';
+      ctx.beginPath();
+      for (let k=0;k<10;k++){
+        const a = -Math.PI / 2 + k * Math.PI / 5;
+        const r = (k % 2 === 0) ? 19 : 8.4;
+        const px = Math.cos(a) * r, py = Math.sin(a) * r;
+        if (!k) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,180,40,0.9)';
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+    } else {
+      /* 동전 — 테두리 굵은 금화 */
+      ctx.fillStyle = '#ffcf3d';
+      ctx.beginPath(); ctx.arc(0, 0, 17, 0, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(168,107,0,0.9)';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0, 0, 15, 0, 7); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.62)';
+      ctx.beginPath(); ctx.arc(-5, -6, 5.4, 0, 7); ctx.fill();
+      ctx.fillStyle = 'rgba(255,246,200,0.95)';
+      ctx.fillRect(-8, -2, 16, 4);
+    }
+    ctx.restore();
+  }
+}
+
+/* ---------- v13: 🪙 피버 타임 — 화면 전체 금빛 피버 오버레이 ---------- */
+function drawFeverFx(ctx, sim){
+  const t = sim.feverT || 0;
+  if (t <= 0) return;
+  const W = WORLD_W, H = sim.worldH || 1400;
+  const a = Math.min(1, t / 0.8) * 0.85;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalAlpha = a * 0.52;
+  const g = cachedGrad('fever|edge', function(){
+    const gg = ctx.createRadialGradient(W / 2, H * 0.5, Math.min(W, H) * 0.26, W / 2, H * 0.5, Math.max(W, H) * 0.62);
+    gg.addColorStop(0, 'rgba(255,207,61,0)');
+    gg.addColorStop(0.66, 'rgba(255,196,40,0.20)');
+    gg.addColorStop(1, 'rgba(255,168,0,0.72)');
+    return gg;
+  });
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = a * 0.9;
+  ctx.strokeStyle = 'rgba(255,226,120,0.85)';
+  ctx.lineWidth = 8;
+  ctx.strokeRect(4, 4, W - 8, H - 8);
+  /* 위에서 쏟아지는 금빛 불티 */
+  ctx.beginPath();
+  for (let i=0;i<26;i++){
+    const x = ((i * 137.5 + (sim.scroll || 0) * 0.8) % (W + 60)) - 30;
+    const y = ((i * 211.7 + (sim.time || 0) * 420) % (H + 90)) - 45;
+    ctx.rect(x, y, 3.2, 16);
+  }
+  ctx.fillStyle = 'rgba(255,240,170,0.55)';
+  ctx.fill();
+  ctx.restore();
+  ctx.globalAlpha = 1;
 }
 
 /* ---------- 미션 캡슐 (🎯) — 금색 육각 티켓 · 점선 이중 테 ---------- */
@@ -6030,7 +6454,7 @@ function drawCameras(ctx, sim){
   }
 }
 
-/* ---------- 내 차 주변 아이템 효과 아우라 (자석·슬로우·사이렌) ---------- */
+/* ---------- 내 차 주변 아이템 효과 아우라 (자석·사이렌·범퍼·유령·피버) ---------- */
 function drawItemAuras(ctx, sim){
   if (sim.state !== 'playing') return;
   const x = playerX(sim), y = playerY(sim);
@@ -6046,11 +6470,46 @@ function drawItemAuras(ctx, sim){
     if (ctx.setLineDash) ctx.setLineDash([]);
     ctx.restore();
   }
-  if (sim.slowT > 0){
+  /* v13: 🛡️ 무적 범퍼 — 주황 이중 철퇴 링이 돌아간다 */
+  if ((sim.bumperT || 0) > 0){
     ctx.save();
-    ctx.strokeStyle = 'rgba(143,211,255,' + (0.22 + 0.10 * Math.sin(t * 5)).toFixed(3) + ')';
-    ctx.lineWidth = 8;
-    ctx.beginPath(); ctx.arc(x, y, 120, 0, 7); ctx.stroke();
+    const pulse = 0.55 + 0.45 * Math.abs(Math.sin(t * 6.4));
+    ctx.strokeStyle = 'rgba(255,170,60,' + (0.34 + 0.30 * pulse).toFixed(3) + ')';
+    ctx.lineWidth = 9;
+    ctx.beginPath(); ctx.arc(x, y, 92 + pulse * 8, 0, 7); ctx.stroke();
+    ctx.lineWidth = 4;
+    if (ctx.setLineDash) ctx.setLineDash([14, 10]);
+    ctx.beginPath(); ctx.arc(x, y, 112, -t * 2.6, -t * 2.6 + 5.6); ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    /* 앞쪽 우람한 범퍼 — 앞차를 밀어내는 느낌 */
+    ctx.fillStyle = 'rgba(255,190,90,' + (0.34 + 0.26 * pulse).toFixed(3) + ')';
+    rr(ctx, x - PLAYER.w * 0.72, y - PLAYER.h / 2 - 12, PLAYER.w * 1.44, 14, 7);
+    ctx.fill();
+    ctx.restore();
+  }
+  /* v13: 👻 유령 모드 — 보랏빛 잔상 고리 */
+  if ((sim.ghostT || 0) > 0){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = 'rgba(184,168,255,' + (0.26 + 0.14 * Math.sin(t * 5.4)).toFixed(3) + ')';
+    ctx.lineWidth = 6;
+    for (let k = 0; k < 3; k++){
+      ctx.globalAlpha = 0.30 - k * 0.08;
+      ctx.beginPath(); ctx.arc(x, y + k * 26, 62 - k * 6, 0, 7); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  /* v13: 🪙 피버 타임 — 금빛 소용돌이 */
+  if ((sim.feverT || 0) > 0){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = 'rgba(255,207,61,' + (0.30 + 0.18 * Math.sin(t * 9)).toFixed(3) + ')';
+    ctx.lineWidth = 5;
+    for (let k = 0; k < 2; k++){
+      ctx.beginPath();
+      ctx.arc(x, y, 84 + k * 34, t * (2.4 + k) % 6.28, t * (2.4 + k) % 6.28 + 3.4);
+      ctx.stroke();
+    }
     ctx.restore();
   }
   if (sim.sirenT > 0){
@@ -6380,7 +6839,12 @@ function drawTitleTraffic(ctx, sim, now){
 }
 
 const SORT_SCRATCH = [];
+/* 이번 프레임의 시간·밤 정도 — drawCar 처럼 sim을 받지 않는 함수가
+   경관등 점멸·야간 가시성 계산에 쓴다. */
+const SCENE = { t: 0, night: 0 };
 function drawSim(ctx, sim, now){
+  SCENE.t = now || 0;
+  SCENE.night = clamp(sim.theme && sim.theme.night || 0, 0, 1);
   ctx.save();
   if (sim.shake > 0.01){
     const s = sim.shake * 16;
@@ -6412,6 +6876,7 @@ function drawSim(ctx, sim, now){
     drawCameras(ctx, sim);
     drawMissionCaps(ctx, sim);
     drawItems(ctx, sim);
+    drawCoins(ctx, sim);
   }
 
   const list = SORT_SCRATCH;
@@ -6421,6 +6886,9 @@ function drawSim(ctx, sim, now){
   for (let i=0;i<list.length;i++) drawCar(ctx, list[i]);
 
   drawVeil(ctx, sim);
+
+  /* v13: 밤 안개 뒤에 그려야 라바콘 경관등이 묻히지 않는다 */
+  drawConeLights(ctx, sim);
 
   const lightStrength = sim.theme.night > 0 ? 1 : 0.42;
   for (let i=0;i<list.length;i++) drawCarLights(ctx, list[i], lightStrength);
@@ -6439,6 +6907,7 @@ function drawSim(ctx, sim, now){
   drawWeather(ctx, sim);
   drawSpeedFlash(ctx, sim);
   drawEdgePulse(ctx, sim);
+  drawFeverFx(ctx, sim);
   drawWarnings(ctx, sim);
   drawCrashOverlay(ctx, sim);
   ctx.restore();
@@ -6876,6 +7345,39 @@ const Sfx = (function(){
       tone(2349, 0.20, 'sine', 0.06, null, 0.22);
       noise(0.20, 0.05, 6000, 2000, 'bandpass');
     },
+    /* v13: 신규 아이템 전용 효과음 */
+    bumper: function(){
+      tone(120, 0.22, 'square', 0.11, 62, 0);
+      noise(0.30, 0.16, 1800, 260, 'lowpass');
+      tone(520, 0.12, 'triangle', 0.07, 980, 0.04);
+      tone(780, 0.10, 'triangle', 0.05, 1320, 0.10);
+    },
+    ghost: function(){
+      tone(920, 0.42, 'sine', 0.055, 300, 0);
+      tone(1380, 0.34, 'sine', 0.035, 520, 0.06);
+      noise(0.46, 0.05, 4800, 700, 'bandpass');
+    },
+    clearWave: function(){
+      noise(0.72, 0.30, 2600, 120, 'lowpass');
+      tone(92, 0.55, 'sawtooth', 0.13, 38, 0);
+      tone(1700, 0.28, 'square', 0.05, 220, 0.04);
+      noise(0.22, 0.14, 900, 200, 'bandpass');
+    },
+    heli: function(){
+      noise(0.95, 0.12, 320, 2100, 'bandpass');
+      tone(72, 0.70, 'sawtooth', 0.085, 118, 0);
+      for (let i=0;i<6;i++) noise(0.07, 0.05, 1600, 900, 'bandpass');
+      tone(880, 0.18, 'sine', 0.05, 1320, 0.55);
+      tone(1320, 0.22, 'triangle', 0.045, null, 0.70);
+    },
+    fever: function(){
+      tone(1046, 0.10, 'square', 0.065, null, 0);
+      tone(1318, 0.10, 'square', 0.06, null, 0.09);
+      tone(1568, 0.10, 'square', 0.055, null, 0.18);
+      tone(2093, 0.26, 'triangle', 0.05, null, 0.27);
+      tone(1046, 0.20, 'triangle', 0.045, null, 0.40);
+    },
+    coin: function(){ tone(1568, 0.05, 'triangle', 0.03, 2093, 0); },
     mission: function(){
       tone(587, 0.11, 'square', 0.06, null, 0);
       tone(784, 0.11, 'square', 0.06, null, 0.1);
@@ -7247,8 +7749,16 @@ const API = {
   OIL: OIL, OIL_R: OIL_R, OIL_FIRST: OIL_FIRST, OIL_CD_MIN: OIL_CD_MIN, OIL_CD_MAX: OIL_CD_MAX,
   spawnOil: spawnOil, hitOil: hitOil, oilWobbleAmp: oilWobbleAmp, oilLabel: oilLabel,
   MAGNET_PULL: MAGNET_PULL, MAGNET_RANGE_Y: MAGNET_RANGE_Y, MAGNET_RANGE_X: MAGNET_RANGE_X,
-  SLOW_REL: SLOW_REL, SIREN_RANGE_Y: SIREN_RANGE_Y, SIREN_DODGE_DUR: SIREN_DODGE_DUR,
-  magnetPull: magnetPull, sirenDodge: sirenDodge, slowLabel: slowLabel,
+  SIREN_RANGE_Y: SIREN_RANGE_Y, SIREN_DODGE_DUR: SIREN_DODGE_DUR,
+  magnetPull: magnetPull, sirenDodge: sirenDodge,
+  /* v13: 신규 5종 아이템 */
+  BUMPER_SMASH_BONUS: BUMPER_SMASH_BONUS, GHOST_ALPHA_CAR: GHOST_ALPHA_CAR, CLEAR_BONUS: CLEAR_BONUS,
+  HELI_KM: HELI_KM, HELI_DUR: HELI_DUR, HELI_LAND_INVULN: HELI_LAND_INVULN, HELI_BONUS: HELI_BONUS,
+  FEVER_COIN_BONUS: FEVER_COIN_BONUS, FEVER_COIN_EVERY: FEVER_COIN_EVERY, FEVER_COIN_MAX: FEVER_COIN_MAX,
+  ITEM_SPAWN_MIN: ITEM_SPAWN_MIN, ITEM_SPAWN_RND: ITEM_SPAWN_RND, ITEM_MAX_ON_ROAD: ITEM_MAX_ON_ROAD,
+  waveClear: waveClear, heliJump: heliJump, updateFever: updateFever, spawnFeverCoins: spawnFeverCoins,
+  feverLabel: feverLabel, explosionAt: explosionAt, drawCoins: drawCoins, drawConeLights: drawConeLights,
+  drawFeverFx: drawFeverFx, heliLift: heliLift,
   drawOils: drawOils, drawItemAuras: drawItemAuras,
   RANK_TABS: RANK_TABS, RANK_TAB_IDS: RANK_TAB_IDS, RANK_NOTE: RANK_NOTE, COMBO_POINT: COMBO_POINT,
   combinedScore: combinedScore, rankTabId: rankTabId, rankValue: rankValue, sortRowsByTab: sortRowsByTab,
@@ -7296,7 +7806,7 @@ const API = {
   normalizeServerEntry: normalizeServerEntry, shouldPostEntry: shouldPostEntry,
   fetchWithTimeout: fetchWithTimeout, createServerRank: createServerRank,
   loadPostMark: loadPostMark, savePostMark: savePostMark,
-  drawSim: drawSim, drawVehicle: drawVehicle, drawGhosts: drawGhosts, drawRivalMarkers: drawRivalMarkers,
+  drawSim: drawSim, drawVehicle: drawVehicle, drawCar: drawCar, drawGhosts: drawGhosts, drawRivalMarkers: drawRivalMarkers,
   nameTag: nameTag, Haptics: Haptics, markerSignRect: markerSignRect, markerSignSide: markerSignSide,
   laneCenter: laneCenter, playerX: playerX, playerY: playerY,
   newGame: newGame, start: start, update: update, steer: steer, setLane: setLane,
@@ -7888,13 +8398,15 @@ if (typeof document !== 'undefined'){
       if (camZoneBar) camZoneBar.style.width = clamp(sim.camT / CAMERA.dur * 100, 0, 100).toFixed(0) + '%';
     }
 
-    /* HUD에 지금 걸려 있는 아이템 효과를 한 줄로 (자석·슬로우·사이렌·기름) */
+    /* HUD에 지금 걸려 있는 아이템 효과를 한 줄로 (자석·사이렌·범퍼·유령·피버·점수2배·기름) */
     function updateFxLine(){
       if (!fxLineEl) return;
       const bits = [];
       if ((sim.magnetT || 0) > 0) bits.push('🧲 ' + sim.magnetT.toFixed(1) + 's');
-      if ((sim.slowT || 0) > 0) bits.push('⏳ ' + sim.slowT.toFixed(1) + 's');
       if ((sim.sirenT || 0) > 0) bits.push('📣 ' + sim.sirenT.toFixed(1) + 's');
+      if ((sim.bumperT || 0) > 0) bits.push('🛡️ 범퍼 ' + sim.bumperT.toFixed(1) + 's');
+      if ((sim.ghostT || 0) > 0) bits.push('👻 유령 ' + sim.ghostT.toFixed(1) + 's');
+      if ((sim.feverT || 0) > 0) bits.push('🪙 피버 ' + sim.feverT.toFixed(1) + 's');
       if ((sim.doubleT || 0) > 0) bits.push('✨ ' + sim.doubleT.toFixed(1) + 's');
       if ((sim.nitro || 0) > 0) bits.push('🔥 ' + sim.nitro.toFixed(1) + 's');
       if ((sim.oilT || 0) > 0) bits.push('🛢️ 미끈덩 ' + sim.oilT.toFixed(1) + 's');
@@ -8120,14 +8632,37 @@ if (typeof document !== 'undefined'){
         } else if (e.type === 'item'){
           if (e.item.id === 'nitro'){ Sfx.boost(); Haptics.buzz([22, 34, 70]); }
           else if (e.item.id === 'shield'){ Sfx.shield(); Haptics.buzz([18, 40]); }
+          else if (e.item.id === 'bumper'){ Sfx.bumper(); Haptics.buzz([26, 30, 46]); }
+          else if (e.item.id === 'ghost'){ Sfx.ghost(); Haptics.buzz([14, 26]); }
+          else if (e.item.id === 'clear'){ Sfx.clearWave(); Haptics.buzz([40, 30, 60]); }
+          else if (e.item.id === 'heli'){ Sfx.heli(); Haptics.buzz([26, 36, 26, 36]); }
+          else if (e.item.id === 'fever'){ Sfx.fever(); Haptics.buzz([16, 22, 16, 22, 30]); }
           else { Sfx.itemBig(); Haptics.buzz([16, 22, 34]); }
           pop(e.item.emoji + ' ' + e.item.label + '!', e.x, e.y, e.item.color, 26);
           if (e.item.id === 'double') toast('✨ 더블 점수 · ' + itemDef('double').dur + '초간 점수 2배');
           else if (e.item.id === 'nitro') toast('🔥 니트로 · ' + itemDef('nitro').dur + '초 무적 광속 돌진');
           else if (e.item.id === 'magnet') toast('🧲 자석 · ' + itemDef('magnet').dur + '초 아이템 흡인');
-          else if (e.item.id === 'slow') toast('⏳ 슬로우모션 · ' + itemDef('slow').dur + '초 차량 0.55배');
           else if (e.item.id === 'siren') toast('📣 사이렌 · ' + itemDef('siren').dur + '초 앞차 양보');
+          else if (e.item.id === 'bumper') toast('🛡️ 무적 범퍼 · ' + itemDef('bumper').dur + '초 충돌 무적 · 앞차 튕기기');
+          else if (e.item.id === 'ghost') toast('👻 유령 모드 · ' + itemDef('ghost').dur + '초 차·꼬깔 통과');
+          else if (e.item.id === 'clear') toast('💥 전방 올클리어 · 앞차를 모조리 정리');
+          else if (e.item.id === 'heli') toast('🚁 헬기 공수 · +' + HELI_KM + 'km 무적 공중 점프');
+          else if (e.item.id === 'fever') toast('🪙 피버 타임 · ' + itemDef('fever').dur + '초 코인 펑펑');
           else toast('🛡️ 실드 장착 · 충돌 1회 방어');
+        } else if (e.type === 'bumperSmash'){
+          Haptics.buzz(20);
+          pop('+' + e.gain + (e.cone ? ' 꼬깔 날렸다!' : ' 범퍼 강타!'), e.x, e.y - 26, '#ffb066', 22);
+        } else if (e.type === 'waveClear'){
+          Haptics.buzz([30, 20, 50]);
+          pop('💥 ' + e.count + '대 정리!', playerX(sim), playerY(sim) - 130, '#ffb08a', 28);
+          if (e.count <= 0) toast('💥 전방이 이미 비어 있었다');
+        } else if (e.type === 'heliJump'){
+          Haptics.buzz([24, 30, 24, 30]);
+          toast('🚁 헬기 공수 · +' + e.km + 'km (무적 착지)');
+        } else if (e.type === 'coin'){
+          if (e.total <= 3 || e.total % 6 === 0) Sfx.coin();
+          /* 코인이 초당 수십 개라 매번 띄우면 시끄럽다 — 4개마다 한 번만 */
+          if (e.total <= 3 || e.total % 4 === 0) pop('+' + e.gain, e.x, e.y - 12, '#ffe07a', 20);
         } else if (e.type === 'shield'){
           Haptics.buzz(40);
           Sfx.shield();
