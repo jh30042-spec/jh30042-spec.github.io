@@ -7409,6 +7409,13 @@ function drawTitleTraffic(ctx, sim, now){
 }
 
 const SORT_SCRATCH = [];
+/* 게임오버 오버레이가 떠 있는지 — 캔버스 위에 깔리는 라이벌 푯말을 그릴지 판단한다 */
+let OVER_EL_CACHE = null;
+function overScreenUp(){
+  if (typeof document === 'undefined') return false;
+  if (!OVER_EL_CACHE) OVER_EL_CACHE = document.getElementById('over');
+  return !!(OVER_EL_CACHE && !OVER_EL_CACHE.classList.contains('hidden'));
+}
 /* 이번 프레임의 시간·밤 정도 — drawCar 처럼 sim을 받지 않는 함수가
    경관등 점멸·야간 가시성 계산에 쓴다. */
 const SCENE = { t: 0, night: 0 };
@@ -7440,7 +7447,9 @@ function drawSim(ctx, sim, now){
   if (sim.state === 'title') drawTitleTraffic(ctx, sim, now);
 
   if (sim.state !== 'title'){
-    drawRivalMarkers(ctx, sim);
+    /* 게임오버 화면이 떠 있으면 라이벌 푯말(닉네임·km·'여기서 멈춤')은 그리지 않는다.
+       오버레이 위쪽은 배경이 비쳐 보여서, 캔버스 글자가 게임오버 안내 문구와 겹쳐 뭉개진다. */
+    if (!(sim.state === 'crash' && overScreenUp())) drawRivalMarkers(ctx, sim);
     drawGhosts(ctx, sim);
     drawOils(ctx, sim);
     drawCameras(ctx, sim);
