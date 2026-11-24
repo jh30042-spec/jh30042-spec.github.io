@@ -520,13 +520,13 @@
   #wMap{display:block;width:100%;height:auto}
   .wLand{fill:rgba(46,86,132,.55);stroke:rgba(120,190,255,.5);stroke-width:1.6;stroke-linejoin:round}
   .wRoute{fill:none;stroke-linecap:round;stroke-linejoin:round}
-  .wRoute.done{stroke:#7ce0ff;stroke-width:5;filter:drop-shadow(0 0 6px rgba(124,224,255,.7))}
-  .wRoute.todo{stroke:rgba(160,200,240,.5);stroke-width:4;stroke-dasharray:14 12}
+  .wRoute.done{stroke:#7ce0ff;stroke-width:6;filter:drop-shadow(0 0 7px rgba(124,224,255,.85))}
+  .wRoute.todo{stroke:rgba(190,220,250,.65);stroke-width:4.5;stroke-dasharray:16 12}
   #wRouteDone path{animation:wDraw 1.15s .2s ease-out both}
   @keyframes wDraw{from{stroke-dashoffset:var(--len,4000)}to{stroke-dashoffset:0}}
   .wPin text{font-family:inherit;font-weight:900;text-anchor:middle;paint-order:stroke fill}
-  .wPin .wFlag{font-size:28px}
-  .wPin .wLock{font-size:20px;opacity:.7}
+  .wPin .wFlag{font-size:23px}
+  .wPin .wFlag.dim{opacity:.62}
   .wPin .wName{font-size:19px;fill:#cfe9ff;stroke:rgba(3,8,16,.92);stroke-width:4px}
   .wPin .wDot{fill:#7ce0ff;filter:drop-shadow(0 0 6px rgba(124,224,255,.9))}
   .wPin .wHalo{fill:rgba(124,224,255,.16);stroke:rgba(124,224,255,.55);stroke-width:2}
@@ -537,7 +537,7 @@
   .wPin.next .wName{fill:#ffd479}
   .wPin.sel .wDot{fill:#ffd479;filter:drop-shadow(0 0 8px rgba(255,212,121,.95))}
   .wPin[role="button"]{cursor:pointer}
-  .wPin .wName.next{fill:#ffd479;font-size:22px}
+  .wPin .wName.next{fill:#ffd479;font-size:17px}
   @keyframes wPulse{0%,100%{opacity:.4}50%{opacity:1}}
   .wStamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);
     width:calc(var(--u)*58);padding:calc(var(--u)*2.2) calc(var(--u)*2);border-radius:calc(var(--u)*2.2);
@@ -8623,29 +8623,23 @@ if (typeof document !== 'undefined'){
           try { pth.style.setProperty('--len', String(Math.max(10, Math.round(pth.getTotalLength())))); } catch(e){}
         }
       }
-      /* 핀: 지나온 곳은 국기, 못 간 곳은 점만(다음 목표는 남은 km).
-         글자는 서로 겹치지 않는 자리에만 놓는다(가까운 동아시아 구간은 엇갈려 쌓인다). */
+      /* 핀: 지나온 곳은 국기, 못 간 곳은 점만(다음 목표는 국기 + 남은 km).
+         국기는 자기 핀 가까운 자리에만 놓고, 자리가 없으면 숨긴다(점은 남는다). */
       const stops = route.stops;
       const pts = stops.map(function(s){ return worldPoint(s.lat, s.lon); });
       const placed = [];
+      const OFFS = [[0, -17], [0, 19], [-24, -17], [24, -17], [-24, 19], [24, 19], [0, -36], [0, 38], [-46, 0], [46, 0]];
       function freeLabel(x, y){
         for (let i=0;i<placed.length;i++){
-          if (Math.abs(placed[i].x - x) < 46 && Math.abs(placed[i].y - y) < 26) return false;
+          if (Math.abs(placed[i].x - x) < 27 && Math.abs(placed[i].y - y) < 19) return false;
         }
         return true;
       }
-      function takeLabel(x, y){
-        placed.push({ x: x, y: y });
-        return y;
-      }
       function labelSlot(x, y){
-        for (let k=0;k<8;k++){
-          const cand = y - 24 - k * 25;
-          if (cand > 14 && freeLabel(x, cand)) return takeLabel(x, cand);
-        }
-        for (let k=1;k<4;k++){
-          const cand = y + 26 + k * 24;
-          if (cand < MAP_H - 10 && freeLabel(x, cand)) return takeLabel(x, cand);
+        for (let k=0;k<OFFS.length;k++){
+          const cx = x + OFFS[k][0], cy = y + OFFS[k][1];
+          if (cy < 12 || cy > MAP_H - 8) continue;
+          if (freeLabel(cx, cy)){ placed.push({ x: cx, y: cy }); return cy; }
         }
         return null;
       }
@@ -8658,27 +8652,23 @@ if (typeof document !== 'undefined'){
         const last = (i === stops.length - 1);
         const cls = 'wPin ' + (earned ? 'on' : (isNext ? 'next' : 'locked')) + (selectedKm === s.km ? ' sel' : '');
         let glyph = '';
-        if (earned){
+        if (earned || isNext){
           const ly = labelSlot(pt.x, pt.y);
           if (ly !== null){
-            glyph = '<text class="wFlag" y="' + ly + '">' + s.flag + '</text>';
-            /* 이름은 국기 아래(또는 위)에 자리가 있을 때만 */
-            const nameY = (ly < pt.y) ? ly + 20 : ly - 20;
-            if (freeLabel(pt.x, nameY)){
-              takeLabel(pt.x, nameY);
-              glyph += '<text class="wName" y="' + nameY + '">' + escapeHtml(s.name) + '</text>';
+            glyph = '<text class="wFlag' + (earned ? '' : ' dim') + '" y="' + ly + '">' + s.flag + '</text>';
+            if (isNext){
+              /* 다음 목표는 남은 거리도 함께 (국기 아래) */
+              const ky = ly + 17;
+              if (freeLabel(pt.x, ky)){ placed.push({ x: pt.x, y: ky }); glyph += '<text class="wName next" y="' + ky + '">' + escapeHtml(fmtKm(s.km - total) + 'km') + '</text>'; }
             }
           }
-        } else if (isNext){
-          const ly = labelSlot(pt.x, pt.y);
-          if (ly !== null) glyph = '<text class="wName next" y="' + ly + '">' + escapeHtml(fmtKm(s.km - total) + 'km') + '</text>';
         }
         html.push('<g class="' + cls + '" data-km="' + s.km + '" transform="translate(' + pt.x + ',' + pt.y + ')"' +
           ' role="button" tabindex="0" aria-label="' + escapeHtml((s.country || '') + ' ' + s.name) + '">' +
-          '<circle class="wHalo" r="' + (isNext ? 26 : 18) + '"></circle>' +
-          '<circle class="wDot" r="' + (earned ? 8 : (isNext ? 6 : 4)) + '"></circle>' +
+          '<circle class="wHalo" r="' + (isNext ? 26 : 16) + '"></circle>' +
+          '<circle class="wDot" r="' + (earned ? 7 : (isNext ? 6 : 3.5)) + '"></circle>' +
           glyph +
-          (last ? '<text class="wName" y="46">' + escapeHtml(s.name) + '</text>' : '') +
+          (last && earned ? '<text class="wName" y="44">' + escapeHtml(s.name) + '</text>' : '') +
           '</g>');
       }
       if (wPinsEl) wPinsEl.innerHTML = html.join('');
