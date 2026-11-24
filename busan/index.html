@@ -483,6 +483,93 @@
   .lbGap{text-align:center;font-size:calc(var(--u)*2.0);font-weight:900;line-height:1;color:#7d8ea8;
     padding:calc(var(--u)*.6) 0;border-top:1px solid rgba(255,255,255,.05)}
 
+  /* ---------- v14: 세계 지도 · 여권 배지 ---------- */
+  .mapBtn{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1);
+    width:100%;box-sizing:border-box;margin:calc(var(--u)*.4) 0 calc(var(--u)*1.1);
+    padding:calc(var(--u)*1.5) calc(var(--u)*2);border:none;border-radius:calc(var(--u)*2.2);
+    background:linear-gradient(180deg,rgba(70,180,255,.24),rgba(70,180,255,.10));
+    box-shadow:inset 0 0 0 1px rgba(120,215,255,.38);color:#d6f4ff;font-family:inherit;
+    font-weight:900;font-size:calc(var(--u)*2.5);cursor:pointer;touch-action:manipulation}
+  .mapBtn:active{transform:scale(.985)}
+  .mapBtn em{font-style:normal;background:#39a9ff;color:#04121f;border-radius:calc(var(--u)*3);
+    padding:0 calc(var(--u)*1.1);font-size:calc(var(--u)*2.0)}
+  .mapCta{width:100%;margin-top:calc(var(--u)*1.4)}
+  .mapCta em{font-style:normal;background:#39a9ff;color:#04121f;border-radius:calc(var(--u)*3);
+    padding:0 calc(var(--u)*1.1);font-size:calc(var(--u)*2.6)}
+
+  .wOverlay{z-index:70;justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;background:radial-gradient(120% 70% at 50% 0%,rgba(11,26,46,.98),rgba(3,6,12,.99))}
+  .wCard{width:100%;max-width:calc(var(--u)*106);margin:0 auto;display:flex;flex-direction:column;
+    gap:calc(var(--u)*1.2);transform-origin:50% 0}
+  .wCard.open{animation:wUnfold .64s cubic-bezier(.18,.86,.24,1) both}
+  @keyframes wUnfold{
+    0%{transform:scaleY(.06) scaleX(.9);opacity:0}
+    55%{opacity:1}
+    100%{transform:scaleY(1) scaleX(1);opacity:1}
+  }
+  .wHead{display:flex;align-items:baseline;gap:calc(var(--u)*1.1);color:#fff;font-weight:900}
+  .wHead b{font-size:calc(var(--u)*3.2);font-weight:900}
+  .wHead span{color:#8fa5c2;font-size:calc(var(--u)*1.95);font-weight:800}
+  .wHead button{margin-left:auto;align-self:center;width:calc(var(--u)*7.4);height:calc(var(--u)*7.4);
+    border-radius:50%;border:none;background:rgba(255,255,255,.13);color:#fff;
+    font-size:calc(var(--u)*3);cursor:pointer;font-family:inherit}
+  .wTotal{font-size:calc(var(--u)*2.35);font-weight:900;color:#7ce0ff}
+  .wMapBox{position:relative;border-radius:calc(var(--u)*2.4);overflow:hidden;
+    background:radial-gradient(120% 130% at 50% 0%,#0d1f38,#060b16);
+    box-shadow:inset 0 0 0 1px rgba(120,215,255,.2)}
+  #wMap{display:block;width:100%;height:auto}
+  .wLand{fill:rgba(46,86,132,.55);stroke:rgba(120,190,255,.5);stroke-width:1.6;stroke-linejoin:round}
+  .wRoute{fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .wRoute.done{stroke:#7ce0ff;stroke-width:5;filter:drop-shadow(0 0 6px rgba(124,224,255,.7))}
+  .wRoute.todo{stroke:rgba(160,200,240,.5);stroke-width:4;stroke-dasharray:14 12}
+  #wRouteDone path{animation:wDraw 1.15s .2s ease-out both}
+  @keyframes wDraw{from{stroke-dashoffset:var(--len,4000)}to{stroke-dashoffset:0}}
+  .wPin text{font-family:inherit;font-weight:900;text-anchor:middle;paint-order:stroke fill}
+  .wPin .wFlag{font-size:30px}
+  .wPin .wName{font-size:19px;fill:#cfe9ff;stroke:rgba(3,8,16,.92);stroke-width:4px}
+  .wPin .wDot{fill:#7ce0ff;filter:drop-shadow(0 0 6px rgba(124,224,255,.9))}
+  .wPin .wHalo{fill:rgba(124,224,255,.16);stroke:rgba(124,224,255,.55);stroke-width:2}
+  .wPin.locked .wDot{fill:#33475f;filter:none}
+  .wPin.locked .wName{fill:#6f829b;stroke:rgba(3,8,16,.86)}
+  .wPin.locked .wHalo{fill:rgba(120,160,200,.06);stroke:rgba(120,160,200,.22);stroke-width:1.6}
+  .wPin.next .wHalo{fill:rgba(255,210,74,.14);stroke:rgba(255,210,74,.75);stroke-dasharray:7 6;animation:wPulse 1.7s ease-in-out infinite}
+  .wPin.next .wName{fill:#ffd479}
+  @keyframes wPulse{0%,100%{opacity:.4}50%{opacity:1}}
+  .wStamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);
+    width:calc(var(--u)*58);padding:calc(var(--u)*2.2) calc(var(--u)*2);border-radius:calc(var(--u)*2.2);
+    text-align:center;color:#eaf7ff;background:rgba(8,20,36,.94);
+    border:calc(var(--u)*.7) dashed rgba(124,224,255,.75);
+    box-shadow:0 0 0 calc(var(--u)*.9) rgba(124,224,255,.45),0 calc(var(--u)*3) calc(var(--u)*9) rgba(0,0,0,.65);
+    cursor:pointer}
+  .wStamp.hidden{display:none}
+  .wStamp.on{animation:wStampIn .82s cubic-bezier(.2,1.5,.3,1) both}
+  @keyframes wStampIn{
+    0%{transform:translate(-50%,-50%) rotate(-27deg) scale(2.7);opacity:0}
+    45%{transform:translate(-50%,-50%) rotate(-5deg) scale(.9);opacity:1}
+    66%{transform:translate(-50%,-50%) rotate(-10deg) scale(1.05)}
+    100%{transform:translate(-50%,-50%) rotate(-8deg) scale(1);opacity:1}
+  }
+  .wStamp .wsFlag{font-size:calc(var(--u)*9.5);line-height:1.05}
+  .wStamp .wsName{font-size:calc(var(--u)*3.4);font-weight:900;margin-top:calc(var(--u)*.4)}
+  .wStamp .wsKm{font-size:calc(var(--u)*2.2);font-weight:900;color:#ffd479}
+  .wStamp .wsCode{font-size:calc(var(--u)*1.65);font-weight:900;color:#8fd6ff;letter-spacing:.16em;margin-top:calc(var(--u)*.7)}
+  .wStamp .wsTap{font-size:calc(var(--u)*1.7);font-weight:800;color:#9fb4d0;margin-top:calc(var(--u)*.7)}
+  .wNext{font-size:calc(var(--u)*2.15);font-weight:800;color:#a9bfda;line-height:1.35}
+  .wGrid{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*1.1)}
+  .wBadge{display:grid;grid-template-columns:auto 1fr;column-gap:calc(var(--u)*1);align-items:center;
+    padding:calc(var(--u)*1.15) calc(var(--u)*1.3);border-radius:calc(var(--u)*1.8);
+    background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+  .wBadge .bFlag{grid-row:1 / span 2;font-size:calc(var(--u)*4.4);line-height:1}
+  .wBadge .bName{font-size:calc(var(--u)*2.2);font-weight:900;color:#dbeaf8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wBadge .bKm{font-size:calc(var(--u)*1.8);font-weight:800;color:#8fa5c2}
+  .wBadge.on{background:linear-gradient(180deg,rgba(124,224,255,.17),rgba(124,224,255,.05));
+    box-shadow:inset 0 0 0 1px rgba(124,224,255,.42)}
+  .wBadge.on .bKm{color:#7dffc0}
+  .wBadge.off{opacity:.55}
+  .wBadge.off .bFlag{filter:grayscale(1) brightness(.75)}
+  .wBadge.fresh{animation:wFresh 1.6s ease-out both}
+  @keyframes wFresh{0%{box-shadow:inset 0 0 0 2px rgba(255,210,74,.95)}100%{box-shadow:inset 0 0 0 1px rgba(124,224,255,.42)}}
+
   /* 대전장 링크 수동 복사 */
   #linkBox{display:flex;gap:calc(var(--u)*1);align-items:center;margin-top:calc(var(--u)*1);
     padding:calc(var(--u)*1.2);border-radius:calc(var(--u)*2);background:rgba(255,255,255,.08);
@@ -670,6 +757,7 @@
     <button id="startBtn" class="cta">무한 질주 출발 🏁</button>
     <div class="tBest" id="tBest">아직 기록 없음 <span>· 첫 주행이 곧 기록</span></div>
     <div class="tSub" id="tSub">갈수록 빨라진다 · 갈수록 막힌다 · 스치면 끝</div>
+    <button id="tMapBtn" class="mapBtn" aria-label="내 세계지도 배지 보기">🗺️ 내 세계지도 배지 <em id="mapBtnN">0</em></button>
     <div class="rivals">
       <div class="srvBar loading" id="tSrv"><span class="dot"></span><span class="txt">서버 랭킹 불러오는 중…</span><button id="tSrvBtn" aria-label="서버 랭킹 새로고침">↻</button></div>
       <div class="rHead">🏁 라이벌 순위 <button id="rivalReset">라이벌 초기화</button></div>
@@ -718,9 +806,33 @@
       <button id="linkCopy">복사</button>
       <button id="linkDone" aria-label="닫기">✕</button>
     </div>
+    <button id="mapBtn" class="cta ghost mapCta">🗺️ 내 세계지도 배지 <em id="oMapN">0</em></button>
     <div class="row2">
       <button id="shareBtn" class="cta ghost">도전장 링크 보내기 🔗</button>
       <button id="menuBtn2" class="cta ghost">타이틀</button>
+    </div>
+  </div>
+
+  <!-- v14: 세계 지도 · 여권 배지 -->
+  <div id="world" class="overlay hidden wOverlay" aria-label="내 세계지도 배지">
+    <div class="wCard" id="wCard">
+      <div class="wHead">
+        <b>🌍 내 세계지도</b><span>여권 배지 컬렉션</span>
+        <button id="wClose" aria-label="닫기">✕</button>
+      </div>
+      <div class="wTotal" id="wTotal">누적 0km</div>
+      <div class="wMapBox" id="wMapBox">
+        <svg id="wMap" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="서울에서 출발한 누적 거리 세계 지도">
+          <path id="wLand" class="wLand" d=""></path>
+          <g id="wRouteDone"></g>
+          <g id="wRouteTodo"></g>
+          <g id="wPins"></g>
+        </svg>
+        <div class="wStamp hidden" id="wStamp" aria-live="polite"></div>
+      </div>
+      <div class="wNext" id="wNext"></div>
+      <div class="wGrid" id="wGrid"></div>
+      <button id="wDone" class="cta alt">계속 달리기 🔁</button>
     </div>
   </div>
 </div>
@@ -1972,22 +2084,75 @@ const COMBO_POINT = 300;                /* 통합 점수에서 최대 콤보 1�
 const RANK_NOTE = '통합 = 거리×10 + 점수×0.5 + 최대콤보×300';
 const RANK_NOTE_EARTH = '누적거리 = 지금까지 달린 합계 · 🌍 지구 기준 돌파 지점';
 
+/* ---------- 세계 지도 (Natural Earth 110m 육지, 등장방형 투영 1000×500 육지/해안 단순화) ---------- */
+const MAP_W = 1000, MAP_H = 500;
+const WORLD_MAP_PATH = (
+  'M335 472l-2 3 -17 -2 19 -1zM375 467l5 5 -30 2 15 -7 10 0zM163 454l7 0 -11 1 4 -1zM225 450l8 1 -17 -1 9 0zM310 447l-1 3 -' +
+  '6 1 -11 -2 8 -1 5 -7 5 6zM337 428l-9 2 -1 4 -9 5 10 7 3 9 -27 8 -19 0 10 3 -12 4 55 11 83 -8 -3 -3 -17 1 0 -3 50 -9 5 -2' +
+  ' -2 -2 3 -2 24 -6 18 2 23 -5 8 3 7 -3 38 2 19 -6 13 4 44 -11 20 6 20 0 3 3 -6 3 4 1 -3 4 5 1 11 -7 39 -10 22 3 11 0 9 -5' +
+  ' 9 4 21 -3 17 4 41 -3 1 -3 7 5 22 0 9 4 63 9 -22 13 4 5 6 2 -15 1 -5 5 27 8 29 2 0 15 -1000 0 0 -15 3 -1 99 2 -29 -4 2 -' +
+  '4 -11 -3 29 -2 -24 -3 -9 -6 20 1 14 -3 0 -3 30 -3 59 -1 18 4 21 -1 -10 -6 80 3 21 -4 -3 -7 2 -7 13 -7 16 -4 -4 2zM312 40' +
+  '0l7 2 -11 2 -15 -7 9 3 5 -4 5 4zM337 392l2 2 -9 0 7 -2zM695 388l-4 0 0 -3 4 3zM904 363l8 1 -1 6 -5 1 -2 -8zM981 364l3 1 ' +
+  '-3 7 -11 8 -7 -2 18 -14zM985 350l6 5 5 0 -9 11 -4 -6 2 -6 -5 -8 5 4zM639 288l1 6 -9 25 -9 0 -2 -8 3 -16 10 -4 4 -8 2 5zM' +
+  '899 288l5 4 3 11 6 4 12 15 0 16 -8 16 -11 4 -3 -3 -4 3 -8 -2 -7 -10 -4 2 3 -7 -5 6 -5 -6 -8 -4 -37 10 -8 -2 1 -7 -6 -15 ' +
+  '2 0 -2 -5 2 -8 19 -5 13 -15 11 2 8 -11 11 2 -3 9 13 7 7 -19 3 8zM846 278l-3 0 11 -5 -8 5zM828 272l3 2 -7 1 4 -3zM802 269' +
+  'l19 4 -28 -4 2 -3 7 3zM922 265l-10 1 7 -1 2 -3 1 3zM862 259l1 2 -8 -2 7 0zM873 253l3 6 8 -4 18 6 17 18 -8 -1 -9 -7 -6 5 ' +
+  '-14 -3 3 -3 -2 -5 -14 -4 -2 -3 4 -2 -8 -3 10 0zM848 246l-4 3 -10 0 2 5 7 -2 -5 3 4 10 -5 -2 -1 -6 -1 8 -3 0 -2 -7 3 -10 ' +
+  '15 -2zM857 247l-1 5 -1 -8 2 3zM794 266l-9 -4 -20 -27 6 0 17 15 -1 2 8 7 -1 7zM827 245l4 2 -4 1 -4 13 -17 -3 -3 -7 2 -7 9' +
+  ' -3 10 -10 7 4 -5 6 1 4zM851 227l-3 7 -5 -6 -4 2 9 -7 3 4zM726 233l-4 -2 1 -8 4 6 -1 4zM844 221l-2 4 -2 -2 5 -4 -1 2zM82' +
+  '9 224l-4 3 7 -9 -3 6zM839 217l3 1 -3 3 0 -4zM849 216l-2 6 -2 -7 4 1zM837 199l3 4 -2 7 6 2 1 3 -11 -7 3 -9zM298 195l12 3 ' +
+  '-8 3 -9 -2 6 -1 -3 -3 2 0zM806 198l-4 -2 6 -2 -2 4zM68 197l-1 -3 3 2 -2 1zM279 187l15 7 -10 1 2 -2 -5 -3 -8 -3 -9 2 7 -3' +
+  ' 8 1zM837 187l-2 2 -1 -4 3 -5 0 7zM543 144l-1 4 -7 -2 8 -2zM526 136l1 5 -3 1 -1 -6 3 0zM892 147l-2 5 -13 5 -2 -3 -11 2 3' +
+  ' 2 -5 5 -3 -5 9 -6 9 -1 3 -5 7 -2 2 -7 4 -2 -1 12zM527 133l-1 2 -2 -2 2 -2 1 2zM900 127l4 0 0 3 -15 5 5 -12 6 4zM344 109' +
+  'l-2 3 9 1 2 7 -4 -3 -3 3 -11 -2 6 -9 5 -2 -2 2zM899 109l3 5 -4 -1 1 9 -4 0 0 -23 4 10zM481 105l-9 1 1 -6 8 -3 3 1 -3 7zM' +
+  '535 96l-1 2 -4 -3 5 1zM75 91l-5 -1 7 0 -2 1zM492 87l-3 3 6 0 -4 5 14 9 -1 4 -19 3 6 -4 -6 -1 3 -1 -1 -4 5 -1 -9 -8 3 -5 ' +
+  '6 0zM263 68l14 5 -19 0 5 -5zM460 65l2 4 -14 5 -11 -2 3 -1 -7 -1 5 -2 -6 0 28 -3zM289 63l-4 -1 6 -1 -2 2zM14 65l14 2 -7 1' +
+  ' -1 4 -16 -6 -4 4 0 -12 14 7zM234 58l-11 -1 4 -2 7 3zM4 53l-4 -2 7 1 -3 1zM248 57l0 3 4 -2 5 5 5 -7 8 1 4 1 0 4 -12 3 -2' +
+  '1 13 -4 8 7 5 27 6 1 5 6 6 4 -4 -4 -6 9 -5 -5 -6 3 -3 -2 -7 12 0 12 3 1 6 4 2 9 -6 7 12 13 4 4 7 -12 5 -17 0 -14 10 17 -' +
+  '7 2 9 8 1 3 -4 2 3 -16 7 -2 -3 5 -2 -7 1 -10 5 2 4 -16 6 -1 7 -1 -6 2 10 -16 12 3 17 -11 -14 -27 1 -7 4 -4 17 5 8 5 4 6 ' +
+  '-2 5 -6 9 -2 -5 16 15 2 -1 11 7 7 5 -3 8 3 5 -7 9 -4 0 10 5 -9 5 5 17 -1 -1 2 14 11 16 5 3 12 15 4 1 3 13 1 12 6 3 6 -11' +
+  ' 16 -7 25 -18 8 -4 11 -13 16 -13 -2 4 9 -7 5 -8 0 -1 6 -7 0 5 4 -11 9 4 7 -9 7 3 4 -8 5 -11 -5 -2 -10 4 -5 -4 0 8 -12 -4' +
+  ' 2 2 -17 6 -13 3 -35 -4 -7 -12 -7 -15 -24 4 -10 -3 -4 11 -14 -3 -12 -4 -2 -4 5 -13 -8 -5 -9 -45 -14 -5 -4 -2 -8 -24 -25 ' +
+  '15 24 -8 -5 0 -3 -8 -5 3 -2 -9 -13 -9 -4 -11 -16 0 -22 5 3 0 -5 -13 -5 -18 -20 -37 -8 -12 5 3 -6 -22 14 -18 5 20 -9 2 -4' +
+  ' -14 1 0 -3 -11 -5 4 -4 10 -2 0 -3 -11 1 -9 -3 18 -2 -14 -6 28 -8 56 7 23 -5 54 9 2 -4 5 0 13 3 11 -2 4 3 5 -5 -6 -3 4 -' +
+  '5 12 7zM183 47l12 0 4 4 0 -4 5 0 15 10 -34 3 -11 -4 14 -1 -20 -4 15 -4zM260 47l11 -2 5 5 8 -2 15 3 15 7 -5 1 19 5 -6 5 -' +
+  '11 -3 9 8 -11 -1 7 5 -24 -8 -8 2 0 -3 11 -1 2 -6 -16 -7 -31 -3 2 -5 10 -2 -2 2zM221 45l9 0 -2 2 3 4 -16 -2 6 -1 -3 -2 3 ' +
+  '-1zM241 48l-6 2 -2 -4 16 -1 -8 3zM165 52l-15 -2 6 -5 -3 -1 26 2 -14 6zM903 40l-23 1 6 -2 17 1zM226 37l1 5 -12 -2 11 -3zM' +
+  '199 38l7 2 -18 3 -4 -1 5 -1 -16 0 6 -3 20 0zM660 54l-17 -4 12 -9 36 -4 -29 7 -8 5 6 5zM237 36l41 6 -27 1 -21 -6 7 -1zM17' +
+  '7 34l-2 3 -16 2 18 -5zM797 36l20 3 -13 5 49 2 12 7 2 -3 22 1 -2 -2 3 -1 81 11 3 -1 -1 -3 15 1 12 2 0 12 -7 1 5 6 -16 2 -' +
+  '9 5 -19 0 -4 4 3 2 -3 8 -14 10 -3 -16 24 -16 -12 6 -2 -4 -8 1 -7 5 3 2 -36 0 -20 12 14 1 4 6 -9 16 -30 19 6 8 -1 5 -8 1 ' +
+  '1 -6 -6 -4 2 -4 -12 2 2 -6 -10 5 2 5 10 0 -9 7 8 9 -1 10 -16 15 -14 4 -1 2 -6 -3 -7 5 10 18 -1 5 -11 8 0 -4 -14 -9 -2 11' +
+  ' 10 11 4 11 -8 -4 -4 -10 -5 -4 1 -10 -4 -15 -8 2 0 -6 -8 -12 -12 3 -19 16 -1 15 -7 7 -11 -22 -2 -15 -6 1 -12 -13 -25 0 -' +
+  '2 -4 -5 1 -9 -3 -4 -7 -6 1 11 16 6 0 7 -6 1 6 8 5 -12 14 -33 13 -3 -12 -22 -31 1 -4 -3 5 -4 -6 12 22 2 9 16 18 -1 1 5 4 ' +
+  '18 -4 0 3 -9 18 -24 25 4 28 -16 14 2 11 -9 5 -1 9 -17 14 -21 1 0 -7 -18 -38 5 -20 -5 -16 -9 -11 2 -13 -2 -3 -8 1 -4 -5 -' +
+  '17 4 -20 0 -21 -21 -3 -7 4 -9 -2 -11 31 -38 10 1 32 -6 5 1 -2 9 24 10 7 -7 20 5 14 0 6 -16 -23 0 -4 -8 20 -7 14 3 9 -3 -' +
+  '14 -9 7 -5 -12 2 4 4 -7 2 -4 -3 2 -2 -7 -1 -8 11 3 4 -17 2 4 7 -5 4 -8 -11 0 -4 -17 -11 -2 5 16 10 -4 0 -2 6 -2 -5 -18 -' +
+  '12 -16 3 -15 18 -9 2 -10 -2 -1 -18 22 -2 1 -6 -10 -7 9 0 -1 -3 9 -1 9 -8 10 -2 1 -10 5 -1 -2 6 3 4 25 -1 4 -2 1 -6 7 1 -' +
+  '2 -6 16 -3 -22 -2 1 -7 11 -5 -9 -2 -12 9 -2 4 4 3 -8 11 -8 2 -7 -11 -13 2 -2 -9 27 -16 27 -9 10 -1 36 11 -7 4 -15 -2 11 ' +
+  '8 0 -4 7 2 7 -6 5 1 -1 -6 7 0 1 5 20 -6 18 1 3 -2 -2 -2 22 5 2 -2 -6 -2 -1 -4 7 -5 10 0 -2 4 5 8 -7 6 3 0 7 -4 -5 -10 4 ' +
+  '-4 5 4 -1 -2 4 -1 11 2 -2 -6 17 0 -2 -2 3 -2 48 -7 7 2zM222 32l-14 0 3 -1 -4 -1 15 2zM792 32l-16 2 8 -4 8 2zM551 29l9 2 ' +
+  '-16 6 -15 -8 22 0zM571 27l5 1 -28 -1 23 0zM778 31l-25 -4 14 -3 11 4 0 3zM258 29l4 1 -14 3 -17 -6 12 -3 15 5zM310 19l18 1' +
+  ' -42 10 5 2 -15 6 -25 0 5 -2 -1 -2 9 1 -8 -3 8 -2 -5 -3 14 -1 -27 -3 64 -4zM425 18l17 2 -31 2 55 2 -22 3 7 0 -6 4 4 5 -9' +
+  ' 1 5 2 -2 2 3 3 -11 2 3 3 -7 0 9 5 -11 -2 -2 3 11 0 -49 13 -8 8 -1 7 -14 -2 -9 -8 -7 -10 9 -7 -11 1 1 -4 8 1 -12 -3 3 -3' +
+  ' -11 -8 -27 -1 -8 -3 13 -1 -19 -2 21 -4 -6 -2 15 -4 50 0 -6 -3 55 -2z'
+);
+
 /* =========================================================
    v14: 누적 거리(Total Distance) — 지구 기준 돌파 지점
    서울에서 출발해 그 거리만큼 달렸을 때 도착하는 곳.
    ========================================================= */
 const EARTH_MILESTONES = [
-  { km:0,     name:'국내 주행',  short:'국내',     emoji:'🚗' },
-  { km:400,   name:'부산',      short:'부산',     emoji:'🌊' },
-  { km:1160,  name:'도쿄',      short:'도쿄',     emoji:'🗼' },
-  { km:2090,  name:'홍콩',      short:'홍콩',     emoji:'🥟' },
-  { km:3720,  name:'방콕',      short:'방콕',     emoji:'🐘' },
-  { km:4050,  name:'콜카타',    short:'콜카타',   emoji:'🚃' },
-  { km:4680,  name:'뉴델리',    short:'뉴델리',   emoji:'🛺' },
-  { km:6740,  name:'두바이',    short:'두바이',   emoji:'🐪' },
-  { km:8970,  name:'파리',      short:'파리',     emoji:'🥐' },
-  { km:11050, name:'뉴욕',      short:'뉴욕',     emoji:'🗽' },
-  { km:40075, name:'지구 1바퀴', short:'지구 1바퀴', emoji:'🌍' }
+  { km:0,     name:'국내 주행',  short:'국내',     emoji:'🚗', flag:'🇰🇷', country:'대한민국',      code:'KOR',   lat:37.6, lon:127.0 },
+  { km:400,   name:'부산',      short:'부산',     emoji:'🌊', flag:'🇰🇷', country:'대한민국',      code:'KOR',   lat:35.2, lon:129.0 },
+  { km:1160,  name:'도쿄',      short:'도쿄',     emoji:'🗼', flag:'🇯🇵', country:'일본',          code:'JPN',   lat:35.7, lon:139.7 },
+  { km:2090,  name:'홍콩',      short:'홍콩',     emoji:'🥟', flag:'🇭🇰', country:'홍콩',          code:'HKG',   lat:22.3, lon:114.2 },
+  { km:3720,  name:'방콕',      short:'방콕',     emoji:'🐘', flag:'🇹🇭', country:'태국',          code:'THA',   lat:13.8, lon:100.5 },
+  { km:4050,  name:'콜카타',    short:'콜카타',   emoji:'🚃', flag:'🇮🇳', country:'인도',          code:'IND',   lat:22.6, lon:88.4 },
+  { km:4680,  name:'뉴델리',    short:'뉴델리',   emoji:'🛺', flag:'🇮🇳', country:'인도',          code:'IND',   lat:28.6, lon:77.2 },
+  { km:6740,  name:'두바이',    short:'두바이',   emoji:'🐪', flag:'🇦🇪', country:'아랍에미리트',  code:'UAE',   lat:25.2, lon:55.3 },
+  { km:8970,  name:'파리',      short:'파리',     emoji:'🥐', flag:'🇫🇷', country:'프랑스',        code:'FRA',   lat:48.9, lon:2.35 },
+  { km:11050, name:'뉴욕',      short:'뉴욕',     emoji:'🗽', flag:'🇺🇸', country:'미국',          code:'USA',   lat:40.7, lon:-74.0 },
+  { km:40075, name:'지구 1바퀴', short:'지구 1바퀴', emoji:'🌍', flag:'🌍', country:'지구',         code:'EARTH', lat:37.6, lon:127.0 }
 ];
 const EARTH_KM = EARTH_MILESTONES[EARTH_MILESTONES.length - 1].km;
 function fmtKmComma(v){
@@ -2035,6 +2200,91 @@ function earthNextText(km){
   const n = earthNextAt(k);
   if (!n) return '';
   return '다음 ' + fmtKmComma(n.km) + 'km ' + n.name + '까지 ' + fmtKmComma(Math.max(0, n.km - k)) + 'km';
+}
+
+/* =========================================================
+   v14: 세계 지도 · 여권 배지
+   - 등장방형(equirectangular) 투영: 경도 -180~180 → x 0~1000, 위도 90~-90 → y 0~500
+   ========================================================= */
+const WORLD_START = { name:'서울', flag:'🇰🇷', lat:37.6, lon:127.0 };
+const BADGE_KEY = 'busan8_badges_v1';
+function worldPoint(lat, lon){
+  const la = clamp(Number(lat) || 0, -90, 90), lo = clamp(Number(lon) || 0, -180, 180);
+  return {
+    x: Math.round((lo + 180) / 360 * MAP_W * 10) / 10,
+    y: Math.round((90 - la) / 180 * MAP_H * 10) / 10
+  };
+}
+/* 경로 정점: 서울(0km) → 각 돌파 지점 (지구 1바퀴는 서울로 돌아오는 루프) */
+function worldStops(){
+  const out = [{ km:0, name:WORLD_START.name, flag:WORLD_START.flag, lat:WORLD_START.lat, lon:WORLD_START.lon, start:true }];
+  for (let i=1;i<EARTH_MILESTONES.length;i++){
+    const m = EARTH_MILESTONES[i];
+    out.push({ km:m.km, name:m.name, flag:m.flag, lat:m.lat, lon:m.lon, code:m.code, m:m });
+  }
+  return out;
+}
+/* 누적 거리 기준 경로 — 지나온 구간(done) / 아직인 구간(todo, 태평양은 양 끝으로 나눔) */
+function worldRoute(total){
+  const t = Math.max(0, Number(total) || 0);
+  const stops = worldStops();
+  let lastIdx = 0;
+  for (let i=1;i<stops.length;i++) if (stops[i].km <= t + 0.05) lastIdx = i;
+  const done = [worldPoint(stops[0].lat, stops[0].lon)];
+  for (let i=1;i<=lastIdx;i++) done.push(worldPoint(stops[i].lat, stops[i].lon));
+  const todo = [];
+  const nextIdx = (lastIdx + 1 < stops.length) ? lastIdx + 1 : -1;
+  if (nextIdx >= 0){
+    const a = done[done.length - 1];
+    const b = worldPoint(stops[nextIdx].lat, stops[nextIdx].lon);
+    if (Math.abs(b.x - a.x) > MAP_W / 2){
+      /* 날짜변경선을 넘는 구간(뉴욕 → 서울): 오른쪽 끝과 왼쪽 끝에서 다시 이어진다 */
+      todo.push([a, { x: MAP_W, y: a.y }]);
+      todo.push([{ x: 0, y: b.y }, b]);
+    } else {
+      todo.push([a, b]);
+    }
+  }
+  return { done: done, todo: todo, lastIdx: lastIdx, nextIdx: nextIdx, stops: stops };
+}
+/* 배지 목록 — 누적 거리로 획득 여부·남은 거리 */
+function worldBadges(total){
+  const t = Math.max(0, Number(total) || 0);
+  const out = [];
+  for (let i=1;i<EARTH_MILESTONES.length;i++){
+    const m = EARTH_MILESTONES[i];
+    out.push({
+      km: m.km, name: m.name, flag: m.flag, country: m.country, code: m.code, emoji: m.emoji,
+      earned: t + 0.05 >= m.km,
+      remain: Math.max(0, Math.round((m.km - t) * 10) / 10)
+    });
+  }
+  return out;
+}
+/* 이미 축하한 배지(km 목록) — 같은 배지를 매판 다시 축하하지 않는다 */
+function loadBadgeSeen(store){
+  const st = store || defaultStore();
+  try {
+    const raw = st.getItem(BADGE_KEY);
+    if (!raw) return [];
+    const o = JSON.parse(raw);
+    const arr = Array.isArray(o) ? o : (o && Array.isArray(o.seen) ? o.seen : []);
+    return arr.map(function(v){ return Number(v); }).filter(function(v){ return isFinite(v) && v > 0; });
+  } catch(e){ return []; }
+}
+function saveBadgeSeen(list, store){
+  const st = store || defaultStore();
+  try {
+    const arr = (list || []).map(function(v){ return Number(v); }).filter(function(v){ return isFinite(v) && v > 0; });
+    st.setItem(BADGE_KEY, JSON.stringify({ v:1, seen: arr }));
+    return true;
+  } catch(e){ return false; }
+}
+/* 이번에 처음 획득한 배지들 */
+function newBadges(total, seen){
+  const have = {};
+  (seen || []).forEach(function(v){ have[Number(v)] = true; });
+  return worldBadges(total).filter(function(b){ return b.earned && !have[b.km]; });
 }
 /* 통합 점수: 거리·점수·최대 칼치기 콤보를 한 숫자로 */
 function combinedScore(km, score, combo){
@@ -7541,6 +7791,15 @@ const Sfx = (function(){
       tone(880, 0.16, 'sine', 0.07, null, 0.1);
       tone(1320, 0.3, 'sine', 0.06, null, 0.2);
     },
+    /* v14: 새 지역 배지 도장 "콩!" — 낮은 타격음 + 밝은 팡파르 */
+    stamp: function(){
+      noise(0.18, 0.15, 900, 220, 'lowpass');
+      tone(150, 0.15, 'sine', 0.13, 85, 0);
+      tone(784, 0.12, 'triangle', 0.07, null, 0.07);
+      tone(1046, 0.12, 'triangle', 0.07, null, 0.17);
+      tone(1318, 0.30, 'triangle', 0.065, null, 0.27);
+      tone(1568, 0.34, 'sine', 0.045, null, 0.41);
+    },
     record: function(){
       tone(784, 0.14, 'triangle', 0.08, null, 0);
       tone(988, 0.14, 'triangle', 0.08, null, 0.1);
@@ -8015,6 +8274,10 @@ const API = {
   earthTagText: earthTagText, earthBreakText: earthBreakText, earthNextText: earthNextText,
   totalDistBase: totalDistBase, nextTotalDist: nextTotalDist, runDistOf: runDistOf,
   mergeEntryForPost: mergeEntryForPost,
+  /* v14: 세계 지도 · 여권 배지 */
+  MAP_W: MAP_W, MAP_H: MAP_H, WORLD_MAP_PATH: WORLD_MAP_PATH, WORLD_START: WORLD_START, BADGE_KEY: BADGE_KEY,
+  worldPoint: worldPoint, worldStops: worldStops, worldRoute: worldRoute, worldBadges: worldBadges,
+  loadBadgeSeen: loadBadgeSeen, saveBadgeSeen: saveBadgeSeen, newBadges: newBadges,
   combinedScore: combinedScore, rankTabId: rankTabId, rankValue: rankValue, sortRowsByTab: sortRowsByTab,
   CAMERA: CAMERA, CAMERA_R: CAMERA_R, CAMERA_CD_MIN: CAMERA_CD_MIN, CAMERA_CD_MAX: CAMERA_CD_MAX,
   CAMERA_FIRST: CAMERA_FIRST, IMPACT_LIFE: IMPACT_LIFE,
@@ -8256,6 +8519,154 @@ if (typeof document !== 'undefined'){
       }
       syncRankTabs();
     })();
+
+    /* ---------- v14: 세계 지도 · 여권 배지 ---------- */
+    const worldEl = document.getElementById('world');
+    const wCardEl = document.getElementById('wCard');
+    const wTotalEl = document.getElementById('wTotal');
+    const wLandEl = document.getElementById('wLand');
+    const wDoneEl = document.getElementById('wRouteDone');
+    const wTodoEl = document.getElementById('wRouteTodo');
+    const wPinsEl = document.getElementById('wPins');
+    const wStampEl = document.getElementById('wStamp');
+    const wNextEl = document.getElementById('wNext');
+    const wGridEl = document.getElementById('wGrid');
+    const wCloseBtn = document.getElementById('wClose');
+    const wDoneBtn = document.getElementById('wDone');
+    const tMapBtnEl = document.getElementById('tMapBtn');
+    const mapBtnEl = document.getElementById('mapBtn');
+    const mapBtnNEl = document.getElementById('mapBtnN');
+    const oMapNEl = document.getElementById('oMapN');
+    let stampQueue = [];
+    let worldOpen = false;
+    if (wLandEl) wLandEl.setAttribute('d', WORLD_MAP_PATH);
+
+    function svgPoly(points){
+      if (!points || points.length < 2) return '';
+      const out = [];
+      for (let i=0;i<points.length;i++) out.push((i ? 'L' : 'M') + points[i].x + ' ' + points[i].y);
+      return out.join('');
+    }
+    function earnedCount(total){
+      return worldBadges(total).filter(function(b){ return b.earned; }).length;
+    }
+    function updateMapCounters(){
+      const n = earnedCount(myTotalDistNow());
+      if (mapBtnNEl) mapBtnNEl.textContent = String(n);
+      if (oMapNEl) oMapNEl.textContent = String(n);
+      if (tMapBtnEl) tMapBtnEl.setAttribute('aria-label', '내 세계지도 배지 ' + n + '개 보기');
+    }
+    function renderWorld(opts){
+      const o = opts || {};
+      const total = myTotalDistNow();
+      const route = worldRoute(total);
+      const badges = worldBadges(total);
+      if (wTotalEl) wTotalEl.textContent = '누적 ' + fmtKm(total) + 'km · ' + earthBreakText(total);
+      if (wDoneEl) wDoneEl.innerHTML = (route.done.length > 1)
+        ? '<path class="wRoute done" d="' + svgPoly(route.done) + '"></path>' : '';
+      if (wTodoEl) wTodoEl.innerHTML = (route.todo || []).map(function(seg){
+        return '<path class="wRoute todo" d="' + svgPoly(seg) + '"></path>';
+      }).join('');
+      if (wDoneEl){
+        const pth = wDoneEl.querySelector('path');
+        if (pth && pth.getTotalLength){
+          try { pth.style.setProperty('--len', String(Math.max(10, Math.round(pth.getTotalLength())))); } catch(e){}
+        }
+      }
+      /* 핀: 지나온 곳은 국기, 못 간 곳은 잠금(다음 목표는 남은 km) */
+      const stops = route.stops;
+      const html = [];
+      for (let i=0;i<stops.length;i++){
+        const s = stops[i];
+        const pt = worldPoint(s.lat, s.lon);
+        const earned = (s.km <= total + 0.05);
+        const isNext = (i === route.nextIdx);
+        const last = (i === stops.length - 1);
+        const dy = last ? 34 : 0;                 /* 지구 1바퀴는 서울과 같은 좌표 → 아래로 비킨다 */
+        const cls = 'wPin ' + (earned ? 'on' : 'locked') + (isNext ? ' next' : '');
+        html.push('<g class="' + cls + '" data-km="' + s.km + '" transform="translate(' + pt.x + ',' + pt.y + ')">' +
+          '<circle class="wHalo" r="' + (isNext ? 26 : 20) + '"></circle>' +
+          '<circle class="wDot" r="' + (earned ? 8 : 5) + '"></circle>' +
+          (earned
+            ? '<text class="wFlag" y="' + (-20 + dy) + '">' + s.flag + '</text>' +
+              '<text class="wName" y="' + (32 + dy) + '">' + escapeHtml(s.name) + '</text>'
+            : '<text class="wName" y="' + (30 + dy) + '">' + (isNext ? escapeHtml(fmtKm(s.km - total) + 'km') : '') + '</text>') +
+          '</g>');
+      }
+      if (wPinsEl) wPinsEl.innerHTML = html.join('');
+
+      /* 배지 컬렉션 (여권 스탬프) */
+      const freshKms = {};
+      (o.stamp || []).forEach(function(b){ freshKms[b.km] = true; });
+      if (wGridEl) wGridEl.innerHTML = badges.map(function(b){
+        return '<div class="wBadge ' + (b.earned ? 'on' : 'off') + (freshKms[b.km] ? ' fresh' : '') + '">' +
+          '<b class="bFlag">' + (b.earned ? b.flag : '🔒') + '</b>' +
+          '<span class="bName">' + escapeHtml(b.name) + '</span>' +
+          '<span class="bKm">' + (b.earned ? fmtKmComma(b.km) + 'km 획득' : '남은 ' + fmtKm(b.remain) + 'km') + '</span></div>';
+      }).join('');
+      const next = badges.filter(function(b){ return !b.earned; })[0];
+      if (wNextEl) wNextEl.innerHTML = next
+        ? '다음 배지 <b>' + next.flag + ' ' + escapeHtml(next.name) + '</b> · ' + fmtKm(next.remain) + 'km 더 달리면 획득'
+        : '🌍 모든 지역 배지를 모았다! 지구를 다 돌았다';
+      updateMapCounters();
+      stampQueue = (o.stamp || []).slice();
+      showStamp();
+    }
+    function showStamp(){
+      if (!wStampEl) return;
+      const b = stampQueue[0];
+      if (!b){
+        wStampEl.classList.add('hidden');
+        wStampEl.classList.remove('on');
+        return;
+      }
+      wStampEl.innerHTML = '<div class="wsFlag">' + b.flag + '</div>' +
+        '<div class="wsName">' + escapeHtml(b.name) + ' 배지 획득!</div>' +
+        '<div class="wsKm">' + fmtKmComma(b.km) + 'km 돌파</div>' +
+        '<div class="wsCode">' + escapeHtml(b.code) + ' · PASSPORT</div>' +
+        (stampQueue.length > 1
+          ? '<div class="wsTap">탭하면 다음 배지 (' + (stampQueue.length - 1) + '개 남음)</div>'
+          : '<div class="wsTap">탭해서 닫기</div>');
+      wStampEl.classList.remove('hidden', 'on');
+      void wStampEl.offsetWidth;          /* 애니메이션 다시 시작 */
+      wStampEl.classList.add('on');
+      Sfx.stamp();
+    }
+    function openWorld(opts){
+      if (!worldEl) return;
+      worldOpen = true;
+      renderWorld(opts);
+      worldEl.classList.remove('hidden');
+      if (wCardEl){
+        wCardEl.classList.remove('open');
+        void wCardEl.offsetWidth;         /* 지도가 스르륵 펼쳐지는 애니메이션 */
+        wCardEl.classList.add('open');
+      }
+    }
+    function closeWorld(){
+      if (!worldEl) return;
+      worldOpen = false;
+      worldEl.classList.add('hidden');
+      if (wCardEl) wCardEl.classList.remove('open');
+      stampQueue = [];
+      if (wStampEl){ wStampEl.classList.add('hidden'); wStampEl.classList.remove('on'); }
+    }
+    if (tMapBtnEl) tMapBtnEl.addEventListener('click', function(){ openWorld(); });
+    if (mapBtnEl) mapBtnEl.addEventListener('click', function(){ openWorld(); });
+    if (wCloseBtn) wCloseBtn.addEventListener('click', closeWorld);
+    if (wDoneBtn) wDoneBtn.addEventListener('click', function(){
+      const wasOver = (sim.state === 'crash');
+      closeWorld();
+      if (wasOver) beginRun();
+    });
+    if (wStampEl) wStampEl.addEventListener('click', function(e){
+      e.stopPropagation();
+      stampQueue.shift();
+      if (stampQueue.length) showStamp();
+      else { wStampEl.classList.add('hidden'); wStampEl.classList.remove('on'); }
+    });
+    if (worldEl) worldEl.addEventListener('click', function(e){ if (e.target === worldEl) closeWorld(); });
+
     /* 탭별 강조 수치 (탭에 맞는 값만 크게) */
     function tabValueText(row, tab){
       const t = rankTabId(tab);
@@ -8552,6 +8963,7 @@ if (typeof document !== 'undefined'){
       }
       renderCarUI();
       renderRivals();
+      updateMapCounters();
     }
 
     /* ---------- 인게임: 다음 목표 · 순위 핀 ---------- */
@@ -9051,6 +9463,18 @@ if (typeof document !== 'undefined'){
         updateServerUI();
         refreshOverServer();
       });
+
+      /* v14: 이번 판에 처음 넘은 지역 배지 → 지도가 펼쳐지며 도장 "콩!" */
+      try {
+        const totalNow = myTotalDistNow();
+        const seen = loadBadgeSeen();
+        const fresh = newBadges(totalNow, seen);
+        if (fresh.length){
+          saveBadgeSeen(seen.concat(fresh.map(function(b){ return b.km; })));
+          setTimeout(function(){ openWorld({ stamp: fresh }); }, 1450);
+        }
+        updateMapCounters();
+      } catch(e){}
     }
 
     /* 서버 기록이 섞인 최신 순위표로 게임오버 화면 다시 그림 */
@@ -9060,6 +9484,7 @@ if (typeof document !== 'undefined'){
       /* serverRank.refresh()가 state.rows를 채운 뒤이므로 그 기준으로 다시 합산한다 */
       const lb = renderLeaderboard(sim, mg.list, myBestNow(mg.mine));
       applyOverBest(lb);
+      updateMapCounters();
     }
 
     function applyOverBest(lb){
@@ -9152,6 +9577,10 @@ if (typeof document !== 'undefined'){
     window.addEventListener('keydown', function(e){
       if (e.repeat) return;
       const k = e.key;
+      if (worldOpen){
+        if (k === 'Escape'){ closeWorld(); e.preventDefault(); }
+        return;
+      }
       if (document.activeElement === nickInput){
         if (k === 'Enter' || k === 'Escape'){ nickInput.blur(); e.preventDefault(); }
         return;
@@ -9558,6 +9987,17 @@ if (typeof document !== 'undefined'){
         },
         server: function(){ return serverRank; },
         serverRows: function(){ return serverRank.state.rows.slice(); },
+        /* v14 세계 지도 검증용 */
+        openMap: function(opts){ openWorld(opts); return worldOpen; },
+        closeMap: function(){ closeWorld(); return worldOpen; },
+        mapOpen: function(){ return worldOpen; },
+        badges: function(){ return worldBadges(myTotalDistNow()); },
+        total: function(){ return myTotalDistNow(); },
+        stampBadges: function(kms){
+          const list = worldBadges(myTotalDistNow()).filter(function(b){ return (kms || []).indexOf(b.km) >= 0; });
+          openWorld({ stamp: list });
+          return list.map(function(b){ return b.name; });
+        },
         rivalMerge: function(){ const m = rivalMerge(); return { list: m.list, mine: m.mine, serverCount: m.serverCount, total: m.total }; },
         refreshServer: function(){ return refreshServer(); }
       };
