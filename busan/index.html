@@ -447,14 +447,17 @@
   #over .oBig{font-size:calc(var(--u)*8.6);line-height:1;text-align:center;margin-bottom:calc(var(--u)*1.0);
     filter:drop-shadow(0 6px 22px rgba(0,0,0,.7))}
   #over h2{
-    margin:0 0 calc(var(--u)*.7);font-size:calc(var(--u)*4.6);font-weight:900;line-height:1.28;letter-spacing:-.03em;text-align:center
+    margin:0 0 calc(var(--u)*.7);font-size:calc(var(--u)*4.6);font-weight:900;line-height:1.28;letter-spacing:-.03em;text-align:center;
+    text-shadow:0 3px 16px rgba(0,0,0,.9),0 0 26px rgba(0,0,0,.7)
   }
-  #over .osub{text-align:center;font-size:calc(var(--u)*2.8);color:#9fb4d0;font-weight:700;margin-bottom:calc(var(--u)*2.2)}
+  #over .osub{text-align:center;font-size:calc(var(--u)*2.8);color:#9fb4d0;font-weight:700;margin-bottom:calc(var(--u)*2.2);
+    text-shadow:0 2px 10px rgba(0,0,0,.9)}
   .oStats{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.0);margin-bottom:calc(var(--u)*1.6)}
   .oStats div{background:rgba(255,255,255,.07);border-radius:calc(var(--u)*2.2);padding:calc(var(--u)*1.6) calc(var(--u)*.3);text-align:center}
   .oStats b{display:block;font-size:calc(var(--u)*3.7);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.045em;white-space:nowrap}
   .oStats span{display:block;font-size:calc(var(--u)*2.0);color:#93a9c6;font-weight:700;margin-top:calc(var(--u)*.4);white-space:nowrap}
-  .oBest{text-align:center;font-size:calc(var(--u)*2.8);font-weight:800;color:#ffd479;margin-bottom:calc(var(--u)*1.6);line-height:1.4}
+  .oBest{text-align:center;font-size:calc(var(--u)*2.8);font-weight:800;color:#ffd479;margin-bottom:calc(var(--u)*1.6);line-height:1.4;
+    text-shadow:0 2px 10px rgba(0,0,0,.92),0 0 18px rgba(0,0,0,.6)}
   .oBest span{color:#9fb4d0;font-weight:700;font-size:calc(var(--u)*2.4)}
   .oBest em{font-style:normal;color:#7dffc0}
   /* 게임오버 안내 문구는 한 줄 = 한 블록으로 쌓는다 (겹침·뭉개짐 방지) */
@@ -6620,9 +6623,12 @@ function drawRoadSigns(ctx, sim){
   }
 }
 
-function drawGantry(ctx, sim){
+function drawGantry(ctx, sim, opts){
   const g = sim.gantry;
   if (!g) return;
+  /* 게임오버 오버레이가 떠 있으면 머리 위 큰 초록 표지판(도시 이름)은 그리지 않는다.
+     오버레이 위쪽이 비쳐 보여서 표지판 글자가 게임오버 안내 문구와 겹쳐 뭉개진다. */
+  if (opts && opts.quiet) return;
   const y = g.y;
   if (y < -300 || y > sim.worldH + 300) return;
   ctx.save();
@@ -7476,7 +7482,7 @@ function drawSim(ctx, sim, now){
   drawBeam(ctx, sim);
   drawAngryBubbles(ctx, sim);
 
-  drawGantry(ctx, sim);
+  drawGantry(ctx, sim, { quiet: (sim.state === 'crash' && overScreenUp()) });
   if (sim.state !== 'crash' || sim.crashT < 0.75) drawItemAuras(ctx, sim);
   if (sim.state !== 'crash' || sim.crashT < 0.75) drawPlayer(ctx, sim, now);
   drawPickFx(ctx, sim);
