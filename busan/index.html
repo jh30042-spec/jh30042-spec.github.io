@@ -535,6 +535,9 @@
   .wPin.locked .wHalo{fill:rgba(120,160,200,.06);stroke:rgba(120,160,200,.22);stroke-width:1.6}
   .wPin.next .wHalo{fill:rgba(255,210,74,.14);stroke:rgba(255,210,74,.75);stroke-dasharray:7 6;animation:wPulse 1.7s ease-in-out infinite}
   .wPin.next .wName{fill:#ffd479}
+  .wPin.sel .wDot{fill:#ffd479;filter:drop-shadow(0 0 8px rgba(255,212,121,.95))}
+  .wPin[role="button"]{cursor:pointer}
+  .wPin .wName.next{fill:#ffd479;font-size:22px}
   @keyframes wPulse{0%,100%{opacity:.4}50%{opacity:1}}
   .wStamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);
     width:calc(var(--u)*58);padding:calc(var(--u)*2.2) calc(var(--u)*2);border-radius:calc(var(--u)*2.2);
@@ -556,10 +559,25 @@
   .wStamp .wsCode{font-size:calc(var(--u)*1.65);font-weight:900;color:#8fd6ff;letter-spacing:.16em;margin-top:calc(var(--u)*.7)}
   .wStamp .wsTap{font-size:calc(var(--u)*1.7);font-weight:800;color:#9fb4d0;margin-top:calc(var(--u)*.7)}
   .wNext{font-size:calc(var(--u)*2.15);font-weight:800;color:#a9bfda;line-height:1.35}
+  .wNext b{color:#ffd479}
+  .wDetail{display:flex;align-items:center;gap:calc(var(--u)*1.4);padding:calc(var(--u)*1.4) calc(var(--u)*1.5);
+    border-radius:calc(var(--u)*2);background:rgba(70,180,255,.10);
+    box-shadow:inset 0 0 0 1px rgba(120,215,255,.32)}
+  .wDetail .wdFlag{font-size:calc(var(--u)*6.4);line-height:1}
+  .wDetail .wdBody{flex:1 1 auto;min-width:0}
+  .wDetail .wdTitle{font-size:calc(var(--u)*2.5);font-weight:900;color:#eaf7ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wDetail .wdKm{font-size:calc(var(--u)*1.95);font-weight:900;color:#7ce0ff}
+  .wDetail .wdLand{font-size:calc(var(--u)*1.95);font-weight:800;color:#b9cfe6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wDetail .wdState{flex:0 0 auto;font-size:calc(var(--u)*1.9);font-weight:900;padding:calc(var(--u)*.35) calc(var(--u)*1);border-radius:99px}
+  .wDetail .wdState.on{background:rgba(125,255,192,.18);color:#7dffc0}
+  .wDetail .wdState.off{background:rgba(255,255,255,.10);color:#9fb4d0}
   .wGrid{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*1.1)}
   .wBadge{display:grid;grid-template-columns:auto 1fr;column-gap:calc(var(--u)*1);align-items:center;
-    padding:calc(var(--u)*1.15) calc(var(--u)*1.3);border-radius:calc(var(--u)*1.8);
-    background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+    padding:calc(var(--u)*1.15) calc(var(--u)*1.3);border-radius:calc(var(--u)*1.8);border:none;
+    font-family:inherit;text-align:left;cursor:pointer;touch-action:manipulation;
+    background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);color:inherit}
+  .wBadge.sel{box-shadow:inset 0 0 0 1.5px rgba(255,212,121,.9)}
+  .wBadge:active{transform:scale(.98)}
   .wBadge .bFlag{grid-row:1 / span 2;font-size:calc(var(--u)*4.4);line-height:1}
   .wBadge .bName{font-size:calc(var(--u)*2.2);font-weight:900;color:#dbeaf8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .wBadge .bKm{font-size:calc(var(--u)*1.8);font-weight:800;color:#8fa5c2}
@@ -832,6 +850,7 @@
         <div class="wStamp hidden" id="wStamp" aria-live="polite"></div>
       </div>
       <div class="wNext" id="wNext"></div>
+      <div class="wDetail" id="wDetail"></div>
       <div class="wGrid" id="wGrid"></div>
       <button id="wDone" class="cta alt">계속 달리기 🔁</button>
     </div>
@@ -2029,8 +2048,8 @@ function rankRecordsFor(status, localRecords, mine){
     r.bestCombo = Math.max(0, Number(mine.maxCombo) || 0);
     r.bestSpot = typeof mine.spot === 'string' ? mine.spot : '';
     r.runs = Math.max(1, Number(r.runs) || 0);
-    /* 누적 거리는 서버 항목과 기기 기록 중 큰 쪽 (줄어들지 않는다) */
-    r.totalKm = Math.round(Math.max(r.totalKm, totalDistBase(mine)) * 10) / 10;
+    /* 서버가 live면 누적 거리도 서버 기록 기준(다른 사람과 같은 잣대) */
+    r.totalKm = Math.round(totalDistBase(mine) * 10) / 10;
     r.totalDist = r.totalKm;
   } else {
     r.bestKm = 0; r.bestScore = 0; r.bestCombo = 0; r.bestSpot = ''; r.runs = 0;
@@ -2143,17 +2162,25 @@ const WORLD_MAP_PATH = (
    서울에서 출발해 그 거리만큼 달렸을 때 도착하는 곳.
    ========================================================= */
 const EARTH_MILESTONES = [
-  { km:0,     name:'국내 주행',  short:'국내',     emoji:'🚗', flag:'🇰🇷', country:'대한민국',      code:'KOR',   lat:37.6, lon:127.0 },
-  { km:400,   name:'부산',      short:'부산',     emoji:'🌊', flag:'🇰🇷', country:'대한민국',      code:'KOR',   lat:35.2, lon:129.0 },
-  { km:1160,  name:'도쿄',      short:'도쿄',     emoji:'🗼', flag:'🇯🇵', country:'일본',          code:'JPN',   lat:35.7, lon:139.7 },
-  { km:2090,  name:'홍콩',      short:'홍콩',     emoji:'🥟', flag:'🇭🇰', country:'홍콩',          code:'HKG',   lat:22.3, lon:114.2 },
-  { km:3720,  name:'방콕',      short:'방콕',     emoji:'🐘', flag:'🇹🇭', country:'태국',          code:'THA',   lat:13.8, lon:100.5 },
-  { km:4050,  name:'콜카타',    short:'콜카타',   emoji:'🚃', flag:'🇮🇳', country:'인도',          code:'IND',   lat:22.6, lon:88.4 },
-  { km:4680,  name:'뉴델리',    short:'뉴델리',   emoji:'🛺', flag:'🇮🇳', country:'인도',          code:'IND',   lat:28.6, lon:77.2 },
-  { km:6740,  name:'두바이',    short:'두바이',   emoji:'🐪', flag:'🇦🇪', country:'아랍에미리트',  code:'UAE',   lat:25.2, lon:55.3 },
-  { km:8970,  name:'파리',      short:'파리',     emoji:'🥐', flag:'🇫🇷', country:'프랑스',        code:'FRA',   lat:48.9, lon:2.35 },
-  { km:11050, name:'뉴욕',      short:'뉴욕',     emoji:'🗽', flag:'🇺🇸', country:'미국',          code:'USA',   lat:40.7, lon:-74.0 },
-  { km:40075, name:'지구 1바퀴', short:'지구 1바퀴', emoji:'🌍', flag:'🌍', country:'지구',         code:'EARTH', lat:37.6, lon:127.0 }
+  { km:0,     name:'서울',      short:'서울',     emoji:'🚗', flag:'🇰🇷', country:'대한민국',      code:'KOR',   lat:37.57, lon:126.98, landmark:'여기서 출발!' },
+  { km:400,   name:'부산',      short:'부산',     emoji:'🌊', flag:'🇰🇷', country:'대한민국',      code:'KOR',   lat:35.18, lon:129.08, landmark:'해운대·광안리 도착!' },
+  { km:830,   name:'오사카',    short:'오사카',   emoji:'🐙', flag:'🇯🇵', country:'일본',          code:'JPN',   lat:34.69, lon:135.50, landmark:'도톤보리 타코야키!' },
+  { km:1155,  name:'도쿄',      short:'도쿄',     emoji:'🗼', flag:'🇯🇵', country:'일본',          code:'JPN',   lat:35.68, lon:139.69, landmark:'시부야 교차로!' },
+  { km:1480,  name:'타이베이',  short:'타이베이', emoji:'🏮', flag:'🇹🇼', country:'대만',          code:'TWN',   lat:25.03, lon:121.56, landmark:'지우펀·야시장!' },
+  { km:2090,  name:'홍콩',      short:'홍콩',     emoji:'🥟', flag:'🇭🇰', country:'홍콩',          code:'HKG',   lat:22.30, lon:114.17, landmark:'침사추이 백만불 야경!' },
+  { km:2740,  name:'하노이',    short:'하노이',   emoji:'🐢', flag:'🇻🇳', country:'베트남',        code:'VNM',   lat:21.03, lon:105.85, landmark:'호안끼엠 호수!' },
+  { km:3720,  name:'방콕',      short:'방콕',     emoji:'🐘', flag:'🇹🇭', country:'태국',          code:'THA',   lat:13.76, lon:100.50, landmark:'카오산로드!' },
+  { km:4050,  name:'콜카타',    short:'콜카타',   emoji:'🚃', flag:'🇮🇳', country:'인도',          code:'IND',   lat:22.57, lon:88.36,  landmark:'갠지스 하류 · 4,000km대 돌파!' },
+  { km:4670,  name:'싱가포르',  short:'싱가포르', emoji:'🦁', flag:'🇸🇬', country:'싱가포르',      code:'SGP',   lat:1.35,  lon:103.82, landmark:'마리나베이 머라이언상!' },
+  { km:5290,  name:'자카르타',  short:'자카르타', emoji:'🏙️', flag:'🇮🇩', country:'인도네시아',    code:'IDN',   lat:-6.21, lon:106.85, landmark:'적도 다리 넘어 적도 돌파!' },
+  { km:6740,  name:'두바이',    short:'두바이',   emoji:'🐪', flag:'🇦🇪', country:'아랍에미리트',  code:'UAE',   lat:25.20, lon:55.27,  landmark:'부르즈 할리파!' },
+  { km:7960,  name:'이스탄불',  short:'이스탄불', emoji:'🕌', flag:'🇹🇷', country:'튀르키예',      code:'TUR',   lat:41.01, lon:28.98,  landmark:'유럽·아시아 경계 보스포루스!' },
+  { km:8320,  name:'시드니',    short:'시드니',   emoji:'🎭', flag:'🇦🇺', country:'호주',          code:'AUS',   lat:-33.87, lon:151.21, landmark:'오페라하우스!' },
+  { km:8970,  name:'파리',      short:'파리',     emoji:'🥐', flag:'🇫🇷', country:'프랑스',        code:'FRA',   lat:48.86, lon:2.35,   landmark:'에펠탑!' },
+  { km:9580,  name:'로스앤젤레스', short:'LA',    emoji:'🎬', flag:'🇺🇸', country:'미국',          code:'USA',   lat:34.05, lon:-118.24, landmark:'할리우드 사인!' },
+  { km:11050, name:'뉴욕',      short:'뉴욕',     emoji:'🗽', flag:'🇺🇸', country:'미국',          code:'USA',   lat:40.71, lon:-74.01, landmark:'타임스스퀘어!' },
+  { km:18350, name:'상파울루',  short:'상파울루', emoji:'⚽', flag:'🇧🇷', country:'브라질',        code:'BRA',   lat:-23.55, lon:-46.63, landmark:'지구 반대편 남미!' },
+  { km:40075, name:'지구 1바퀴', short:'지구 1바퀴', emoji:'🌍', flag:'🌍', country:'지구',         code:'EARTH', lat:37.57, lon:126.98, landmark:'서울 금의환향!' }
 ];
 const EARTH_KM = EARTH_MILESTONES[EARTH_MILESTONES.length - 1].km;
 function fmtKmComma(v){
@@ -2193,7 +2220,7 @@ function earthTagText(km){
 /* "🌊 지구 기준 400km 부산 돌파!" */
 function earthBreakText(km){
   const m = earthMilestoneAt(km);
-  if (!m || m.km <= 0) return '🚗 아직 국내 주행 중 · 400km에서 부산 돌파!';
+  if (!m || m.km <= 0) return '🚗 아직 서울 · 400km에서 부산 돌파!';
   return m.emoji + ' 지구 기준 ' + fmtKmComma(m.km) + 'km ' + m.name + ' 돌파!';
 }/* "다음 1,160km 도쿄까지 760km" */
 function earthNextText(km){
@@ -2218,10 +2245,12 @@ function worldPoint(lat, lon){
 }
 /* 경로 정점: 서울(0km) → 각 돌파 지점 (지구 1바퀴는 서울로 돌아오는 루프) */
 function worldStops(){
-  const out = [{ km:0, name:WORLD_START.name, flag:WORLD_START.flag, lat:WORLD_START.lat, lon:WORLD_START.lon, start:true }];
+  const out = [{ km:0, name:WORLD_START.name, flag:WORLD_START.flag, lat:WORLD_START.lat, lon:WORLD_START.lon,
+    country:'대한민국', code:'KOR', landmark:'여기서 출발!', start:true }];
   for (let i=1;i<EARTH_MILESTONES.length;i++){
     const m = EARTH_MILESTONES[i];
-    out.push({ km:m.km, name:m.name, flag:m.flag, lat:m.lat, lon:m.lon, code:m.code, m:m });
+    out.push({ km:m.km, name:m.name, flag:m.flag, lat:m.lat, lon:m.lon, country:m.country, code:m.code,
+      landmark:m.landmark || '', emoji:m.emoji, m:m });
   }
   return out;
 }
@@ -2248,7 +2277,7 @@ function worldRoute(total){
   }
   return { done: done, todo: todo, lastIdx: lastIdx, nextIdx: nextIdx, stops: stops };
 }
-/* 배지 목록 — 누적 거리로 획득 여부·남은 거리 */
+/* 배지 목록 — 누적 거리로 획득 여부·남은 거리 + 지역 디테일 */
 function worldBadges(total){
   const t = Math.max(0, Number(total) || 0);
   const out = [];
@@ -2256,11 +2285,22 @@ function worldBadges(total){
     const m = EARTH_MILESTONES[i];
     out.push({
       km: m.km, name: m.name, flag: m.flag, country: m.country, code: m.code, emoji: m.emoji,
+      landmark: m.landmark || '',
       earned: t + 0.05 >= m.km,
       remain: Math.max(0, Math.round((m.km - t) * 10) / 10)
     });
   }
   return out;
+}
+/* 배지 한 줄 소개 — "대한민국 · 부산" / "서울에서 400km" / "해운대·광안리 도착!" */
+function badgeTitle(b){
+  if (!b) return '';
+  return b.country + ' · ' + b.name;
+}
+function badgeLine(b){
+  if (!b) return '';
+  const head = b.flag + ' ' + badgeTitle(b);
+  return head + ' · 서울에서 ' + fmtKmComma(b.km) + 'km' + (b.landmark ? ' · ' + b.landmark : '');
 }
 /* 이미 축하한 배지(km 목록) — 같은 배지를 매판 다시 축하하지 않는다 */
 function loadBadgeSeen(store){
@@ -8278,6 +8318,7 @@ const API = {
   /* v14: 세계 지도 · 여권 배지 */
   MAP_W: MAP_W, MAP_H: MAP_H, WORLD_MAP_PATH: WORLD_MAP_PATH, WORLD_START: WORLD_START, BADGE_KEY: BADGE_KEY,
   worldPoint: worldPoint, worldStops: worldStops, worldRoute: worldRoute, worldBadges: worldBadges,
+  badgeTitle: badgeTitle, badgeLine: badgeLine,
   loadBadgeSeen: loadBadgeSeen, saveBadgeSeen: saveBadgeSeen, newBadges: newBadges,
   combinedScore: combinedScore, rankTabId: rankTabId, rankValue: rankValue, sortRowsByTab: sortRowsByTab,
   CAMERA: CAMERA, CAMERA_R: CAMERA_R, CAMERA_CD_MIN: CAMERA_CD_MIN, CAMERA_CD_MAX: CAMERA_CD_MAX,
@@ -8538,8 +8579,10 @@ if (typeof document !== 'undefined'){
     const mapBtnEl = document.getElementById('mapBtn');
     const mapBtnNEl = document.getElementById('mapBtnN');
     const oMapNEl = document.getElementById('oMapN');
+    const wDetailEl = document.getElementById('wDetail');
     let stampQueue = [];
     let worldOpen = false;
+    let selectedKm = 0;
     if (wLandEl) wLandEl.setAttribute('d', WORLD_MAP_PATH);
 
     function svgPoly(points){
@@ -8562,6 +8605,12 @@ if (typeof document !== 'undefined'){
       const total = myTotalDistNow();
       const route = worldRoute(total);
       const badges = worldBadges(total);
+      /* 선택 배지: 새로 받은 배지 → 마지막 획득 → 다음 목표 */
+      if (o.stamp && o.stamp.length) selectedKm = o.stamp[0].km;
+      if (!badgeByKm(selectedKm)){
+        const earnedList = badges.filter(function(b){ return b.earned; });
+        selectedKm = earnedList.length ? earnedList[earnedList.length - 1].km : (badges[0] ? badges[0].km : 0);
+      }
       if (wTotalEl) wTotalEl.textContent = '누적 ' + fmtKm(total) + 'km · ' + earthBreakText(total);
       if (wDoneEl) wDoneEl.innerHTML = (route.done.length > 1)
         ? '<path class="wRoute done" d="' + svgPoly(route.done) + '"></path>' : '';
@@ -8574,44 +8623,62 @@ if (typeof document !== 'undefined'){
           try { pth.style.setProperty('--len', String(Math.max(10, Math.round(pth.getTotalLength())))); } catch(e){}
         }
       }
-      /* 핀: 지나온 곳은 국기, 못 간 곳은 잠금(다음 목표는 남은 km)
-         동아시아처럼 가까운 지점은 국기를 계단식으로 올려 이름 없이 세로로 쌓아 겹침을 막는다. */
+      /* 핀: 지나온 곳은 국기, 못 간 곳은 점만(다음 목표는 남은 km).
+         글자는 서로 겹치지 않는 자리에만 놓는다(가까운 동아시아 구간은 엇갈려 쌓인다). */
       const stops = route.stops;
       const pts = stops.map(function(s){ return worldPoint(s.lat, s.lon); });
-      const dense = pts.map(function(p, i){
-        for (let j=0;j<pts.length;j++){
-          if (i === j) continue;
-          if (Math.abs(pts[j].x - p.x) < 46 && Math.abs(pts[j].y - p.y) < 30) return true;
+      const placed = [];
+      function freeLabel(x, y){
+        for (let i=0;i<placed.length;i++){
+          if (Math.abs(placed[i].x - x) < 46 && Math.abs(placed[i].y - y) < 26) return false;
         }
-        return false;
-      });
-      const levels = [];
+        return true;
+      }
+      function takeLabel(x, y){
+        placed.push({ x: x, y: y });
+        return y;
+      }
+      function labelSlot(x, y){
+        for (let k=0;k<8;k++){
+          const cand = y - 24 - k * 25;
+          if (cand > 14 && freeLabel(x, cand)) return takeLabel(x, cand);
+        }
+        for (let k=1;k<4;k++){
+          const cand = y + 26 + k * 24;
+          if (cand < MAP_H - 10 && freeLabel(x, cand)) return takeLabel(x, cand);
+        }
+        return null;
+      }
       const html = [];
       for (let i=0;i<stops.length;i++){
         const s = stops[i];
         const pt = pts[i];
-        let level = 0;
-        for (let j=0;j<i;j++){
-          if (Math.abs(pts[j].x - pt.x) < 46 && Math.abs(pts[j].y - pt.y) < 30) level = Math.max(level, levels[j] + 1);
-        }
-        levels.push(level);
         const earned = (s.km <= total + 0.05);
         const isNext = (i === route.nextIdx);
         const last = (i === stops.length - 1);
-        const dy = last ? 34 : 0;                 /* 지구 1바퀴는 서울과 같은 좌표 → 아래로 비킨다 */
-        const showName = (!dense[i] || i === 0);
-        const flagY = -20 - level * 26 + (last ? 18 : 0);
-        const nameY = 32 + dy;
-        const cls = 'wPin ' + (earned ? 'on' : 'locked') + (isNext ? ' next' : '');
-        html.push('<g class="' + cls + '" data-km="' + s.km + '" transform="translate(' + pt.x + ',' + pt.y + ')">' +
-          '<circle class="wHalo" r="' + (isNext ? 26 : 20) + '"></circle>' +
-          '<circle class="wDot" r="' + (earned ? 8 : 5) + '"></circle>' +
-          (earned
-            ? '<text class="wFlag" y="' + flagY + '">' + s.flag + '</text>'
-            : '<text class="wLock" y="' + flagY + '">🔒</text>') +
-          (showName
-            ? '<text class="wName" y="' + nameY + '">' + escapeHtml(s.name) + '</text>'
-            : (isNext ? '<text class="wName" y="' + nameY + '">' + escapeHtml(fmtKm(s.km - total) + 'km') + '</text>' : '')) +
+        const cls = 'wPin ' + (earned ? 'on' : (isNext ? 'next' : 'locked')) + (selectedKm === s.km ? ' sel' : '');
+        let glyph = '';
+        if (earned){
+          const ly = labelSlot(pt.x, pt.y);
+          if (ly !== null){
+            glyph = '<text class="wFlag" y="' + ly + '">' + s.flag + '</text>';
+            /* 이름은 국기 아래(또는 위)에 자리가 있을 때만 */
+            const nameY = (ly < pt.y) ? ly + 20 : ly - 20;
+            if (freeLabel(pt.x, nameY)){
+              takeLabel(pt.x, nameY);
+              glyph += '<text class="wName" y="' + nameY + '">' + escapeHtml(s.name) + '</text>';
+            }
+          }
+        } else if (isNext){
+          const ly = labelSlot(pt.x, pt.y);
+          if (ly !== null) glyph = '<text class="wName next" y="' + ly + '">' + escapeHtml(fmtKm(s.km - total) + 'km') + '</text>';
+        }
+        html.push('<g class="' + cls + '" data-km="' + s.km + '" transform="translate(' + pt.x + ',' + pt.y + ')"' +
+          ' role="button" tabindex="0" aria-label="' + escapeHtml((s.country || '') + ' ' + s.name) + '">' +
+          '<circle class="wHalo" r="' + (isNext ? 26 : 18) + '"></circle>' +
+          '<circle class="wDot" r="' + (earned ? 8 : (isNext ? 6 : 4)) + '"></circle>' +
+          glyph +
+          (last ? '<text class="wName" y="46">' + escapeHtml(s.name) + '</text>' : '') +
           '</g>');
       }
       if (wPinsEl) wPinsEl.innerHTML = html.join('');
@@ -8620,18 +8687,50 @@ if (typeof document !== 'undefined'){
       const freshKms = {};
       (o.stamp || []).forEach(function(b){ freshKms[b.km] = true; });
       if (wGridEl) wGridEl.innerHTML = badges.map(function(b){
-        return '<div class="wBadge ' + (b.earned ? 'on' : 'off') + (freshKms[b.km] ? ' fresh' : '') + '">' +
+        return '<button class="wBadge ' + (b.earned ? 'on' : 'off') + (freshKms[b.km] ? ' fresh' : '') +
+          (b.km === selectedKm ? ' sel' : '') + '" data-km="' + b.km + '" aria-label="' +
+          escapeHtml(b.flag + ' ' + b.country + ' ' + b.name) + '">' +
           '<b class="bFlag">' + (b.earned ? b.flag : '🔒') + '</b>' +
           '<span class="bName">' + escapeHtml(b.name) + '</span>' +
-          '<span class="bKm">' + (b.earned ? fmtKmComma(b.km) + 'km 획득' : '남은 ' + fmtKm(b.remain) + 'km') + '</span></div>';
+          '<span class="bKm">' + (b.earned ? fmtKmComma(b.km) + 'km 획득' : '남은 ' + fmtKm(b.remain) + 'km') + '</span></button>';
       }).join('');
       const next = badges.filter(function(b){ return !b.earned; })[0];
       if (wNextEl) wNextEl.innerHTML = next
-        ? '다음 배지 <b>' + next.flag + ' ' + escapeHtml(next.name) + '</b> · ' + fmtKm(next.remain) + 'km 더 달리면 획득'
+        ? '다음 배지 <b>' + next.flag + ' ' + escapeHtml(next.country + ' ' + next.name) + '</b> · ' + fmtKm(next.remain) + 'km 더 달리면 획득'
         : '🌍 모든 지역 배지를 모았다! 지구를 다 돌았다';
+      renderBadgeDetail();
       updateMapCounters();
-      stampQueue = (o.stamp || []).slice();
-      showStamp();
+      if (!o.keepStamp){
+        stampQueue = (o.stamp || []).slice();
+        showStamp();
+      }
+    }
+    function badgeByKm(km){
+      const list = worldBadges(myTotalDistNow());
+      for (let i=0;i<list.length;i++) if (list[i].km === Number(km)) return list[i];
+      return null;
+    }
+    /* 선택한 배지 디테일 — 국가 · 지역 · 서울에서 거리 · 랜드마크 */
+    function renderBadgeDetail(){
+      if (!wDetailEl) return;
+      const b = badgeByKm(selectedKm);
+      if (!b){ wDetailEl.innerHTML = ''; return; }
+      wDetailEl.innerHTML =
+        '<div class="wdFlag">' + b.flag + '</div>' +
+        '<div class="wdBody">' +
+          '<div class="wdTitle">' + escapeHtml(b.country) + ' · ' + escapeHtml(b.name) + '</div>' +
+          '<div class="wdKm">서울에서 ' + fmtKmComma(b.km) + 'km</div>' +
+          '<div class="wdLand">' + escapeHtml(b.landmark || '') + '</div>' +
+        '</div>' +
+        '<div class="wdState ' + (b.earned ? 'on' : 'off') + '">' +
+          (b.earned ? '✓ 획득' : '잠금 · ' + fmtKm(b.remain) + 'km') + '</div>';
+    }
+    function selectBadge(km){
+      selectedKm = Number(km) || 0;
+      renderWorld({ keepStamp: true });
+      if (wDetailEl && wDetailEl.scrollIntoView) {
+        try { wDetailEl.scrollIntoView({ block: 'nearest' }); } catch(e){}
+      }
     }
     function showStamp(){
       if (!wStampEl) return;
@@ -8685,6 +8784,16 @@ if (typeof document !== 'undefined'){
       stampQueue.shift();
       if (stampQueue.length) showStamp();
       else { wStampEl.classList.add('hidden'); wStampEl.classList.remove('on'); }
+    });
+    if (wPinsEl) wPinsEl.addEventListener('click', function(e){
+      const g = (e.target && e.target.closest) ? e.target.closest('[data-km]') : null;
+      if (!g) return;
+      selectBadge(Number(g.getAttribute('data-km')));
+    });
+    if (wGridEl) wGridEl.addEventListener('click', function(e){
+      const btn = (e.target && e.target.closest) ? e.target.closest('[data-km]') : null;
+      if (!btn) return;
+      selectBadge(Number(btn.getAttribute('data-km')));
     });
     if (worldEl) worldEl.addEventListener('click', function(e){ if (e.target === worldEl) closeWorld(); });
 
@@ -8914,15 +9023,18 @@ if (typeof document !== 'undefined'){
       }
       return base;
     }
-    /* 화면에 보여줄 내 누적 거리 — 기기 기록·서버 기록 중 큰 쪽 (역전 없음) */
+    /* 화면에 보여줄 내 누적 거리 — 서버가 live면 서버 기록(다른 사람과 같은 잣대),
+       오프라인이거나 아직 서버 기록이 없으면 기기 기록 */
     function myTotalDistNow(){
       const st = serverRank.state;
       const rec = sim.rec || loadRecords();
-      let t = Math.max(0, Number(rec.totalKm) || 0, Number(rec.totalDist) || 0);
+      const local = Math.round(Math.max(0, Number(rec.totalKm) || 0, Number(rec.totalDist) || 0) * 10) / 10;
+      if (st.status !== 'live') return local;
+      let t = 0;
       const mine = rivalMerge().mine;
       if (mine) t = Math.max(t, totalDistBase(mine));
       if (st.posted) t = Math.max(t, totalDistBase(st.posted));
-      return Math.round(t * 10) / 10;
+      return Math.round((t > 0 ? t : local) * 10) / 10;
     }
 
     /* 게임오버 → 서버 등록(1km 이상) → 최신 랭킹 재조회 */
