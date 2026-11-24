@@ -10,5 +10,13 @@
 </head>
 <body>
 <iframe id="f" src="./index.html" title="서울→부산 390x680 검증"></iframe>
+<script>
+  /* 검증용: ?cb=캐시버스터 로 게임 문서를 새로 받는다 (Pages 캐시 회피) */
+  (function(){
+    var q = new URLSearchParams(location.search);
+    var cb = q.get('cb');
+    if (cb) document.getElementById('f').src = './index.html?cb=' + encodeURIComponent(cb);
+  })();
+</script>
 </body>
 </html>
