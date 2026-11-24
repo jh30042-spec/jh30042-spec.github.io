@@ -9000,7 +9000,7 @@ if (typeof document !== 'undefined'){
       return serverRank.refresh().then(function(st){
         updateServerUI();
         if (sim.state === 'title'){
-          renderRivals();
+          updateTitle();          /* 누적 거리·배지 수도 서버 기준으로 다시 */
         } else if (sim.state === 'crash'){
           refreshOverServer();
         }
