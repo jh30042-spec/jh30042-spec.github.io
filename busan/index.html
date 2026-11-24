@@ -4752,7 +4752,22 @@ function drawConeLights(ctx, sim){
     ctx.lineTo(x + 12, y - 100 - 34 * on);
     ctx.lineTo(x - 12, y - 100 - 34 * on);
     ctx.closePath(); ctx.fill();
-    /* LED 코알 — on이면 주황-흰색, off면 적색 */
+    /* 밤 안개에 먹힌 콘 본체를 '빛나는 콘'으로 한 번 더 그린다 (형태가 남는다) */
+    const cw = o.w || 24, chh = o.h || 26;
+    const cy2 = o.y;
+    ctx.fillStyle = 'rgba(255,112,20,' + (0.34 + 0.34 * night).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.moveTo(x, cy2 - chh / 2);
+    ctx.lineTo(x + cw / 2, cy2 + chh / 2 - 4);
+    ctx.lineTo(x - cw / 2, cy2 + chh / 2 - 4);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,245,225,' + (0.42 + 0.40 * night).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.moveTo(x, cy2 - chh * 0.12);
+    ctx.lineTo(x + cw * 0.26, cy2 + chh * 0.16);
+    ctx.lineTo(x - cw * 0.26, cy2 + chh * 0.16);
+    ctx.closePath(); ctx.fill();
+    /* LED 코어 — on이면 주황-흰색, off면 적색 */
     ctx.fillStyle = on > 0.45
       ? 'rgba(255,236,180,' + (0.85 * k).toFixed(3) + ')'
       : 'rgba(255,64,36,' + (0.62 * k).toFixed(3) + ')';
