@@ -6232,8 +6232,12 @@ function drawItems(ctx, sim){
     if (ctx.setLineDash) ctx.setLineDash([7, 6]);
     ctx.beginPath(); ctx.arc(0, 0, 35, 0, 7); ctx.stroke();
     if (ctx.setLineDash) ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(255,255,255,0.20)';
-    ctx.beginPath(); ctx.arc(0, 0, 24, 0, 7); ctx.fill();
+    /* 아이콘이 묻히지 않게 안쪽은 어둡게 — 이모지가 또렷하게 읽힌다 */
+    ctx.fillStyle = 'rgba(8,12,20,0.62)';
+    ctx.beginPath(); ctx.arc(0, 0, 25, 0, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(0, 0, 25, 0, 7); ctx.stroke();
     if (it.type === MYSTERY.id){
       /* 랜덤 박스: 물음표(?)가 적힌 상자 — 한눈에 '뭐가 나올까' 로 보이게 */
       ctx.fillStyle = 'rgba(38,22,64,0.96)';
