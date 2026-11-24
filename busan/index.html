@@ -1093,7 +1093,7 @@ function loadRecords(store){
       r.bestSpeed = Math.max(0, Number(o.bestSpeed) || 0);
       r.bestCombo = Math.max(0, Number(o.bestCombo) || 0);
       r.runs = Math.max(0, Number(o.runs) || 0);
-      r.totalKm = Math.max(0, Number(o.totalKm) || 0, Number(o.totalDist) || 0);
+      r.totalKm = Math.max(0, Number(o.totalKm) || 0, Number(o.totalDist) || 0, Number(o.bestKm) || 0);
       r.totalDist = r.totalKm;
       r.updated = Number(o.updated) || 0;
       r.bestSpot = typeof o.bestSpot === 'string' ? o.bestSpot.slice(0, 48) : '';
@@ -1129,7 +1129,7 @@ function runDistOf(sim){
 function commitRun(sim, store){
   const r = Object.assign(blankRecords(), sim.rec || {});
   const prevBest = r.bestKm || 0;
-  const prevTotal = Math.max(0, Number(r.totalKm) || 0, Number(r.totalDist) || 0);
+  const prevTotal = Math.max(0, Number(r.totalKm) || 0, Number(r.totalDist) || 0, Number(r.bestKm) || 0);
   const dNow = Math.round(Math.max(0, Number(sim.dist) || 0) * 10) / 10;
   const prevBanked = Math.max(0, Number(sim.bankedDist) || 0);
   const runDelta = Math.round(Math.max(0, dNow - prevBanked) * 10) / 10;
@@ -1298,13 +1298,15 @@ function defaultRivals(){
     { nick:'최기사', car:'tractor', km:61.2,  score:1190, maxCombo:2,  totalDist:402.8,  spot:'수원 톨게이트 경운기 참변', d:true }
   ];
 }
-/* 누적 거리의 시작점 — totalDist 가 없는 예전 기록은 최고 거리(km)에서 시작한다 */
+/* 누적 거리의 시작점 — totalDist 가 없는 예전 기록은 최고 거리(km)에서 시작한다.
+   누적은 최고 거리보다 작을 수 없다(구버전 totalKm이 낙은 경우도 여기서 보정). */
 function totalDistBase(row){
   const r = row || {};
-  const td = Number(r.totalDist);
-  if (isFinite(td) && td >= 0) return Math.round(clamp(td, 0, 9999999) * 10) / 10;
   const km = Number(r.km);
-  return isFinite(km) && km > 0 ? Math.round(clamp(km, 0, 9999999) * 10) / 10 : 0;
+  const kmR = (isFinite(km) && km > 0) ? Math.round(clamp(km, 0, 9999999) * 10) / 10 : 0;
+  const td = Number(r.totalDist);
+  const tdR = (isFinite(td) && td >= 0) ? Math.round(clamp(td, 0, 9999999) * 10) / 10 : 0;
+  return Math.max(kmR, tdR);
 }
 /* 이번 판을 더한 새 누적 거리 (역전 없음: 항상 base 이상으로만 커진다) */
 function nextTotalDist(prev, runDist){
