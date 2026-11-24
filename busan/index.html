@@ -2295,6 +2295,7 @@ function worldBadges(total){
 /* 배지 한 줄 소개 — "대한민국 · 부산" / "서울에서 400km" / "해운대·광안리 도착!" */
 function badgeTitle(b){
   if (!b) return '';
+  if (!b.country || b.country === b.name) return b.name;   /* 홍콩 · 싱가포르처럼 도시=나라 */
   return b.country + ' · ' + b.name;
 }
 function badgeLine(b){
@@ -8696,7 +8697,7 @@ if (typeof document !== 'undefined'){
       if (wGridEl) wGridEl.innerHTML = badges.map(function(b){
         return '<button class="wBadge ' + (b.earned ? 'on' : 'off') + (freshKms[b.km] ? ' fresh' : '') +
           (b.km === selectedKm ? ' sel' : '') + '" data-km="' + b.km + '" aria-label="' +
-          escapeHtml(b.flag + ' ' + b.country + ' ' + b.name) + '">' +
+          escapeHtml(b.flag + ' ' + badgeTitle(b)) + '">' +
           '<b class="bFlag">' + (b.earned ? b.flag : '🔒') + '</b>' +
           '<span class="bName">' + escapeHtml(b.name) + '</span>' +
           '<span class="bKm">' + (b.earned ? fmtKmComma(b.km) + 'km 획득' : '남은 ' + fmtKm(b.remain) + 'km') + '</span></button>';
@@ -8725,7 +8726,7 @@ if (typeof document !== 'undefined'){
       wDetailEl.innerHTML =
         '<div class="wdFlag">' + b.flag + '</div>' +
         '<div class="wdBody">' +
-          '<div class="wdTitle">' + escapeHtml(b.country) + ' · ' + escapeHtml(b.name) + '</div>' +
+          '<div class="wdTitle">' + escapeHtml(badgeTitle(b)) + '</div>' +
           '<div class="wdKm">서울에서 ' + fmtKmComma(b.km) + 'km</div>' +
           '<div class="wdLand">' + escapeHtml(b.landmark || '') + '</div>' +
         '</div>' +
