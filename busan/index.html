@@ -1806,12 +1806,21 @@ function createServerRank(opts){
     }
     state.status = 'loading';
     /* v14: 누적거리는 km 와 다른 축 — 두 축을 한꺼번에 받아 닉네임 기준으로 합핍다.
-       totalDist 조회가 실패해도(인덱스 없음·구버전 DB) km 순위는 그대로 살린다. */
+       totalDist 인덱스가 없는 DB(규칙 .indexOn 미포함)는 전체 목록으로 대체하고,
+       그도 실패하면 km 순위만으로 살린다. */
     const qKm = url + '?orderBy="km"&limitToLast=' + limit;
     const qTotal = url + '?orderBy="totalDist"&limitToLast=' + limit;
+    function fetchAll(){
+      return fetchWithTimeout(fetchImpl, url, { method: 'GET', cache: 'no-store' }, timeoutMs)
+        .then(function(res){
+          if (!res || !res.ok) throw new Error('http ' + (res && res.status));
+          return res.json();
+        })
+        .then(function(json){ return parseServerPayload(json); });
+    }
     const job = Promise.all([
       fetchRows(qKm),
-      fetchRows(qTotal).catch(function(){ return null; })
+      fetchRows(qTotal).catch(fetchAll).catch(function(){ return null; })
     ]).then(function(res){
       state.rows = dedupeServerRivals((res[0] || []).concat(res[1] || []));
       state.status = 'live';
