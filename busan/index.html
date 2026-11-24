@@ -385,9 +385,9 @@
   .rRow .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .rRow .km{color:#ffd479;font-variant-numeric:tabular-nums;white-space:nowrap}
   /* v14: 누적거리 탭 — 지구 기준 돌파 지점 배지 */
-  .rRow .eb{flex:0 0 auto;font-size:calc(var(--u)*1.7);font-weight:900;color:#bdefff;
-    background:rgba(70,180,255,.16);box-shadow:inset 0 0 0 1px rgba(120,215,255,.3);
-    border-radius:99px;padding:calc(var(--u)*.15) calc(var(--u)*.7);white-space:nowrap}
+  .rRow .eb{flex:0 0 auto;font-size:calc(var(--u)*1.85);line-height:1.45;font-weight:900;color:#d6f4ff;
+    background:rgba(70,180,255,.18);box-shadow:inset 0 0 0 1px rgba(120,215,255,.32);
+    border-radius:99px;padding:0 calc(var(--u)*.9);margin-right:calc(var(--u)*.2);white-space:nowrap}
   .rRow.me{background:rgba(125,255,192,.12);border-radius:calc(var(--u)*1.4);padding-left:calc(var(--u)*.6);padding-right:calc(var(--u)*.6)}
   .rRow.me .nm{color:#7dffc0}
   /* TOP 10 — 화면이 좁아도 넘치지 않게 순위표만 스크롤 */
@@ -1978,7 +1978,7 @@ const RANK_NOTE_EARTH = '누적거리 = 지금까지 달린 합계 · 🌍 지�
    ========================================================= */
 const EARTH_MILESTONES = [
   { km:0,     name:'국내 주행',  short:'국내',     emoji:'🚗' },
-  { km:400,   name:'부산 돌파',  short:'부산',     emoji:'🌊' },
+  { km:400,   name:'부산',      short:'부산',     emoji:'🌊' },
   { km:1160,  name:'도쿄',      short:'도쿄',     emoji:'🗼' },
   { km:2090,  name:'홍콩',      short:'홍콩',     emoji:'🥟' },
   { km:3720,  name:'방콕',      short:'방콕',     emoji:'🐘' },
@@ -2029,8 +2029,7 @@ function earthBreakText(km){
   const m = earthMilestoneAt(km);
   if (!m || m.km <= 0) return '🚗 아직 국내 주행 중 · 400km에서 부산 돌파!';
   return m.emoji + ' 지구 기준 ' + fmtKmComma(m.km) + 'km ' + m.name + ' 돌파!';
-}
-/* "다음 1,160km 도쿄까지 760km" */
+}/* "다음 1,160km 도쿄까지 760km" */
 function earthNextText(km){
   const k = Math.max(0, Number(km) || 0);
   const n = earthNextAt(k);
@@ -8270,8 +8269,12 @@ if (typeof document !== 'undefined'){
     function tabSubText(row, tab, spot){
       const t = rankTabId(tab);
       const bits = [];
-      if (t === 'earth') bits.push(earthBreakText(totalDistBase(row)));
-      if (t !== 'dist') bits.push(fmtKm(row.km) + 'km');
+      if (t === 'earth'){
+        bits.push(earthBreakText(totalDistBase(row)));
+        bits.push('최고 ' + fmtKm(row.km) + 'km');
+      } else if (t !== 'dist'){
+        bits.push(fmtKm(row.km) + 'km');
+      }
       if (t !== 'score') bits.push(fmtNum(row.score || 0) + '점');
       if (t !== 'combo' && (row.maxCombo || 0) > 0) bits.push('⚡x' + Math.round(row.maxCombo));
       if (spot) bits.push(spot);
