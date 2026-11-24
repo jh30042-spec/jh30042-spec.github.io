@@ -8591,6 +8591,23 @@ if (typeof document !== 'undefined'){
       for (let i=0;i<points.length;i++) out.push((i ? 'L' : 'M') + points[i].x + ' ' + points[i].y);
       return out.join('');
     }
+    /* 구간을 살짝 휘어진 항로 모양으로 (직선이 많으면 읽기 어렵다) */
+    function svgArc(a, b){
+      if (!a || !b) return '';
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const len = Math.sqrt(dx * dx + dy * dy) || 1;
+      const bulge = Math.min(30, len * 0.16);
+      const cx = (a.x + b.x) / 2 - dy / len * bulge;
+      const cy = (a.y + b.y) / 2 + dx / len * bulge;
+      return 'M' + a.x + ' ' + a.y + 'Q' + Math.round(cx * 10) / 10 + ' ' + Math.round(cy * 10) / 10 + ' ' + b.x + ' ' + b.y;
+    }
+    function svgRoute(points){
+      const list = points || [];
+      if (list.length < 2) return '';
+      let d = '';
+      for (let i=1;i<list.length;i++) d += svgArc(list[i - 1], list[i]);
+      return d;
+    }
     function earnedCount(total){
       return worldBadges(total).filter(function(b){ return b.earned; }).length;
     }
@@ -8613,9 +8630,9 @@ if (typeof document !== 'undefined'){
       }
       if (wTotalEl) wTotalEl.textContent = '누적 ' + fmtKm(total) + 'km · ' + earthBreakText(total);
       if (wDoneEl) wDoneEl.innerHTML = (route.done.length > 1)
-        ? '<path class="wRoute done" d="' + svgPoly(route.done) + '"></path>' : '';
+        ? '<path class="wRoute done" d="' + svgRoute(route.done) + '"></path>' : '';
       if (wTodoEl) wTodoEl.innerHTML = (route.todo || []).map(function(seg){
-        return '<path class="wRoute todo" d="' + svgPoly(seg) + '"></path>';
+        return '<path class="wRoute todo" d="' + svgArc(seg[0], seg[1]) + '"></path>';
       }).join('');
       if (wDoneEl){
         const pth = wDoneEl.querySelector('path');
