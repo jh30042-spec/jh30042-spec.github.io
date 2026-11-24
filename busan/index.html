@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v15.1">
+<meta name="busan-build" content="v15.2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -8703,11 +8703,14 @@ if (typeof document !== 'undefined'){
         }
         return true;
       }
+      /* 자리 탐색은 지도 절대 좌표로 하고, 돌려주는 값은 <g translate(pt)> 안에서 쓸 상대 좌표.
+         (절대 y 를 <text y> 에 그대로 넣으면 pt.y 가 두 번 더해져 국기가 지도 아래로 밀린다) */
       function labelSlot(x, y){
         for (let k=0;k<OFFS.length;k++){
           const cx = x + OFFS[k][0], cy = y + OFFS[k][1];
+          if (cx < 16 || cx > MAP_W - 16) continue;
           if (cy < 12 || cy > MAP_H - 8) continue;
-          if (freeLabel(cx, cy)){ placed.push({ x: cx, y: cy }); return cy; }
+          if (freeLabel(cx, cy)){ placed.push({ x: cx, y: cy }); return { cx: cx, cy: cy, dx: cx - x, dy: cy - y }; }
         }
         return null;
       }
@@ -8721,13 +8724,19 @@ if (typeof document !== 'undefined'){
         const cls = 'wPin ' + (earned ? 'on' : (isNext ? 'next' : 'locked')) + (selectedKm === s.km ? ' sel' : '');
         let glyph = '';
         if (earned || isNext){
-          const ly = labelSlot(pt.x, pt.y);
-          if (ly !== null){
-            glyph = '<text class="wFlag' + (earned ? '' : ' dim') + '" y="' + ly + '">' + s.flag + '</text>';
+          const slot = labelSlot(pt.x, pt.y);
+          if (slot){
+            glyph = '<text class="wFlag' + (earned ? '' : ' dim') + '" x="' + slot.dx + '" y="' + slot.dy + '">' + s.flag + '</text>';
             if (isNext){
-              /* 다음 목표는 남은 거리도 함께 (국기 아래) */
-              const ky = ly + 17;
-              if (freeLabel(pt.x, ky)){ placed.push({ x: pt.x, y: ky }); glyph += '<text class="wName next" y="' + ky + '">' + escapeHtml(fmtKm(s.km - total) + 'km') + '</text>'; }
+              /* 다음 목표는 남은 거리도 함께 (국기 바로 아래 17px) — 충돌 검사는 절대 좌표, 그리기는 상대 좌표.
+                 방금 놓은 국기 자리는 검사에서 빼야 자기 국기와 부딪히지 않는다. */
+              const own = placed.pop();
+              const ky = slot.cy + 17;
+              if (ky <= MAP_H - 8 && freeLabel(slot.cx, ky)){
+                if (own) placed.push(own);
+                placed.push({ x: slot.cx, y: ky });
+                glyph += '<text class="wName next" x="' + slot.dx + '" y="' + (slot.dy + 17) + '">' + escapeHtml(fmtKm(s.km - total) + 'km') + '</text>';
+              } else if (own) placed.push(own);
             }
           }
         }
