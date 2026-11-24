@@ -4526,6 +4526,16 @@ function drawCar(ctx, o){
     ctx.lineTo(x + w*0.16, y - h*0.18);
     ctx.lineTo(x - w*0.16, y - h*0.18);
     ctx.closePath(); ctx.fill();
+    /* 밤에는 콘 실루엣 테두리를 밝혀 어두운 노면에서도 형태가 남는다 */
+    if (night > 0.2){
+      ctx.strokeStyle = 'rgba(255,214,150,' + (0.30 + 0.42 * night).toFixed(3) + ')';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(x, y - h/2);
+      ctx.lineTo(x + w/2, y + h/2 - 4);
+      ctx.lineTo(x - w/2, y + h/2 - 4);
+      ctx.closePath(); ctx.stroke();
+    }
     /* 반사 띠 2줄 (불빛을 되돌려 밤에도 테두리가 보인다) */
     ctx.fillStyle = 'rgba(255,255,255,' + (0.90 + 0.1 * night).toFixed(3) + ')';
     ctx.beginPath();
@@ -4730,17 +4740,17 @@ function drawConeLights(ctx, sim){
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     /* 넓게 번지는 후광 */
-    ctx.fillStyle = 'rgba(255,128,26,' + (0.10 * k + 0.20 * k * on).toFixed(3) + ')';
-    ctx.beginPath(); ctx.arc(x, y, 20 + 12 * on, 0, 7); ctx.fill();
-    ctx.fillStyle = 'rgba(255,176,60,' + (0.10 * k).toFixed(3) + ')';
-    ctx.beginPath(); ctx.arc(x, y, 34, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,128,26,' + (0.10 * k + 0.18 * k * on).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y, 16 + 9 * on, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,176,60,' + (0.07 * k).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y, 27, 0, 7); ctx.fill();
     /* 위로 솟는 빛기둥 — 멀리서도 쫓아온다 */
-    ctx.fillStyle = 'rgba(255,150,50,' + (0.05 * k + 0.13 * k * on).toFixed(3) + ')';
+    ctx.fillStyle = 'rgba(255,150,50,' + (0.04 * k + 0.10 * k * on).toFixed(3) + ')';
     ctx.beginPath();
-    ctx.moveTo(x - 5, y);
-    ctx.lineTo(x + 5, y);
-    ctx.lineTo(x + 15, y - 120 - 40 * on);
-    ctx.lineTo(x - 15, y - 120 - 40 * on);
+    ctx.moveTo(x - 4, y);
+    ctx.lineTo(x + 4, y);
+    ctx.lineTo(x + 12, y - 100 - 34 * on);
+    ctx.lineTo(x - 12, y - 100 - 34 * on);
     ctx.closePath(); ctx.fill();
     /* LED 코알 — on이면 주황-흰색, off면 적색 */
     ctx.fillStyle = on > 0.45
