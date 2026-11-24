@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v15.0">
+<meta name="busan-build" content="v15.1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -4209,6 +4209,10 @@ function update(sim, dt){
   const fSafe = feverSafeWindow(sim);
   updateImpacts(sim, dt);
   updateItemFx(sim, dt);
+  /* v15.1: playing 중에도 폭발·스파크 파티클을 진행시킨다.
+     (예전엔 crash 분기에서만 updateParticles가 불려, 올클리어·범퍼·칼치기 스파크·실드 방어로
+      생긴 파편이 life가 줄지 않아 화면에 얼어붙은 채 게임 끝까지 남았다) */
+  updateParticles(sim, dt);
   if (sim.state === 'playing') sim.shake = Math.max(0, (sim.shake || 0) - dt * 2.2);
   const nitroOn = sim.nitro > 0;
 
