@@ -4745,12 +4745,12 @@ function drawConeLights(ctx, sim){
     ctx.fillStyle = 'rgba(255,176,60,' + (0.07 * k).toFixed(3) + ')';
     ctx.beginPath(); ctx.arc(x, y, 27, 0, 7); ctx.fill();
     /* 위로 솟는 빛기둥 — 멀리서도 쫓아온다 */
-    ctx.fillStyle = 'rgba(255,150,50,' + (0.04 * k + 0.10 * k * on).toFixed(3) + ')';
+    ctx.fillStyle = 'rgba(255,150,50,' + (0.04 * k + 0.11 * k * on).toFixed(3) + ')';
     ctx.beginPath();
     ctx.moveTo(x - 4, y);
     ctx.lineTo(x + 4, y);
-    ctx.lineTo(x + 12, y - 100 - 34 * on);
-    ctx.lineTo(x - 12, y - 100 - 34 * on);
+    ctx.lineTo(x + 11, y - 58 - 26 * on);
+    ctx.lineTo(x - 11, y - 58 - 26 * on);
     ctx.closePath(); ctx.fill();
     /* 밤 안개에 먹힌 콘 본체를 '빛나는 콘'으로 한 번 더 그린다 (형태가 남는다) */
     const cw = o.w || 24, chh = o.h || 26;
