@@ -525,7 +525,8 @@
   #wRouteDone path{animation:wDraw 1.15s .2s ease-out both}
   @keyframes wDraw{from{stroke-dashoffset:var(--len,4000)}to{stroke-dashoffset:0}}
   .wPin text{font-family:inherit;font-weight:900;text-anchor:middle;paint-order:stroke fill}
-  .wPin .wFlag{font-size:30px}
+  .wPin .wFlag{font-size:28px}
+  .wPin .wLock{font-size:20px;opacity:.7}
   .wPin .wName{font-size:19px;fill:#cfe9ff;stroke:rgba(3,8,16,.92);stroke-width:4px}
   .wPin .wDot{fill:#7ce0ff;filter:drop-shadow(0 0 6px rgba(124,224,255,.9))}
   .wPin .wHalo{fill:rgba(124,224,255,.16);stroke:rgba(124,224,255,.55);stroke-width:2}
@@ -8573,24 +8574,44 @@ if (typeof document !== 'undefined'){
           try { pth.style.setProperty('--len', String(Math.max(10, Math.round(pth.getTotalLength())))); } catch(e){}
         }
       }
-      /* 핀: 지나온 곳은 국기, 못 간 곳은 잠금(다음 목표는 남은 km) */
+      /* 핀: 지나온 곳은 국기, 못 간 곳은 잠금(다음 목표는 남은 km)
+         동아시아처럼 가까운 지점은 국기를 계단식으로 올려 이름 없이 세로로 쌓아 겹침을 막는다. */
       const stops = route.stops;
+      const pts = stops.map(function(s){ return worldPoint(s.lat, s.lon); });
+      const dense = pts.map(function(p, i){
+        for (let j=0;j<pts.length;j++){
+          if (i === j) continue;
+          if (Math.abs(pts[j].x - p.x) < 46 && Math.abs(pts[j].y - p.y) < 30) return true;
+        }
+        return false;
+      });
+      const levels = [];
       const html = [];
       for (let i=0;i<stops.length;i++){
         const s = stops[i];
-        const pt = worldPoint(s.lat, s.lon);
+        const pt = pts[i];
+        let level = 0;
+        for (let j=0;j<i;j++){
+          if (Math.abs(pts[j].x - pt.x) < 46 && Math.abs(pts[j].y - pt.y) < 30) level = Math.max(level, levels[j] + 1);
+        }
+        levels.push(level);
         const earned = (s.km <= total + 0.05);
         const isNext = (i === route.nextIdx);
         const last = (i === stops.length - 1);
         const dy = last ? 34 : 0;                 /* 지구 1바퀴는 서울과 같은 좌표 → 아래로 비킨다 */
+        const showName = (!dense[i] || i === 0);
+        const flagY = -20 - level * 26 + (last ? 18 : 0);
+        const nameY = 32 + dy;
         const cls = 'wPin ' + (earned ? 'on' : 'locked') + (isNext ? ' next' : '');
         html.push('<g class="' + cls + '" data-km="' + s.km + '" transform="translate(' + pt.x + ',' + pt.y + ')">' +
           '<circle class="wHalo" r="' + (isNext ? 26 : 20) + '"></circle>' +
           '<circle class="wDot" r="' + (earned ? 8 : 5) + '"></circle>' +
           (earned
-            ? '<text class="wFlag" y="' + (-20 + dy) + '">' + s.flag + '</text>' +
-              '<text class="wName" y="' + (32 + dy) + '">' + escapeHtml(s.name) + '</text>'
-            : '<text class="wName" y="' + (30 + dy) + '">' + (isNext ? escapeHtml(fmtKm(s.km - total) + 'km') : '') + '</text>') +
+            ? '<text class="wFlag" y="' + flagY + '">' + s.flag + '</text>'
+            : '<text class="wLock" y="' + flagY + '">🔒</text>') +
+          (showName
+            ? '<text class="wName" y="' + nameY + '">' + escapeHtml(s.name) + '</text>'
+            : (isNext ? '<text class="wName" y="' + nameY + '">' + escapeHtml(fmtKm(s.km - total) + 'km') + '</text>' : '')) +
           '</g>');
       }
       if (wPinsEl) wPinsEl.innerHTML = html.join('');
