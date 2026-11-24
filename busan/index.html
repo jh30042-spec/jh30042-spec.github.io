@@ -9035,12 +9035,14 @@ if (typeof document !== 'undefined'){
     function myTotalDistNow(){
       const st = serverRank.state;
       const rec = sim.rec || loadRecords();
+      const myKey = nickKey(profile.nick || '');
       const local = Math.round(Math.max(0, Number(rec.totalKm) || 0, Number(rec.totalDist) || 0) * 10) / 10;
       if (st.status !== 'live') return local;
       let t = 0;
       const mine = rivalMerge().mine;
       if (mine) t = Math.max(t, totalDistBase(mine));
-      if (st.posted) t = Math.max(t, totalDistBase(st.posted));
+      /* 기기 마크는 지금 닉네임의 것만 인정한다(닉네임을 바꾸면 옛 누적이 끼어들지 않게) */
+      if (st.posted && (!myKey || nickKey(st.posted.nick) === myKey)) t = Math.max(t, totalDistBase(st.posted));
       return Math.round((t > 0 ? t : local) * 10) / 10;
     }
 
