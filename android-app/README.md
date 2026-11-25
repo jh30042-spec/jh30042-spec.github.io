@@ -11,7 +11,8 @@
 | webDir | `www` (빌드할 때 `../busan/index.html` 을 복사해 만든다) |
 | Capacitor | 6.2.3 (Java 17 호환) |
 | AdMob 플러그인 | @capacitor-community/admob 6.2.0 |
-| compileSdk / targetSdk / minSdk | 34 / 34 / 22 |
+| compileSdk / targetSdk / minSdk | **36 / 36** / 22 |
+| AGP / Gradle / JDK | 8.13.2 / 8.13 / 17 |
 
 ## 광고 단위 바꾸는 곳 — `admob-config.json` 한 파일
 
@@ -63,8 +64,8 @@ cd android && ./gradlew assembleDebug    # → app/build/outputs/apk/debug/app-d
 | 항목 | 경로 |
 |---|---|
 | JDK | `/workspace/work/android-env/jdk-17.0.21.1+2` (Temurin OpenJDK 17.0.21.1) |
-| Android SDK | `/workspace/work/android-env/android-sdk` (cmdline-tools, platform-tools, platforms;android-34, build-tools;34.0.0) |
-| Gradle | wrapper 8.2.1, 캐시 `GRADLE_USER_HOME=/workspace/work/gradle-home` |
+| Android SDK | `/workspace/work/android-env/android-sdk` (cmdline-tools, platform-tools, platforms;android-34·**36**, build-tools;34.0.0·**36.0.0**) |
+| Gradle | wrapper **8.13**, AGP **8.13.2**, 캐시 `GRADLE_USER_HOME=/workspace/work/gradle-home` |
 | Node | `/workspace/work/.node/node-v20.18.1-linux-x64/bin` |
 
 빌드 명령 예:
@@ -98,7 +99,7 @@ cd repos/elevator-fart-hold/android-app/android && ./gradlew bundleRelease --no-
    ```bash
    node -r /workspace/work/os-shim.js node_modules/@capacitor/cli/bin/capacitor sync android
    ```
-2. **Gradle wrapper 가 배포판을 매번 지우고 다시 받는 문제** — `GRADLE_USER_HOME/wrapper/dists/.../gradle-8.2.1-all.zip.ok` 마커가 없으면 재설치합니다. 한 번 `touch` 해 두면 됩니다.
+2. **Gradle wrapper 가 배포판을 매번 지우고 다시 받는 문제** — `GRADLE_USER_HOME/wrapper/dists/.../gradle-8.13-bin.zip.ok` 마커가 없으면 재설치합니다. 한 번 `touch` 해 두면 됩니다.
 3. 빌드가 5분(도구 제한)을 넘기면 같은 명령을 다시 실행하세요. 캐시 덕분에 이어서 끝납니다.
 
 ## 2026-11-25 빌드 검증 결과
@@ -107,7 +108,11 @@ cd repos/elevator-fart-hold/android-app/android && ./gradlew bundleRelease --no-
 - `./gradlew assembleDebug` **BUILD SUCCESSFUL** → `app/build/outputs/apk/debug/app-debug.apk` (25.9MB)
 - `./gradlew bundleRelease` **BUILD SUCCESSFUL**, `signReleaseBundle` 수행 → `app/build/outputs/bundle/release/app-release.aab` (18.4MB)
 - `./gradlew assembleRelease` **BUILD SUCCESSFUL** → `app/build/outputs/apk/release/app-release.apk` (18.8MB)
-- APK/AAB 확인: package `com.busanrush.game`, versionCode 1 / 1.0, label **전국일주 칼치기**, 매니페스트 AdMob APPLICATION_ID `ca-app-pub-9622717538101019~8272360691`, 서명 인증서 SHA-256 `246400ba…8d59a63`
+- APK/AAB 확인: package `com.busanrush.game`, versionCode 1 / 1.0, label **전국일주 칼치기**, `targetSdkVersion 36`(bundletool 로 AAB 매니페스트 확인), 매니페스트 AdMob APPLICATION_ID `ca-app-pub-9622717538101019~8272360691`, 서명 인증서 SHA-256 `246400ba…8d59a63`
+
+> **왜 SDK 36인가** · Google Play 는 2026-08-31부터 **새 앱과 업데이트 모두 targetSdk 36(Android 16) 이상**을 요구합니다. 처음 만든 targetSdk 34 빌드는 Play Console 업로드가 거부되므로 AGP 8.13.2·Gradle 8.13 으로 올리고 compileSdk/targetSdk 를 36 으로 바꿨습니다. Capacitor 6.2.3 라이브러리는 그대로 동작합니다.
+
+> **이 컨테이너 메모리 주의** · RAM 이 1GB 뿐이라 기본 `-Xmx1536m` 으로는 릴리스 빌드 중 Gradle 데몬이 OOM 으로 죽습니다. `android/gradle.properties` 에 `org.gradle.jvmargs=-Xmx1024m -XX:MaxMetaspaceSize=384m`, `org.gradle.workers.max=1`, `kotlin.compiler.execution.strategy=in-process` 를 두고, `app/build.gradle` 의 `lint { checkReleaseBuilds false }` 로 릴리스 lint 를 꺼 두었습니다.
 
 ## 자동 빌드(GitHub Actions)
 
