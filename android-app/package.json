@@ -2,7 +2,7 @@
   "name": "busan-rush-android",
   "version": "1.0.0",
   "private": true,
-  "description": "서울→부산 무한질주 — Capacitor + AdMob 안드로이드 앱",
+  "description": "전국일주 칼치기 — Capacitor + AdMob 안드로이드 앱",
   "scripts": {
     "www": "node scripts/prepare-www.js",
     "sync": "npm run www && cap sync android",

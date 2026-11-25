@@ -1,32 +1,36 @@
-# 서울→부산 무한질주 — 안드로이드 앱 (Capacitor + AdMob)
+# 전국일주 칼치기 — 안드로이드 앱 (Capacitor + AdMob)
 
-웹 게임(`../busan/index.html`)을 그대로 감싸서 Google Play 출시용 안드로이드 앱으로 만드는 프로젝트입니다.
+웹 게임(`../busan/index.html`, 주소 `https://jh30042-spec.github.io/busan/`)을 그대로 감싸서 Google Play 출시용 안드로이드 앱으로 만드는 프로젝트입니다.
 **웹 게임이 단일 소스**이고, 이 폴더는 그 게임을 앱으로 포장하고 광고를 붙이는 껍데기입니다.
 
 | 항목 | 값 |
 |---|---|
-| appId | `com.busanrush.game` |
-| appName | 서울→부산 무한질주 |
+| appId (패키지) | `com.busanrush.game` (변경 금지 — 이미 배포·등록된 ID) |
+| appName | **전국일주 칼치기** |
+| versionCode / versionName | 1 / 1.0 |
 | webDir | `www` (빌드할 때 `../busan/index.html` 을 복사해 만든다) |
 | Capacitor | 6.2.3 (Java 17 호환) |
 | AdMob 플러그인 | @capacitor-community/admob 6.2.0 |
+| compileSdk / targetSdk / minSdk | 34 / 34 / 22 |
 
 ## 광고 단위 바꾸는 곳 — `admob-config.json` 한 파일
 
 ```json
 {
-  "appId":         "ca-app-pub-…~…",
-  "bannerId":      "ca-app-pub-…/…",
-  "interstitialId":"ca-app-pub-…/…",
-  "rewardedId":    "ca-app-pub-…/…",
-  "testing": true
+  "appId":         "ca-app-pub-9622717538101019~8272360691",
+  "bannerId":      "ca-app-pub-9622717538101019/3574441473",
+  "interstitialId":"ca-app-pub-9622717538101019/2173856200",
+  "rewardedId":    "ca-app-pub-9622717538101019/5646197357",
+  "testing": false
 }
 ```
 
-- 지금은 **Google 공식 테스트 ID**가 들어 있습니다. 실제 ID를 발급받으면 이 파일의 4개 값만 바꾸고 `testing` 을 `false` 로 바꾸면 됩니다.
+- **2026-11-25 실제 AdMob ID 발급·반영 완료.** `testing: false` 는 "실제 광고 단위로 실제 광고를 요청"한다는 뜻입니다.
+  (`testing: true` 는 ID를 테스트 ID로 바꾸는 스위치가 아니라, 플러그인 호출마다 `isTesting: true` 를 붙여 **Google 테스트 광고**를 받는 플래그입니다.)
 - 이 파일은 빌드할 때 `www/admob-config.json` 으로 복사되어 앱이 읽고,
   `scripts/inject-admob-app-id.js` 가 같은 `appId` 를 `AndroidManifest.xml` 의
   `com.google.android.gms.ads.APPLICATION_ID` 메타데이터에 넣습니다.
+- **광고 ID는 비밀값이 아닙니다** (APK 안에 그대로 들어가고 누구나 꺼낼 수 있음). 반면 **키스토어와 비밀번호는 절대 커밋 금지**입니다.
 
 ## 게임 쪽 광고 동작 (`busan/index.html` 의 `window.BusanAds`)
 
@@ -45,39 +49,66 @@ cp games/seoul-to-busan.html repos/elevator-fart-hold/busan/index.html
 
 # 1) 앱
 cd repos/elevator-fart-hold/android-app
-npm install
 npm run www                              # www/index.html 생성 (+ 브릿지 확인)
-npx cap add android                      # 최초 1회 (android/ 폴더 생성, git에는 안 올라감)
 node scripts/inject-admob-app-id.js      # AndroidManifest 에 AdMob App ID 주입
-npx capacitor-assets generate --android  # assets/icon.png · splash.png → mipmap/스플래시
-npx cap sync android
+node scripts/enable-release-signing.js   # (최초 1회) android/keystore.properties 로 릴리스 서명 설정
+npx cap sync android                     # 이 컨테이너에서는 os-shim 필요 (아래 참고)
 cd android && ./gradlew assembleDebug    # → app/build/outputs/apk/debug/app-debug.apk
+./gradlew bundleRelease                  # → app/build/outputs/bundle/release/app-release.aab (서명됨)
+./gradlew assembleRelease                # → app/build/outputs/apk/release/app-release.apk (서명됨, 폰 설치용)
 ```
 
-필요 환경: **JDK 17**, Android SDK(platform 34 / build-tools 34.0.0), Node 20,
-Capacitor 6.2.3(compileSdk 34 · minSdk 22 · targetSdk 34 · Gradle 8.2.1).
+### 이 워크스페이스의 빌드 환경 (2026-11-25 설치 완료)
 
-### 이미 확인된 것 (2026-11-22)
+| 항목 | 경로 |
+|---|---|
+| JDK | `/workspace/work/android-env/jdk-17.0.21.1+2` (Temurin OpenJDK 17.0.21.1) |
+| Android SDK | `/workspace/work/android-env/android-sdk` (cmdline-tools, platform-tools, platforms;android-34, build-tools;34.0.0) |
+| Gradle | wrapper 8.2.1, 캐시 `GRADLE_USER_HOME=/workspace/work/gradle-home` |
+| Node | `/workspace/work/.node/node-v20.18.1-linux-x64/bin` |
 
-- `npm ci` → `npm run www` → `cap add android` → `inject-admob-app-id.js` → `capacitor-assets generate` 까지 실제로 실행해 성공 확인
-  (앱 이름 `서울→부산 무한질주`, 패키지 `com.busanrush.game`, AdMob 플러그인 1개 인식, 아이콘·스플래시 87개 생성).
-- 남은 단계는 `./gradlew assembleDebug` 뿐이며, 이 환경에는 JDK/Android SDK가 아직 없습니다.
+빌드 명령 예:
 
-### 이 환경(샌드박스)에서만 필요한 두 가지
+```bash
+export JAVA_HOME=/workspace/work/android-env/jdk-17.0.21.1+2
+export PATH=$JAVA_HOME/bin:/workspace/work/android-env/android-sdk/platform-tools:/workspace/work/.node/node-v20.18.1-linux-x64/bin:$PATH
+export ANDROID_HOME=/workspace/work/android-env/android-sdk
+export ANDROID_SDK_ROOT=$ANDROID_HOME
+export GRADLE_USER_HOME=/workspace/work/gradle-home
+export TMPDIR=/workspace/work/android-env/tmp      # /tmp 이 128MB tmpfs 라서 필요
+cd repos/elevator-fart-hold/android-app/android && ./gradlew bundleRelease --no-daemon
+```
 
-1. **Capacitor CLI 가 `os.userInfo()` 에서 죽는 문제** — 이 컨테이너에는 uid 1000의 passwd 엔트리가 없어
-   `npx cap …` 이 `uv_os_get_passwd ENOENT` 로 즉시 죽습니다. preload 한 줄로 우회합니다:
+### 업로드 키스토어 (절대 공개 저장소에 올리지 말 것)
+
+| 항목 | 값 |
+|---|---|
+| 키 파일 | `/workspace/work/keystore/upload-keystore.jks` (JKS, RSA 2048, 유효 ~2054-04-12) |
+| 별명(alias) | `upload` |
+| 비밀번호 | `/workspace/work/keystore/keystore.properties` (chmod 600, git 제외) |
+| SHA-256 | `24:64:00:BA:32:80:D6:A2:C6:22:D2:D0:E2:1C:56:51:47:06:C8:75:D6:08:BD:90:98:AC:BB:40:48:D5:9A:63` |
+| SHA-1 | `86:AB:D2:51:60:FD:6E:A2:C3:77:2C:86:7F:9A:19:C6:67:B9:B6:65` |
+
+- Gradle 서명 설정은 `android/keystore.properties`(git 제외된 `android/` 안)를 읽습니다. `scripts/enable-release-signing.js` 가 멱등하게 넣습니다.
+- **이 키를 잃어버리면 같은 패키지로 다시 업로드할 수 없습니다.** Play Console 업로드 키 등록 후에는 Play App Signing 이 앱 서명 키를 따로 관리하지만, 업로드 키는 계속 필요합니다. 파일과 비밀번호를 안전한 곳에 백업하세요.
+
+### 이 환경(샌드박스)에서만 필요한 것
+
+1. **Capacitor CLI 가 `os.userInfo()` 에서 죽는 문제** — uid 1000의 passwd 엔트리가 없어 `npx cap …` 이 `uv_os_get_passwd ENOENT` 로 죽습니다. preload 로 우회:
    ```bash
-   node -r /workspace/work/os-shim.js node_modules/@capacitor/cli/bin/capacitor add android
-   node -r /workspace/work/os-shim.js node_modules/@capacitor/assets/bin/capacitor-assets generate --android
+   node -r /workspace/work/os-shim.js node_modules/@capacitor/cli/bin/capacitor sync android
    ```
-   (GitHub Actions 러너나 일반 PC 에서는 필요 없습니다.)
-2. **sharp 네이티브 바이너리** — 아이콘 생성기가 sharp 를 씁니다. 없으면
-   `npm install sharp --platform=linux --arch=x64` 한 번 실행하세요.
+2. **Gradle wrapper 가 배포판을 매번 지우고 다시 받는 문제** — `GRADLE_USER_HOME/wrapper/dists/.../gradle-8.2.1-all.zip.ok` 마커가 없으면 재설치합니다. 한 번 `touch` 해 두면 됩니다.
+3. 빌드가 5분(도구 제한)을 넘기면 같은 명령을 다시 실행하세요. 캐시 덕분에 이어서 끝납니다.
 
-## 자동 빌드(GitHub Actions) 상태
+## 2026-11-25 빌드 검증 결과
 
-`../.github/workflows/build-android.yml` 초안은 저장소에 아직 **푸시하지 못했습니다.**
-Pickle의 GitHub 연결 토큰에 `workflows` 권한이 없어 GitHub이 푸시를 거부하기 때문입니다.
-초안은 워크스페이스 `work/busan-android-workflow.yml` 에 최종본으로 보관되어 있고,
-권한이 생기면 저장소 루트의 `.github/workflows/build-android.yml` 로 그대로 올리면 됩니다.
+- `npm run www` → `cap sync android` → `inject-admob-app-id.js` 성공
+- `./gradlew assembleDebug` **BUILD SUCCESSFUL** → `app/build/outputs/apk/debug/app-debug.apk` (25.9MB)
+- `./gradlew bundleRelease` **BUILD SUCCESSFUL**, `signReleaseBundle` 수행 → `app/build/outputs/bundle/release/app-release.aab` (18.4MB)
+- `./gradlew assembleRelease` **BUILD SUCCESSFUL** → `app/build/outputs/apk/release/app-release.apk` (18.8MB)
+- APK/AAB 확인: package `com.busanrush.game`, versionCode 1 / 1.0, label **전국일주 칼치기**, 매니페스트 AdMob APPLICATION_ID `ca-app-pub-9622717538101019~8272360691`, 서명 인증서 SHA-256 `246400ba…8d59a63`
+
+## 자동 빌드(GitHub Actions)
+
+`../.github/workflows/build-android.yml` 초안은 `work/busan-android-workflow.yml` 에 있습니다. Pickle의 GitHub 연결 토큰에 `workflows` 권한이 없어 아직 푸시하지 못했습니다.
