@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v15.2">
+<meta name="busan-build" content="v16.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="서울→부산">
-<meta name="description" content="서울에서 부산까지, 친구들과 순위 경쟁하며 죽을 때까지 끝없이 달리는 병맛 무한 하드코어 질주. 차량 12종·비/눈·아이템·과속카메라·돌발 미션까지.">
+<meta name="apple-mobile-web-app-title" content="전국일주 칼치기">
+<meta name="description" content="전국 4개 권역 1,600km를 친구들과 순위 경쟁하며 죽을 때까지 끝없이 달리는 병맛 무한 하드코어 질주. 차량 12종·비/눈·아이템·과속카메라·돌발 미션까지.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="🚗 서울→부산 무한 하드코어 질주">
+<meta property="og:title" content="🚗 전국일주 칼치기">
 <meta property="og:description" content="끝없이 달려 기록을 세워라. 차량 12종 · 비/눈길 · 아이템 · 과속카메라 단속 · 돌발 미션. 친구 기록을 추월하고, 어디서 멈췄는지 확인하라. 스치면 데이고, 데이면 끝.">
 <meta property="og:url" content="https://jh30042-spec.github.io/busan/">
 <meta property="og:site_name" content="종혁의 미니게임">
@@ -20,10 +20,10 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="서울→부산 8차로 고속도로를 질주하는 병맛 아케이드 게임 썸네일">
+<meta property="og:image:alt" content="전국일주 칼치기 — 고속도로를 질주하는 병맛 아케이드 게임 썸네일">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://jh30042-spec.github.io/busan/og-busan.png">
-<title>🚗 서울→부산 무한 하드코어 질주</title>
+<title>🚗 전국일주 칼치기</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E">
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -376,6 +376,8 @@
   .tRoute b{color:#ffe08a;font-weight:900}
   .tKeys{margin-top:calc(var(--u)*1.2);font-size:calc(var(--u)*2.3);color:#8fa5c2;line-height:1.55;font-weight:600}
   .tKeys b{color:#d9ecff}
+  .tPrivacy{display:inline-block;margin-top:calc(var(--u)*1.1);font-size:calc(var(--u)*2.1);font-weight:700;color:#7f93ad;text-decoration:underline;text-underline-offset:calc(var(--u)*.4);opacity:.9}
+  .tPrivacy:active{color:#d9ecff}
 
   /* 도전장 배너 */
   #chBanner{margin:calc(var(--u)*.4) 0 calc(var(--u)*1.6);padding:calc(var(--u)*1.7) calc(var(--u)*2.2);
@@ -804,7 +806,7 @@
   <div id="title" class="overlay">
     <div id="chBanner" class="hidden"><b></b><span></span></div>
     <div class="tEmoji">🚗💨</div>
-    <h1>서울 → 부산<em>무한 하드코어 질주</em></h1>
+    <h1>전국일주<em>칼치기</em></h1>
     <div class="tRoute">🗺️ <b>경부선 → 남해·호남선 → 강원·동해선 → 제주 환상도로</b><br>400km마다 풍경·색감·배경음이 바뀐다</div>
     <div id="itemGuide" aria-label="도로 위 아이템 10종 · 미션 캡슐 안내">
       <div class="ig"><b>🛡️</b><em>실드</em><span>충돌·함정 1회 방어</span></div>
@@ -864,6 +866,7 @@
       <div id="rivalList"></div>
     </div>
     <div class="tKeys"><b>좌우 탭</b> · 스와이프 · <b>← →</b> · 내 차 탭 = <b>빵빵!</b> 📣</div>
+    <a class="tPrivacy" href="https://jh30042-spec.github.io/busan/privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>
   </div>
 
   <div id="over" class="overlay hidden">
@@ -9479,7 +9482,7 @@ if (typeof document !== 'undefined'){
       hintEl.classList.add('on');
       setTimeout(function(){ hintEl.classList.remove('on'); }, 3600);
       const n = (sim.rivals || []).length;
-      banner('∞ 무한 하드코어 질주', '라이벌 ' + n + '명과 순위 경쟁 · 스치면 끝');
+      banner('∞ 전국일주 칼치기', '라이벌 ' + n + '명과 순위 경쟁 · 스치면 끝');
       updateHUD();
       layoutHudChips();
     }
@@ -9991,13 +9994,13 @@ if (typeof document !== 'undefined'){
       };
       const url = challengeUrl(location.href, rec);
       const cname = carById(rec.car).name;
-      const text = '🔥 나 ' + fmtKm(rec.km) + 'km에서 멈췄다 (' + cname + ' · ' + rec.spot + '). 이 기록 이길 수 있어? 서울→부산 무한 질주';
+      const text = '🔥 나 ' + fmtKm(rec.km) + 'km에서 멈췄다 (' + cname + ' · ' + rec.spot + '). 이 기록 이길 수 있어? 전국일주 칼치기';
       /* 링크는 먼저 보여준다 (공유/복사가 막혀도 손으로 쓸 수 있게) */
       showLinkBox(url);
       let shared = false;
       if (navigator.share){
         try {
-          await navigator.share({ title: '🚗 서울→부산 도전장', text: text, url: url });
+          await navigator.share({ title: '🚗 전국일주 칼치기 도전장', text: text, url: url });
           shared = true;
         } catch(err){
           if (err && err.name === 'AbortError') return;
