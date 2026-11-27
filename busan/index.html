@@ -7252,11 +7252,13 @@ function drawTrapOverlay(ctx, sim){
     ctx.font = '900 22px system-ui,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    /* 상단 HUD(경로·속도 칩) 아래쪽에 띄워 글자가 겹치지 않게 */
+    const y0 = Math.round(H * 0.15);
     for (let i=0;i<warns.length;i++){
       const wn = warns[i];
       const label = wn.emoji + ' ' + wn.text + ' ' + wn.sec.toFixed(1) + 's';
       const wid = (ctx.measureText ? ctx.measureText(label).width : label.length * 11) + 34;
-      const x = (W - wid) / 2, y = 86 + i * 46;
+      const x = (W - wid) / 2, y = y0 + i * 46;
       ctx.fillStyle = 'rgba(8,12,20,0.82)';
       rr(ctx, x, y, wid, 36, 18); ctx.fill();
       ctx.strokeStyle = hexRgba(wn.color, 0.9);
