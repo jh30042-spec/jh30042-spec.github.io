@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#08040f">
+<meta name="theme-color" content="#05060a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="엄지 펌프">
-<meta name="thumb-pump-build" content="v1.0">
-<title>🕹️ 엄지 펌프 — 5버튼 손가락 리듬게임</title>
-<meta name="description" content="오락실 손펌프를 두 엄지로! ↙ ↖ ◉ ↗ ↘ 5버튼 X자 패드로 즐기는 오리지널 신스 리듬게임 3곡. PERFECT 판정·콤보 피버·홀드 노트·랭크까지.">
+<meta name="thumb-pump-build" content="v2.0">
+<title>🕹️ 엄지 펌프 PUMP MINI — 문방구 손펌프 리듬게임</title>
+<meta name="description" content="문방구 앞 미니 손펌프 그대로! 동그란 버튼 5개를 두 엄지로 눌러 즐기는 오리지널 신스 리듬게임 5곡. 베토벤 비창·터키 행진곡 리믹스까지. PERFECT 판정·콤보 피버·홀드 노트·랭크.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="🕹️ 엄지 펌프 — 두 엄지로 오락실 손펌프">
-<meta property="og:description" content="↙ ↖ ◉ ↗ ↘ 5버튼 X자 패드! 오리지널 테크노 3곡 · PERFECT 판정 · 콤보 피버 · 홀드 노트. 아이폰 사파리·카톡 인앱에서 바로 플레이.">
+<meta property="og:title" content="🕹️ 엄지 펌프 PUMP MINI — 문방구 손펌프">
+<meta property="og:description" content="문방구 앞 그 오락기! 동그란 버튼 5개 X자 패드 · 오리지널 신스 5곡 · 베토벤·모차르트 클래식 리믹스 · PERFECT 판정 · 콤보 피버.">
 <meta property="og:url" content="https://jh30042-spec.github.io/pump/">
 <meta property="og:site_name" content="종혁의 미니게임">
 <meta property="og:locale" content="ko_KR">
@@ -21,352 +21,503 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="엄지 펌프 — ↙ ↖ ◉ ↗ ↘ 5버튼 X자 패드 리듬게임">
+<meta property="og:image:alt" content="엄지 펌프 — 문방구 손펌프 5버튼 리듬게임">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://jh30042-spec.github.io/pump/og-pump.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%95%B9%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%23161a24' stroke='%23ff2f5e' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23ff2f5e'/%3E%3C/svg%3E">
 <style>
   :root{
-    --pink:#ff2f6d; --cyan:#28c8ff; --amber:#ffb020; --lime:#7dff9b; --violet:#a33bff;
-    --ink:#05030a; --panel:rgba(16,10,28,.82);
+    /* 문방구 오락기 팔레트 */
+    --blue:#2fd0ff; --amber:#ffb01f; --red:#ff2f5e; --lime:#7dff9b;
+    --cab:#0a0c12; --cab2:#05060a; --deck:#20242e; --ink:#05060a;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+    --pink:#ff2f6d; --cyan:#28c8ff;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html{height:100%;background:#05030a;overflow:hidden;overscroll-behavior:none;touch-action:none}
+  html{height:100%;background:var(--cab2);overflow:hidden;overscroll-behavior:none;touch-action:none}
   body{
-    margin:0;position:fixed;left:0;top:0;width:100%;height:100%;overflow:hidden;background:#05030a;color:#fff;
+    margin:0;position:fixed;left:0;top:0;width:100%;height:100%;overflow:hidden;background:var(--cab2);color:#fff;
     font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
     -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
     overscroll-behavior:none;touch-action:none;
   }
   #app{
     position:relative;width:100%;height:100%;height:100dvh;max-width:560px;margin:0 auto;
-    overflow:hidden;background:#05030a;display:flex;flex-direction:column;
-    box-shadow:0 0 80px rgba(163,59,255,.14);
+    overflow:hidden;background:#06070c;display:flex;flex-direction:column;
+    box-shadow:0 0 90px rgba(47,208,255,.10), inset 0 0 60px rgba(0,0,0,.9);
   }
   button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;-webkit-appearance:none}
+  canvas{display:block}
 
-  /* ---------------- 플레이 영역 ---------------- */
-  #play{position:absolute;inset:0;display:flex;flex-direction:column;background:#05030a}
-  #field{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;background:#05030a}
-  #cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
-  #padzone{
-    flex:0 0 44%;height:44%;padding:6px 11px calc(6px + env(safe-area-inset-bottom));
-    display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(to bottom,rgba(10,6,20,0),rgba(10,6,20,.75) 26%,#08040f);
-    border-top:1px solid rgba(255,255,255,.05);
-  }
-  #pad{
-    height:100%;width:auto;max-width:100%;aspect-ratio:.99;
-    display:grid;grid-template-columns:1fr 1.02fr 1fr;grid-template-rows:1fr 1.02fr 1fr;gap:7px;
-    touch-action:none;-webkit-user-select:none;user-select:none;
-  }
-  .padbtn{
-    position:relative;display:flex;align-items:center;justify-content:center;
-    border-radius:20px;border:1px solid rgba(255,255,255,.08);
-    color:var(--c);
-    background:
-      radial-gradient(circle at 50% 120%, var(--cA) 0%, transparent 62%),
-      linear-gradient(165deg, rgba(255,255,255,.13), rgba(255,255,255,.02) 46%, rgba(0,0,0,.25));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.16), inset 0 -8px 18px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.55);
-    transition:transform .05s ease-out, box-shadow .09s ease-out, background .09s ease-out;
-    touch-action:none;
-  }
-  .padbtn .gl{font-size:var(--fs,54px);line-height:1;filter:drop-shadow(0 0 12px var(--cA));pointer-events:none;transform:translateY(-2px)}
-  .padbtn .kk{
-    position:absolute;bottom:6px;right:9px;font-size:11px;font-weight:800;letter-spacing:.04em;
-    color:rgba(255,255,255,.42);display:none;pointer-events:none;
-  }
-  .padbtn .lbl{
-    position:absolute;top:7px;left:9px;font-size:9px;font-weight:800;letter-spacing:.12em;
-    color:rgba(255,255,255,.30);pointer-events:none;
-  }
-  .padbtn.on{
-    transform:scale(.955);
-    background:
-      radial-gradient(circle at 50% 55%, var(--cA) 0%, transparent 78%),
-      linear-gradient(165deg, rgba(255,255,255,.30), rgba(255,255,255,.06));
-    box-shadow:0 0 26px var(--cA), 0 0 60px var(--cA), inset 0 0 30px var(--cA), inset 0 1px 0 rgba(255,255,255,.4);
-  }
-  .padbtn.on .gl{filter:drop-shadow(0 0 18px #fff) brightness(1.35)}
-  @media (hover:hover) and (pointer:fine){ .padbtn .kk{display:block} }
+  /* ================= 플레이 영역 ================= */
+  #play{position:absolute;inset:0;display:flex;flex-direction:column;background:#06070c}
 
-  /* ---------------- HUD ---------------- */
+  /* --- 모니터 베젤(CRT) --- */
+  #bezel{
+    position:relative;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+    padding:0;background:linear-gradient(#0e1017,#090b11 40%,#0b0d13);
+    border-bottom:1px solid rgba(255,255,255,.06);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+  }
+  #bezTop{
+    flex:0 0 auto;display:flex;align-items:center;gap:6px;justify-content:space-between;
+    padding:calc(env(safe-area-inset-top) * .55 + 4px) 10px 3px;
+    font:800 6.5px/1 var(--mono);letter-spacing:.28em;color:rgba(255,255,255,.30);
+    text-transform:uppercase;pointer-events:none;
+  }
+  #bezTop .lamp{display:inline-flex;align-items:center;gap:4px}
+  #bezTop i{width:4px;height:4px;border-radius:50%;background:var(--lime);box-shadow:0 0 6px var(--lime);display:block}
+  #bezTop i.b{background:var(--blue);box-shadow:0 0 6px var(--blue)}
+  #field{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;background:#04050a;margin:0 9px}
+  #cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;border-radius:7px}
+  .crt{position:absolute;inset:0;pointer-events:none;border-radius:7px;overflow:hidden}
+  .crt::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(120% 70% at 22% 0%, rgba(255,255,255,.075), rgba(255,255,255,0) 55%);
+  }
+  .crt::after{
+    content:'';position:absolute;inset:0;
+    background:repeating-linear-gradient(to bottom, rgba(0,0,0,.30) 0 1px, rgba(0,0,0,0) 1px 3px);
+    opacity:.55;
+  }
+
+  /* --- HUD (오락실 모니터 상단 계기판) --- */
   #hud{
     position:absolute;left:0;right:0;top:0;z-index:12;pointer-events:none;
-    padding:calc(env(safe-area-inset-top) + 11px) 13px 0;
-    background:linear-gradient(to bottom,rgba(4,2,10,.92),rgba(4,2,10,.55) 62%,rgba(4,2,10,0));
+    padding:6px 9px 0;
+    background:linear-gradient(to bottom,rgba(2,3,7,.94),rgba(2,3,7,.62) 62%,rgba(2,3,7,0));
     transition:opacity .2s;
   }
   #hud.idle{opacity:0}
-  .hudrow{display:flex;align-items:center;gap:8px}
+  .hudrow{display:flex;align-items:center;gap:7px}
   #pauseBtn{
-    pointer-events:auto;width:34px;height:34px;flex:0 0 34px;border-radius:11px;
-    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
-    font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;color:#fff;
+    pointer-events:auto;width:30px;height:30px;flex:0 0 30px;border-radius:8px;
+    background:linear-gradient(#1b2030,#0e1119);border:1px solid rgba(255,255,255,.14);
+    font:800 10px/1 var(--mono);display:flex;align-items:center;justify-content:center;color:#cfe6ff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 6px rgba(0,0,0,.6);
   }
-  #pauseBtn:active{background:rgba(255,255,255,.2)}
-  #hudTitle{font-size:13px;font-weight:800;letter-spacing:-.01em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #hudSub{font-size:9.5px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.45);margin-top:2px}
+  #pauseBtn:active{background:#26304a}
+  #hudTitle{
+    font-size:11.5px;font-weight:900;letter-spacing:-.01em;line-height:1.1;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px #000;
+  }
+  #hudSub{font:800 7.5px/1 var(--mono);letter-spacing:.16em;color:rgba(160,200,240,.62);margin-top:2px}
   #scoreWrap{margin-left:auto;text-align:right;line-height:1}
-  #score{font-size:21px;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
-    text-shadow:0 0 14px rgba(40,200,255,.6)}
-  #scoreWrap small{display:block;font-size:8px;letter-spacing:.22em;color:rgba(255,255,255,.4);margin-top:3px;font-weight:800}
+  #score{
+    font:900 19px/1 var(--mono);letter-spacing:.02em;color:#ffe066;
+    text-shadow:0 0 12px rgba(255,190,40,.55),0 1px 0 #000;
+  }
+  #scoreWrap small{display:block;font:800 6.5px/1 var(--mono);letter-spacing:.26em;color:rgba(255,255,255,.42);margin-top:3px}
   #lifeWrap{
-    position:relative;height:7px;margin-top:9px;border-radius:5px;overflow:hidden;
-    background:rgba(255,255,255,.10);box-shadow:inset 0 1px 2px rgba(0,0,0,.6);
+    position:relative;height:8px;margin-top:6px;border-radius:3px;overflow:hidden;
+    background:#0b0f18;border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 3px rgba(0,0,0,.8);
   }
   #lifeBar{
-    position:absolute;left:0;top:0;bottom:0;width:60%;border-radius:5px;
-    background:linear-gradient(90deg,#ff2f6d,#ffb020 45%,#7dff9b);
-    box-shadow:0 0 14px rgba(125,255,155,.6);transition:width .12s linear;
+    position:absolute;left:0;top:0;bottom:0;width:60%;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(4,6,10,0) 0 5px, rgba(4,6,10,.92) 5px 7px),
+      linear-gradient(90deg,#ff2f5e,#ffb01f 45%,#7dff9b);
+    transition:width .12s linear;
   }
-  #lifeWrap.low #lifeBar{background:linear-gradient(90deg,#ff2f6d,#ff5f4a);animation:lowPulse .6s infinite alternate}
-  @keyframes lowPulse{from{opacity:.55}to{opacity:1}}
+  #lifeWrap.low #lifeBar{
+    background-image:
+      repeating-linear-gradient(90deg, rgba(4,6,10,0) 0 5px, rgba(4,6,10,.92) 5px 7px),
+      linear-gradient(90deg,#ff2f5e,#ff6a3a);
+    animation:lowPulse .55s infinite alternate;
+  }
+  @keyframes lowPulse{from{opacity:.5}to{opacity:1}}
+  #comboTag{
+    position:absolute;right:10px;top:calc(env(safe-area-inset-top) * .55 + 56px);z-index:13;
+    font:900 9px/1 var(--mono);letter-spacing:.16em;color:#ffd34d;
+    text-shadow:0 0 10px rgba(255,170,20,.8);opacity:0;transition:opacity .15s;pointer-events:none;
+  }
+  #comboTag.on{opacity:1}
+  #comboTag b{font-size:15px;color:#fff}
   #feverTag{
-    position:absolute;right:11px;top:calc(env(safe-area-inset-top) + 70px);z-index:13;
-    font-size:10.5px;font-weight:900;letter-spacing:.14em;padding:3px 8px;border-radius:20px;
-    color:#12030a;background:linear-gradient(90deg,#ffe066,#ff9f43);
-    box-shadow:0 0 18px rgba(255,190,60,.75);opacity:0;transform:translateY(-4px) scale(.9);
-    transition:opacity .18s,transform .18s;pointer-events:none;
+    position:absolute;right:9px;top:calc(env(safe-area-inset-top) * .55 + 72px);z-index:13;
+    font:900 8.5px/1 var(--mono);letter-spacing:.12em;padding:3px 7px;border-radius:3px;
+    color:#1a0d02;background:linear-gradient(90deg,#ffd34d,#ff9f1f);
+    box-shadow:0 0 16px rgba(255,180,40,.8);opacity:0;transform:translateY(-3px);
+    transition:opacity .16s,transform .16s;pointer-events:none;
   }
   #feverTag.on{opacity:1;transform:none}
 
-  /* ---------------- 공용 화면 ---------------- */
+  /* --- 데크(버튼 판) --- */
+  #padzone{
+    flex:0 0 44%;height:44%;
+    padding:7px 10px calc(5px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;justify-content:center;position:relative;
+    background:
+      linear-gradient(180deg,#171b24 0%,#14171f 12%,#101319 100%);
+    border-top:1px solid rgba(255,255,255,.09);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10), inset 0 12px 22px rgba(0,0,0,.55);
+  }
+  /* 브러시드 메탈 결 + 상단 LED 스트립 */
+  #padzone::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, rgba(255,255,255,0) 1px 3px),
+      radial-gradient(120% 100% at 50% 0%, rgba(90,140,220,.16), rgba(0,0,0,0) 62%);
+    opacity:.9;
+  }
+  #deck{
+    position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  }
+  #deck .plate{
+    position:absolute;left:50%;top:4px;transform:translateX(-50%);
+    font:800 6px/1 var(--mono);letter-spacing:.34em;color:rgba(190,215,255,.24);
+    white-space:nowrap;pointer-events:none;
+  }
+  #deck .coin{
+    position:absolute;right:2px;bottom:0;font:800 6px/1 var(--mono);letter-spacing:.1em;
+    color:rgba(255,180,60,.34);pointer-events:none;
+  }
+  #pad{
+    position:relative;width:100%;height:100%;
+    touch-action:none;-webkit-user-select:none;user-select:none;
+  }
+
+  /* 동그란 3D 푸시 버튼 */
+  .padbtn{
+    position:absolute;left:0;top:0;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    padding:0;touch-action:none;
+    width:var(--d);height:var(--d);margin-left:calc(var(--d) / -2);margin-top:calc(var(--d) / -2);
+    transform:translate(0,0);
+    /* 베젤 링 */
+    background:
+      radial-gradient(circle at 50% 32%, rgba(255,255,255,.20), rgba(255,255,255,0) 58%),
+      linear-gradient(#3a4150,#1b2029 62%,#0d1016);
+    box-shadow:
+      0 6px 12px rgba(0,0,0,.62),
+      0 1px 0 rgba(255,255,255,.16) inset,
+      0 -2px 6px rgba(0,0,0,.6) inset,
+      0 0 0 1px rgba(0,0,0,.6);
+    transition:transform .045s ease-out, box-shadow .08s ease-out;
+  }
+  .padbtn .cap{
+    position:absolute;left:9%;top:9%;width:82%;height:82%;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(circle at 50% 22%, rgba(255,255,255,.55), rgba(255,255,255,.06) 42%, rgba(0,0,0,.28) 100%),
+      linear-gradient(180deg, var(--c1), var(--c2));
+    box-shadow:
+      0 2px 3px rgba(255,255,255,.30) inset,
+      0 -6px 12px rgba(0,0,0,.45) inset,
+      0 3px 7px rgba(0,0,0,.45);
+    transition:transform .045s ease-out, box-shadow .08s ease-out, filter .08s ease-out;
+  }
+  .padbtn svg{width:56%;height:56%;display:block;color:#fff;opacity:.96;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.55))}
+  .padbtn .led{
+    position:absolute;left:9%;top:9%;width:82%;height:82%;border-radius:50%;
+    border:2px solid var(--c1);opacity:.35;
+    box-shadow:0 0 0 rgba(0,0,0,0);
+    transition:opacity .07s,box-shadow .07s;
+    pointer-events:none;
+  }
+  .padbtn .kk{
+    position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);
+    font:800 7px/1 var(--mono);letter-spacing:.1em;color:rgba(255,255,255,.34);
+    display:none;pointer-events:none;
+  }
+  .padbtn.on{transform:translateY(3px) scale(.975);box-shadow:0 1px 3px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.6)}
+  .padbtn.on .cap{transform:scale(.965);box-shadow:0 1px 2px rgba(255,255,255,.2) inset,0 -3px 8px rgba(0,0,0,.5) inset;filter:brightness(1.18)}
+  .padbtn.on .led{opacity:1;box-shadow:0 0 14px var(--c1),0 0 28px var(--c1)}
+  /* 노트가 다가오면 해당 버튼 LED가 먼저 은은하게 켜진다 (어느 버튼인지 알려주는 신호) */
+  .padbtn.hint .led{opacity:.9;border-color:#fff;box-shadow:0 0 12px var(--c1),0 0 22px var(--c1)}
+  .padbtn.hint .cap{filter:brightness(1.12)}
+  .padbtn.on svg{opacity:1;filter:drop-shadow(0 0 8px rgba(255,255,255,.9))}
+  @media (hover:hover) and (pointer:fine){ .padbtn .kk{display:block} }
+
+  /* ================= 공용 화면 ================= */
   .screen{
     position:absolute;inset:0;z-index:40;overflow-y:auto;-webkit-overflow-scrolling:touch;
     touch-action:pan-y;display:flex;flex-direction:column;
-    padding:calc(env(safe-area-inset-top) + 18px) 18px calc(env(safe-area-inset-bottom) + 18px);
+    padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 14px);
     background:
-      radial-gradient(circle at 18% 8%, rgba(255,47,109,.20), transparent 52%),
-      radial-gradient(circle at 88% 18%, rgba(40,200,255,.17), transparent 50%),
-      radial-gradient(circle at 50% 104%, rgba(163,59,255,.20), transparent 58%),
-      #05030a;
+      radial-gradient(circle at 50% -8%, rgba(47,208,255,.13), transparent 46%),
+      radial-gradient(circle at 12% 104%, rgba(255,47,94,.16), transparent 48%),
+      linear-gradient(#080a11,#05060a 70%);
   }
   .screen.hidden{display:none}
   .hidden{display:none !important}
 
-  /* 타이틀 */
-  #title{align-items:center;justify-content:center;text-align:center;gap:0}
-  .logo{
-    font-size:clamp(46px,16vw,74px);font-weight:900;letter-spacing:-.055em;line-height:1.16;padding-bottom:.04em;
-    background:linear-gradient(178deg,#fff 6%,#ffe066 34%,#ff2f6d 68%,#a33bff 100%);
+  /* --- 타이틀: 문방구 오락기 어트랙트 --- */
+  #title{align-items:center;justify-content:flex-start;text-align:center;gap:0}
+  .marquee{
+    width:100%;max-width:360px;margin-top:2px;padding:10px 12px 9px;border-radius:12px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0) 40%),
+      linear-gradient(180deg,#1b2233,#0c1018);
+    border:1px solid rgba(120,180,255,.24);
+    box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 10px 26px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.16);
+    position:relative;
+  }
+  .marquee::before,.marquee::after{
+    content:'';position:absolute;top:6px;width:5px;height:5px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #8f9bb3, #2a3140);
+    box-shadow:0 0 0 1px rgba(0,0,0,.5);
+  }
+  .marquee::before{left:6px} .marquee::after{right:6px}
+  .mqSmall{font:800 7px/1 var(--mono);letter-spacing:.34em;color:rgba(120,200,255,.7)}
+  .mqBig{
+    font-size:clamp(34px,11.5vw,44px);font-weight:900;letter-spacing:-.05em;line-height:1.1;margin-top:3px;
+    background:linear-gradient(178deg,#fff 4%,#ffe066 32%,#ff2f5e 66%,#2fd0ff 100%);
     -webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:drop-shadow(0 0 22px rgba(255,47,109,.55)) drop-shadow(0 0 7px rgba(255,255,255,.35));
+    filter:drop-shadow(0 0 16px rgba(255,47,94,.5));
   }
-  .logo span{position:relative;display:inline-block}
-  .logo-sub{
-    margin-top:9px;font-size:10.5px;font-weight:900;letter-spacing:.42em;color:rgba(255,255,255,.55);
+  .mqSub{font:800 7.5px/1 var(--mono);letter-spacing:.28em;color:rgba(255,255,255,.42);margin-top:4px}
+  .coinline{
+    margin-top:11px;font:900 11px/1 var(--mono);letter-spacing:.22em;color:#ffe066;
+    text-shadow:0 0 14px rgba(255,200,40,.65);animation:blink 1.15s steps(1,end) infinite;
   }
-  .arrowrow{display:flex;gap:7px;justify-content:center;margin:20px 0 4px;flex-wrap:wrap}
-  .abtn{
-    width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;
-    font-size:26px;color:var(--c);border:1px solid rgba(255,255,255,.09);
-    background:radial-gradient(circle at 50% 120%,var(--cA),transparent 70%),linear-gradient(165deg,rgba(255,255,255,.11),rgba(0,0,0,.22));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 5px 14px rgba(0,0,0,.5);
-    text-shadow:0 0 12px var(--cA);
+  @keyframes blink{0%,55%{opacity:1}56%,100%{opacity:.18}}
+  #startBtn{
+    margin-top:9px;width:100%;max-width:330px;height:52px;border-radius:10px;
+    font-size:16px;font-weight:900;letter-spacing:.02em;color:#2a060f;
+    background:linear-gradient(100deg,#ffd34d,#ff9f1f 46%,#ff2f5e);
+    border:1px solid rgba(255,255,255,.35);
+    box-shadow:0 5px 0 #8b1020, 0 10px 22px rgba(255,47,94,.38), inset 0 1px 0 rgba(255,255,255,.6);
+    transition:transform .06s, box-shadow .06s;
   }
-  .tagline{margin-top:14px;font-size:13px;font-weight:700;color:rgba(255,255,255,.72);line-height:1.55}
-  .tagline b{color:#ffe066}
-  .bigbtn{
-    width:100%;max-width:330px;height:56px;border-radius:17px;
-    font-size:17px;font-weight:900;letter-spacing:.02em;color:#12030a;
-    background:linear-gradient(100deg,#ffe066,#ff9f43 42%,#ff2f6d);
-    box-shadow:0 8px 26px rgba(255,47,109,.42),inset 0 1px 0 rgba(255,255,255,.55);
-    transition:transform .07s;
+  #startBtn:active{transform:translateY(4px);box-shadow:0 1px 0 #8b1020,0 4px 10px rgba(255,47,94,.3)}
+  .quickhead{
+    margin:13px 0 6px;width:100%;max-width:340px;display:flex;align-items:center;gap:6px;
+    font:800 7.5px/1 var(--mono);letter-spacing:.2em;color:rgba(255,255,255,.34);
   }
-  .bigbtn:active{transform:scale(.97)}
-  .bigbtn.ghost{color:#fff;background:rgba(255,255,255,.08);box-shadow:none;border:1px solid rgba(255,255,255,.14)}
-  .chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .quickhead::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.16),transparent)}
+  #quickList{width:100%;max-width:340px;display:flex;flex-direction:column;gap:5px}
+  .qrow{
+    display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+    padding:7px 10px;border-radius:9px;border:1px solid rgba(255,255,255,.10);
+    background:linear-gradient(150deg,rgba(255,255,255,.075),rgba(255,255,255,.015));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+    transition:transform .06s, border-color .12s, background .12s;
+  }
+  .qrow:active{transform:scale(.985);border-color:rgba(255,209,64,.6);background:rgba(255,209,64,.10)}
+  .qrow .qe{font-size:17px;width:23px;flex:0 0 23px;text-align:center}
+  .qrow .qt{flex:1 1 auto;min-width:0}
+  .qrow .qn{display:block;font-size:12px;font-weight:900;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .qrow .qm{display:block;font:800 7.5px/1 var(--mono);letter-spacing:.08em;color:rgba(255,255,255,.42);margin-top:3px}
+  .qrow .qs{
+    flex:0 0 auto;font:900 13px/1 var(--mono);color:#ffe066;min-width:34px;text-align:right;
+  }
+  .qrow .qs.none{font-size:8px;color:rgba(255,255,255,.24);font-weight:800}
+  .optrow{display:flex;align-items:center;gap:6px;margin-top:9px;flex-wrap:wrap;justify-content:center}
+  .chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
   .chip{
-    padding:9px 14px;border-radius:12px;font-size:12.5px;font-weight:800;color:rgba(255,255,255,.75);
-    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);
+    padding:7px 11px;border-radius:8px;font-size:11px;font-weight:800;color:rgba(255,255,255,.72);
+    background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.11);
     transition:background .12s,color .12s,border-color .12s;
   }
-  .chip.on{color:#0a0410;background:linear-gradient(100deg,#7dff9b,#28c8ff);border-color:transparent;
-    box-shadow:0 0 18px rgba(40,200,255,.4)}
-  .chip.sel{color:#12030a;background:linear-gradient(100deg,#ffe066,#ffb020);border-color:transparent;
-    box-shadow:0 0 16px rgba(255,176,32,.45)}
-  .titlefoot{margin-top:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:11px;align-items:center}
-  .bestline{font-size:12px;font-weight:800;color:rgba(255,255,255,.6)}
-  .bestline b{color:#ffe066}
-  .hint{font-size:10.5px;line-height:1.6;color:rgba(255,255,255,.36);font-weight:600}
-  .keysline{font-size:11px;color:rgba(255,255,255,.45);font-weight:700;letter-spacing:.02em}
+  .chip.on{color:#04121a;background:linear-gradient(100deg,#7dff9b,#2fd0ff);border-color:transparent;
+    box-shadow:0 0 14px rgba(47,208,255,.35)}
+  .chip.sel{color:#1a0d02;background:linear-gradient(100deg,#ffd34d,#ffb01f);border-color:transparent;
+    box-shadow:0 0 12px rgba(255,176,32,.4)}
+  .hint{margin-top:9px;font:700 9.5px/1.55 system-ui,sans-serif;color:rgba(255,255,255,.34);max-width:330px}
+  .hint b{color:#ffd34d}
+  .keysline{margin-top:6px;font:700 9.5px/1 var(--mono);color:rgba(255,255,255,.34);letter-spacing:.02em}
   .keysline kbd{
-    display:inline-block;min-width:17px;padding:1px 4px;margin:0 1px;border-radius:4px;
-    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);
-    font-family:inherit;font-size:10px;font-weight:800;color:#fff;
+    display:inline-block;min-width:15px;padding:1px 3px;margin:0 1px;border-radius:3px;
+    background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);
+    font-family:inherit;font-size:9px;font-weight:800;color:#fff;
+  }
+  .bestline{margin-top:8px;font:800 10.5px/1 var(--mono);letter-spacing:.06em;color:rgba(255,255,255,.5)}
+  .bestline b{color:#ffe066}
+  .spacer{flex:1 1 auto;min-height:8px}
+  .cabfoot{
+    margin-top:9px;padding-top:7px;width:100%;max-width:340px;
+    border-top:1px solid rgba(255,255,255,.07);
+    font:800 6.5px/1 var(--mono);letter-spacing:.22em;color:rgba(255,255,255,.2);
   }
 
-  /* 곡 선택 */
-  .shead{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-  .shead h2{margin:0;font-size:19px;font-weight:900;letter-spacing:-.02em}
-  #backBtn{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.07);
-    border:1px solid rgba(255,255,255,.12);font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
-  #songList{display:flex;flex-direction:column;gap:10px}
+  /* --- 곡 선택 --- */
+  .shead{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+  .shead h2{margin:0;font-size:17px;font-weight:900;letter-spacing:-.02em}
+  .shead .tag{font:800 7px/1 var(--mono);letter-spacing:.2em;color:rgba(255,255,255,.36);margin-left:auto}
+  #backBtn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.12);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px}
+  #songList{display:flex;flex-direction:column;gap:6px}
   .songcard{
-    display:flex;align-items:center;gap:12px;width:100%;text-align:left;
-    padding:13px 13px;border-radius:17px;border:1px solid rgba(255,255,255,.09);
-    background:linear-gradient(140deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
-    transition:transform .08s,border-color .12s,background .12s;
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    padding:8px 10px;border-radius:11px;border:1px solid rgba(255,255,255,.09);
+    background:linear-gradient(140deg,rgba(255,255,255,.065),rgba(255,255,255,.015));
+    transition:transform .07s,border-color .12s,background .12s;
   }
-  .songcard:active{transform:scale(.985)}
+  .songcard:active{transform:scale(.99)}
   .songcard.sel{
-    border-color:rgba(255,224,102,.75);
-    background:linear-gradient(140deg,rgba(255,224,102,.18),rgba(255,47,109,.10));
-    box-shadow:0 0 24px rgba(255,176,32,.22);
+    border-color:rgba(255,211,77,.75);
+    background:linear-gradient(140deg,rgba(255,211,77,.16),rgba(255,47,94,.08));
+    box-shadow:0 0 18px rgba(255,176,32,.18);
   }
-  .semoji{font-size:28px;width:44px;height:44px;flex:0 0 44px;border-radius:13px;display:flex;align-items:center;justify-content:center;
-    background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.07)}
+  .semoji{font-size:19px;width:32px;height:32px;flex:0 0 32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.07)}
   .sinfo{flex:1 1 auto;min-width:0}
-  .stitle{font-size:14.5px;font-weight:900;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .smeta{font-size:10.5px;font-weight:800;letter-spacing:.02em;color:rgba(255,255,255,.5);margin-top:3px}
-  .sdesc{font-size:10.5px;font-weight:600;color:rgba(255,255,255,.34);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .sbest{flex:0 0 auto;text-align:right;min-width:52px}
-  .sbest b{display:block;font-size:17px;font-weight:900;line-height:1;color:#ffe066}
-  .sbest span{display:block;font-size:9.5px;font-weight:800;color:rgba(255,255,255,.45);margin-top:3px;font-variant-numeric:tabular-nums}
+  .stitle{font-size:12.5px;font-weight:900;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .smeta{font:800 8px/1 var(--mono);letter-spacing:.06em;color:rgba(255,255,255,.5);margin-top:3px}
+  .sdesc{font-size:9.5px;font-weight:600;color:rgba(255,255,255,.32);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sbest{flex:0 0 auto;text-align:right;min-width:44px}
+  .sbest b{display:block;font:900 14px/1 var(--mono);color:#ffe066}
+  .sbest span{display:block;font:800 8px/1 var(--mono);color:rgba(255,255,255,.45);margin-top:3px}
   .sbest .none{color:rgba(255,255,255,.22);font-weight:700}
-  .optrow{display:flex;align-items:center;gap:9px;margin-top:14px;flex-wrap:wrap}
-  .optlabel{font-size:10.5px;font-weight:900;letter-spacing:.16em;color:rgba(255,255,255,.4);margin-right:2px}
-  #select .bigbtn{margin-top:auto}
-  .selpad{height:14px}
+  .optlabel{font:900 8px/1 var(--mono);letter-spacing:.18em;color:rgba(255,255,255,.4)}
   .tipcard{
-    margin-top:18px;padding:13px 15px;border-radius:16px;text-align:left;
-    background:linear-gradient(140deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+    margin-top:10px;padding:9px 11px;border-radius:11px;text-align:left;
+    background:linear-gradient(140deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
     border:1px solid rgba(255,255,255,.07);
   }
-  .tiptitle{font-size:9px;font-weight:900;letter-spacing:.24em;color:rgba(255,255,255,.35);margin-bottom:9px}
-  .tiprow{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.62);margin-top:7px;line-height:1.35}
-  .tiprow .te{flex:0 0 62px;font-size:12px;font-weight:900;letter-spacing:.02em;color:#ffe066;text-align:center}
-  .tiprow:nth-child(3) .te{color:#28c8ff}
+  .tiptitle{font:900 7px/1 var(--mono);letter-spacing:.26em;color:rgba(255,255,255,.34);margin-bottom:7px}
+  .tiprow{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;color:rgba(255,255,255,.6);margin-top:5px;line-height:1.3}
+  .tiprow .te{flex:0 0 62px;font-size:11px;font-weight:900;color:#ffd34d;text-align:center}
+  .tiprow:nth-child(3) .te{color:#2fd0ff}
   .tiprow:nth-child(4) .te{color:#7dff9b}
+  .bigbtn{
+    width:100%;max-width:340px;height:50px;border-radius:11px;
+    font-size:15px;font-weight:900;letter-spacing:.02em;color:#2a060f;
+    background:linear-gradient(100deg,#ffd34d,#ff9f1f 42%,#ff2f5e);
+    border:1px solid rgba(255,255,255,.3);
+    box-shadow:0 4px 0 #8b1020,0 8px 20px rgba(255,47,94,.34),inset 0 1px 0 rgba(255,255,255,.55);
+    transition:transform .06s,box-shadow .06s;
+  }
+  .bigbtn:active{transform:translateY(3px);box-shadow:0 1px 0 #8b1020,0 3px 8px rgba(255,47,94,.3)}
+  .bigbtn.ghost{color:#fff;background:rgba(255,255,255,.08);box-shadow:none;border:1px solid rgba(255,255,255,.14)}
+  #select .bigbtn{margin-top:auto}
+  .selpad{height:8px}
 
-  /* 결과 */
+  /* --- 결과 --- */
   #result{justify-content:center;align-items:center;text-align:center;
     background:
-      radial-gradient(circle at 50% 30%, rgba(163,59,255,.22), transparent 58%),
-      radial-gradient(circle at 50% 105%, rgba(255,47,109,.18), transparent 60%),
-      rgba(5,3,10,.93);
+      radial-gradient(circle at 50% 28%, rgba(47,208,255,.14), transparent 56%),
+      radial-gradient(circle at 50% 104%, rgba(255,47,94,.16), transparent 58%),
+      rgba(5,6,10,.94);
     backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
   .rescard{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center}
-  .rescrown{font-size:11px;font-weight:900;letter-spacing:.34em;color:rgba(255,255,255,.6)}
-  .rescrown.clear{color:#7dff9b;text-shadow:0 0 18px rgba(125,255,155,.7)}
-  .rescrown.fail{color:#ff4d6d;text-shadow:0 0 18px rgba(255,77,109,.7)}
+  .rescrown{font:900 9.5px/1 var(--mono);letter-spacing:.3em;color:rgba(255,255,255,.55)}
+  .rescrown.clear{color:#7dff9b;text-shadow:0 0 16px rgba(125,255,155,.65)}
+  .rescrown.fail{color:#ff4d6d;text-shadow:0 0 16px rgba(255,77,109,.65)}
   .rank{
-    font-size:clamp(84px,26vw,116px);font-weight:900;line-height:1.06;letter-spacing:-.06em;margin:4px 0 2px;
-    background-image:linear-gradient(180deg,#fff,#ffe066 45%,#ff9f43);
+    font:900 clamp(76px,24vw,104px)/1.05 var(--mono);letter-spacing:-.04em;margin:6px 0 2px;
+    background-image:linear-gradient(180deg,#fff,#ffe066 45%,#ff9f1f);
     -webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:drop-shadow(0 0 26px rgba(255,196,60,.55));
+    filter:drop-shadow(0 0 22px rgba(255,196,60,.5));
   }
-  .rank.r-s{background-image:linear-gradient(180deg,#fff,#ffe066 40%,#ffb020)}
-  .rank.r-a{background-image:linear-gradient(180deg,#fff,#7dff9b 50%,#28c8ff)}
-  .rank.r-b{background-image:linear-gradient(180deg,#fff,#28c8ff 55%,#a33bff)}
+  .rank.r-a{background-image:linear-gradient(180deg,#fff,#7dff9b 50%,#2fd0ff)}
+  .rank.r-b{background-image:linear-gradient(180deg,#fff,#2fd0ff 55%,#a33bff)}
   .rank.r-c{background-image:linear-gradient(180deg,#fff,#c9a3ff 60%,#7b5bff)}
-  .rank.r-f{background-image:linear-gradient(180deg,#fff,#ff8fb0 45%,#ff2f6d)}
-  .ressong{font-size:13px;font-weight:800;color:rgba(255,255,255,.62)}
-  .resScore{font-size:36px;font-weight:900;letter-spacing:-.03em;margin-top:12px;font-variant-numeric:tabular-nums;
-    text-shadow:0 0 22px rgba(40,200,255,.55)}
-  .resScore small{display:block;font-size:9px;font-weight:900;letter-spacing:.24em;color:rgba(255,255,255,.4);margin-top:2px;text-shadow:none}
-  .resAcc{font-size:13px;font-weight:800;color:rgba(255,255,255,.55);margin-top:6px}
-  .judges{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;width:100%;margin-top:16px}
-  .jd{padding:9px 2px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
-  .jd b{display:block;font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
-  .jd span{display:block;font-size:7px;font-weight:900;letter-spacing:.06em;color:rgba(255,255,255,.45);margin-top:2px}
-  .jd.p b{color:#ffe066}.jd.g b{color:#4fd8ff}.jd.o b{color:#7dff9b}.jd.b b{color:#ff9f43}.jd.m b{color:#ff4d6d}
-  .resFoot{font-size:11px;font-weight:700;color:rgba(255,255,255,.42);margin-top:13px;line-height:1.6}
+  .rank.r-f{background-image:linear-gradient(180deg,#fff,#ff8fb0 45%,#ff2f5e)}
+  .ressong{font-size:11.5px;font-weight:800;color:rgba(255,255,255,.6)}
+  .resScore{font:900 32px/1 var(--mono);letter-spacing:-.01em;margin-top:10px;
+    text-shadow:0 0 20px rgba(47,208,255,.5)}
+  .resScore small{display:block;font:900 7px/1 var(--mono);letter-spacing:.28em;color:rgba(255,255,255,.4);margin-top:4px;text-shadow:none}
+  .resAcc{font:800 11.5px/1 var(--mono);color:rgba(255,255,255,.55);margin-top:8px;letter-spacing:.04em}
+  .judges{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:100%;margin-top:13px}
+  .jd{padding:7px 1px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
+  .jd b{display:block;font:900 13px/1 var(--mono)}
+  .jd span{display:block;font:900 6px/1 var(--mono);letter-spacing:.06em;color:rgba(255,255,255,.45);margin-top:3px}
+  .jd.p b{color:#ffe066}.jd.g b{color:#2fd0ff}.jd.o b{color:#7dff9b}.jd.b b{color:#ff9f1f}.jd.m b{color:#ff4d6d}
+  .resFoot{font:700 10px/1.6 system-ui,sans-serif;color:rgba(255,255,255,.42);margin-top:10px}
   .resFoot b{color:#ffe066}
-  .newrec{display:inline-block;margin-top:9px;padding:4px 11px;border-radius:20px;font-size:10px;font-weight:900;letter-spacing:.14em;
-    color:#12030a;background:linear-gradient(90deg,#7dff9b,#ffe066);box-shadow:0 0 20px rgba(125,255,155,.5)}
-  .btnrow{display:flex;gap:8px;width:100%;margin-top:22px}
+  .newrec{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:3px;font:900 8.5px/1 var(--mono);letter-spacing:.16em;
+    color:#04120a;background:linear-gradient(90deg,#7dff9b,#ffe066);box-shadow:0 0 16px rgba(125,255,155,.45)}
+  .btnrow{display:flex;gap:6px;width:100%;margin-top:18px}
   .btnrow button{
-    flex:1;height:50px;border-radius:15px;font-size:13.5px;font-weight:900;
-    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);
+    flex:1;height:46px;border-radius:10px;font-size:12px;font-weight:900;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
   }
-  .btnrow button:first-child{color:#12030a;background:linear-gradient(100deg,#ffe066,#ff9f43);border-color:transparent}
+  .btnrow button:first-child{color:#2a060f;background:linear-gradient(100deg,#ffd34d,#ff9f1f);border-color:transparent}
   .btnrow button:active{transform:scale(.97)}
 
-  /* 일시정지 */
+  /* --- 일시정지 --- */
   .overlay{
     position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
-    background:rgba(4,2,10,.78);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:20px;
+    background:rgba(4,5,10,.8);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:20px;
   }
   .panel{
-    width:100%;max-width:300px;padding:22px 18px;border-radius:22px;text-align:center;
-    background:linear-gradient(160deg,rgba(38,24,60,.95),rgba(16,10,28,.96));
-    border:1px solid rgba(255,255,255,.12);box-shadow:0 24px 60px rgba(0,0,0,.7);
+    width:100%;max-width:290px;padding:20px 16px;border-radius:14px;text-align:center;
+    background:linear-gradient(160deg,rgba(30,36,50,.96),rgba(10,12,18,.97));
+    border:1px solid rgba(255,255,255,.12);box-shadow:0 22px 54px rgba(0,0,0,.72);
   }
-  .panel h2{margin:0 0 4px;font-size:20px;font-weight:900;letter-spacing:-.02em}
-  .panel p{margin:0 0 16px;font-size:11.5px;color:rgba(255,255,255,.5);font-weight:700}
-  .panel button{display:block;width:100%;height:48px;margin-top:8px;border-radius:14px;font-size:14px;font-weight:900;
-    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
-  .panel button:first-of-type{color:#12030a;background:linear-gradient(100deg,#7dff9b,#28c8ff);border-color:transparent}
+  .panel h2{margin:0 0 4px;font-size:18px;font-weight:900;letter-spacing:-.02em}
+  .panel p{margin:0 0 14px;font-size:10.5px;color:rgba(255,255,255,.5);font-weight:700}
+  .panel button{display:block;width:100%;height:44px;margin-top:7px;border-radius:10px;font-size:13px;font-weight:900;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+  .panel button:first-of-type{color:#04121a;background:linear-gradient(100deg,#7dff9b,#2fd0ff);border-color:transparent}
   .panel button:active{transform:scale(.97)}
 
-  /* 시작 전 안내 */
   #readyHint{
-    position:absolute;left:0;right:0;bottom:8%;text-align:center;z-index:14;pointer-events:none;
-    font-size:12px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.02em;opacity:0;transition:opacity .2s;
+    position:absolute;left:0;right:0;bottom:7%;text-align:center;z-index:14;pointer-events:none;
+    font:800 10.5px/1.5 var(--mono);letter-spacing:.04em;color:rgba(255,255,255,.55);opacity:0;transition:opacity .2s;
   }
   #readyHint.on{opacity:1}
+  #readyHint b{color:#ffd34d}
+  @media (max-height:700px){
+    .tipcard{display:none}
+    .mqBig{font-size:30px}
+  }
 </style>
 </head>
 <body>
 <div id="app" data-screen="title">
 
   <div id="play">
-    <div id="field">
-      <canvas id="cv"></canvas>
-      <div id="hud">
-        <div class="hudrow">
-          <button id="pauseBtn" aria-label="일시정지">❚❚</button>
-          <div style="min-width:0">
-            <div id="hudTitle">엄지 펌프</div>
-            <div id="hudSub">BPM · READY</div>
-          </div>
-          <div id="scoreWrap"><span id="score">0</span><small>SCORE</small></div>
-        </div>
-        <div id="lifeWrap"><div id="lifeBar"></div></div>
+    <div id="bezel">
+      <div id="bezTop">
+        <span class="lamp"><i></i>PUMP&nbsp;MINI</span>
+        <span class="lamp"><i class="b"></i>5&nbsp;BUTTON</span>
       </div>
-      <div id="feverTag">FEVER ×1.2</div>
-      <div id="readyHint">양손 엄지로 ↙ ↖ ◉ ↗ ↘ 를 눌러!</div>
+      <div id="field">
+        <canvas id="cv"></canvas>
+        <div class="crt"></div>
+        <div id="hud">
+          <div class="hudrow">
+            <button id="pauseBtn" aria-label="일시정지">❚❚</button>
+            <div style="min-width:0">
+              <div id="hudTitle">엄지 펌프</div>
+              <div id="hudSub">BPM · READY</div>
+            </div>
+            <div id="scoreWrap"><span id="score">0000000</span><small>SCORE</small></div>
+          </div>
+          <div id="lifeWrap"><div id="lifeBar"></div></div>
+        </div>
+        <div id="comboTag"><b>0</b> COMBO</div>
+        <div id="feverTag">FEVER ×1.2</div>
+        <div id="readyHint">양손 엄지로 <b>↙ ↖</b> · <b>◉</b> · <b>↗ ↘</b> 를 눌러!</div>
+      </div>
     </div>
 
     <div id="padzone">
-      <div id="pad" aria-label="5버튼 펌프 패드">
-        <button class="padbtn" data-lane="1" style="--c:#28c8ff;--cA:rgba(40,200,255,.55);grid-area:1/1"><span class="lbl">LU</span><span class="gl">↖</span><span class="kk">Q</span></button>
-        <button class="padbtn" data-lane="3" style="--c:#28c8ff;--cA:rgba(40,200,255,.55);grid-area:1/3"><span class="lbl">RU</span><span class="gl">↗</span><span class="kk">E</span></button>
-        <button class="padbtn" data-lane="2" style="--c:#ff2f6d;--cA:rgba(255,47,109,.6);grid-area:2/2"><span class="lbl">C</span><span class="gl">◉</span><span class="kk">S</span></button>
-        <button class="padbtn" data-lane="0" style="--c:#ffb020;--cA:rgba(255,176,32,.55);grid-area:3/1"><span class="lbl">LD</span><span class="gl">↙</span><span class="kk">Z</span></button>
-        <button class="padbtn" data-lane="4" style="--c:#ffb020;--cA:rgba(255,176,32,.55);grid-area:3/3"><span class="lbl">RD</span><span class="gl">↘</span><span class="kk">C</span></button>
+      <div id="deck">
+        <div class="plate">PUMP MINI · THUMB EDITION</div>
+        <div id="pad" aria-label="5버튼 손펌프 패드"></div>
+        <div class="coin">100₩</div>
       </div>
     </div>
   </div>
 
   <section id="title" class="screen">
-    <div class="logo">엄지<span>펌프</span></div>
-    <div class="logo-sub">THUMB&nbsp;PUMP&nbsp;·&nbsp;5&nbsp;BUTTON</div>
-    <div class="arrowrow">
-      <div class="abtn" style="--c:#ffb020;--cA:rgba(255,176,32,.5)">↙</div>
-      <div class="abtn" style="--c:#28c8ff;--cA:rgba(40,200,255,.5)">↖</div>
-      <div class="abtn" style="--c:#ff2f6d;--cA:rgba(255,47,109,.55)">◉</div>
-      <div class="abtn" style="--c:#28c8ff;--cA:rgba(40,200,255,.5)">↗</div>
-      <div class="abtn" style="--c:#ffb020;--cA:rgba(255,176,32,.5)">↘</div>
+    <div class="marquee">
+      <div class="mqSmall">MUNBANG-GU ARCADE</div>
+      <div class="mqBig">엄지펌프</div>
+      <div class="mqSub">THUMB PUMP · PUMP MINI</div>
     </div>
-    <div class="tagline">오락실 손펌프를 <b>두 엄지</b>로.<br>X자 5버튼을 박자에 맞춰 톡톡!</div>
-    <div class="selpad"></div>
-    <button id="startBtn" class="bigbtn">▶ 곡 고르기</button>
-    <div class="titlefoot">
-      <div class="bestline" id="homeBest">아직 기록이 없어</div>
-      <div class="chips">
-        <button class="chip on" id="sfxChip">🔊 효과음 ON</button>
-        <button class="chip" id="nofailChip">🛡 노 페일 OFF</button>
-      </div>
-      <div class="keysline">PC 테스트 : <kbd>Z</kbd>↙ <kbd>Q</kbd>↖ <kbd>S</kbd>◉ <kbd>E</kbd>↗ <kbd>C</kbd>↘</div>
-      <div class="hint">아이폰 사파리·카톡 인앱 그대로 플레이<br>무음 스위치를 끄고 소리 🔊 를 켜야 박자가 맞아</div>
+    <div class="coinline" id="insertCoin">INSERT COIN ▸ 100원</div>
+    <button id="startBtn">▶ 동전 넣고 곡 고르기</button>
+    <div class="quickhead">바로 시작</div>
+    <div id="quickList"></div>
+    <div class="spacer"></div>
+    <div class="optrow">
+      <button class="chip on" id="sfxChip">🔊 버튼음 ON</button>
+      <button class="chip" id="nofailChip">🛡 노 페일 OFF</button>
     </div>
+    <div class="bestline" id="homeBest">아직 기록이 없어</div>
+    <div class="hint">아이폰은 <b>옆면 무음 스위치</b>를 끄고 소리를 켜야 박자가 들려<br>동그란 버튼 5개를 두 엄지로 톡톡 · 안 누르고 있으면 안 돼</div>
+    <div class="keysline">PC : <kbd>Z</kbd>↙ <kbd>Q</kbd>↖ <kbd>S</kbd>◉ <kbd>E</kbd>↗ <kbd>C</kbd>↘</div>
+    <div class="cabfoot">1&nbsp;COIN&nbsp;·&nbsp;100₩&nbsp;·&nbsp;5&nbsp;TRACKS&nbsp;·&nbsp;PUMP&nbsp;MINI&nbsp;v2.0</div>
   </section>
 
   <section id="select" class="screen hidden">
-    <div class="shead"><button id="backBtn" aria-label="뒤로">‹</button><h2>곡 선택</h2></div>
+    <div class="shead"><button id="backBtn" aria-label="뒤로">‹</button><h2>곡 선택</h2><span class="tag" id="songCount">5 TRACKS</span></div>
     <div id="songList"></div>
     <div class="optrow">
       <div class="optlabel">배속</div>
@@ -378,16 +529,15 @@
       </div>
     </div>
     <div class="optrow">
-      <button class="chip on" id="selectSfx">🔊 효과음 ON</button>
+      <button class="chip on" id="selectSfx">🔊 버튼음 ON</button>
       <button class="chip" id="selectNofail">🛡 노 페일 OFF</button>
     </div>
     <div class="tipcard">
-      <div class="tiptitle">PLAY TIP</div>
-      <div class="tiprow"><span class="te">↙ ↖ ◉ ↗ ↘</span>X자 5버튼을 두 엄지로</div>
-      <div class="tiprow"><span class="te">✦ + ✦</span>같은 순간 두 버튼 = 동시타</div>
-      <div class="tiprow"><span class="te">▬▬▬</span>긴 노트는 손 떼지 말고 홀드</div>
+      <div class="tiptitle">HOW TO PLAY</div>
+      <div class="tiprow"><span class="te">↙ ↖ ◉ ↗ ↘</span>동그란 버튼 5개를 두 엄지로</div>
+      <div class="tiprow"><span class="te">▬▬▬</span>같은 순간 두 버튼 = 동시타</div>
+      <div class="tiprow"><span class="te">◉</span>긴 노트는 손 떼지 말고 홀드</div>
     </div>
-    <div class="selpad"></div>
     <button id="playBtn" class="bigbtn">▶ 선택한 곡 시작</button>
   </section>
 
@@ -465,8 +615,39 @@ var CHORDS = {
   Em: { root: 40, tri: [0, 3, 7] },  D: { root: 38, tri: [0, 4, 7] },
   Bm: { root: 35, tri: [0, 3, 7] },  Dm: { root: 38, tri: [0, 3, 7] },
   Bb: { root: 34, tri: [0, 4, 7] },  Gm: { root: 31, tri: [0, 3, 7] },
-  A:  { root: 33, tri: [0, 4, 7] },  Eb: { root: 39, tri: [0, 4, 7] }
+  A:  { root: 33, tri: [0, 4, 7] },  Eb: { root: 39, tri: [0, 4, 7] },
+  /* v2 추가: 클래식 리믹스용 */
+  Cm: { root: 36, tri: [0, 3, 7] },  Fm: { root: 41, tri: [0, 3, 7] },
+  Ab: { root: 44, tri: [0, 4, 7] },  E:  { root: 40, tri: [0, 4, 7] },
+  Db: { root: 37, tri: [0, 4, 7] },  Gs: { root: 44, tri: [0, 3, 7] }
 };
+
+/* ---------- 음이름 → MIDI ---------- */
+var PITCH_CLASS = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+function noteToMidi(tok) {
+  var m = /^([A-G])([#b]?)(-?\d)$/.exec(tok);
+  if (!m) throw new Error('음이름 오류: ' + tok);
+  var v = PITCH_CLASS[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0);
+  return v + (parseInt(m[3], 10) + 1) * 12;
+}
+
+/* ---------- 멜로디 표기 파서 ----------
+   "0:C5*4 4:Eb5 8:G5*8"  → [{step, midi, len}]  (len = 16분음표 스텝 수, 기본 2) */
+function parseMelody(str) {
+  var out = [];
+  if (!str) return out;
+  str.trim().split(/\s+/).forEach(function (tok) {
+    var m = /^(\d{1,2}):([A-G][#b]?-?\d)(?:\*(\d{1,2}))?$/.exec(tok);
+    if (!m) throw new Error('멜로디 토큰 오류: ' + tok);
+    out.push({
+      step: parseInt(m[1], 10),
+      midi: noteToMidi(m[2]),
+      len: m[3] ? parseInt(m[3], 10) : 2
+    });
+  });
+  out.sort(function (a, b) { return a.step - b.step; });
+  return out;
+}
 
 /* ---------- 채보 표기 파서 ----------
    "0:c 4:ld 8:rd 12:c"     16분음표 스텝(0~15) : 레인
@@ -603,18 +784,142 @@ var SONGS = [
       h: '0:c*4 4:ld 5:lu 6:c 8:rd 9:ru 10:c 12:ld+rd 14:c',
       i: '0:lu+rd*12 12:c+ld*4'
     }
+  },
+
+  /* ==========================================================================
+     4) 베토벤 '비창' 3악장 론도 테마 — 퍼블릭 도메인 클래식 리믹스
+     원곡: L.v.Beethoven Piano Sonata No.8 Op.13 III. Rondo (Allegro), C minor
+     멜로디는 원곡 음높이를 그대로 옮기고, 펌프 테크노 비트를 얹은 편곡.
+     ========================================================================== */
+  {
+    id: 'pathetique',
+    title: '베토벤 비창 펌프',
+    emoji: '🎻',
+    bpm: 162,
+    diff: '하드',
+    stars: 4,
+    desc: '비창 3악장 론도 테마 · 클래식 펌프 리믹스',
+    mood: 'hard',
+    kind: 'melody',
+    bars: 32,
+    chords: ['Cm', 'Cm', 'Ab', 'G',
+             'Cm', 'Fm', 'Ab', 'Cm', 'Ab', 'Fm', 'G', 'Cm',
+             'Fm', 'Cm', 'Ab', 'Eb', 'Fm', 'G', 'Cm', 'G',
+             'Cm', 'Fm', 'Ab', 'Cm', 'Ab', 'Fm', 'G', 'Cm',
+             'Ab', 'G', 'Cm', 'Cm'],
+    sections: [[2, 1], [2, 2], [4, 2], [4, 3], [8, 3], [8, 3], [4, 2]],
+    melody: [
+      null, null,
+      '0:C5*4 4:Eb5*4 8:G5*8',
+      '0:G4 2:Bb4 4:C5 6:D5 8:Eb5*8',
+      '6:G4 8:C5 10:D5 12:Eb5*4',
+      '0:Eb5*4 4:F5 6:D5 8:Eb5 10:C5 12:Bb4 14:C5',
+      '0:D5 2:Eb5*6 8:C5 10:Bb4 12:C5 14:D5',
+      '0:Eb5 2:D5 4:Eb5 6:F5 8:G5*6 14:F5',
+      '0:Eb5*4 4:D5 6:Eb5 8:G5*4 12:F5 14:Eb5',
+      '0:D5 2:C5 4:Bb4 6:C5 8:D5*4 12:Eb5 14:F5',
+      '0:G5*4 4:F5 6:Eb5 8:D5 10:C5 12:Bb4*4',
+      '0:C5*8 8:G4 10:Bb4 12:C5*4',
+      '0:Ab4 2:C5 4:F5*4 8:Eb5 10:D5 12:C5*4',
+      '0:G4 2:C5 4:Eb5*4 8:D5 10:C5 12:Bb4*4',
+      '0:Ab4*4 4:C5 6:Eb5 8:Ab5*4 12:G5 14:F5',
+      '0:Eb5*4 4:D5 6:Eb5 8:G5*4 12:F5*4',
+      '0:F5 2:Eb5 4:D5 6:C5 8:Bb4*4 12:C5 14:D5',
+      '0:Eb5 2:D5 4:C5 6:Bb4 8:G4*8',
+      '0:C5*4 4:Eb5*4 8:G5*4 12:Ab5*4',
+      '0:G5*8 8:F5 10:Eb5 12:D5*4',
+      '6:G4 8:C5 10:D5 12:Eb5*4',
+      '0:Eb5*4 4:F5 6:D5 8:Eb5 10:C5 12:Bb4 14:C5',
+      '0:D5 2:Eb5*6 8:C5 10:Bb4 12:C5 14:D5',
+      '0:Eb5 2:D5 4:Eb5 6:F5 8:G5*6 14:F5',
+      '0:Eb5*4 4:D5 6:Eb5 8:G5*4 12:F5 14:Eb5',
+      '0:D5 2:C5 4:Bb4 6:C5 8:D5*4 12:Eb5 14:F5',
+      '0:G5*4 4:F5 6:Eb5 8:D5 10:C5 12:Bb4*4',
+      '0:C5*8 8:G4 10:Bb4 12:C5*4',
+      '0:Ab5*4 4:G5 6:F5 8:Eb5*4 12:D5*4',
+      '0:Eb5 2:D5 4:C5 6:Bb4 8:G4*4 12:Bb4 14:D5',
+      '0:C5*12',
+      '0:C5*16'
+    ]
+  },
+
+  /* ==========================================================================
+     5) 모차르트 '터키 행진곡' — 퍼블릭 도메인 클래식 리믹스
+     원곡: W.A.Mozart Piano Sonata No.11 K.331 III. Alla Turca (A minor)
+     ========================================================================== */
+  {
+    id: 'turkish',
+    title: '모차르트 터키 행진곡',
+    emoji: '🎩',
+    bpm: 152,
+    diff: '하드',
+    stars: 4,
+    desc: '터키 행진곡 테마 · 오리엔탈 펌프 리믹스',
+    mood: 'bright',
+    kind: 'melody',
+    bars: 34,
+    chords: ['Am', 'E', 'Am', 'E', 'Am', 'E', 'Am', 'E', 'Am', 'Dm', 'E', 'Am',
+             'A', 'D', 'E', 'A',
+             'Am', 'E', 'Am', 'E',
+             'Dm', 'E', 'Dm', 'E',
+             'Am', 'E', 'Am', 'E', 'Am', 'Dm', 'E', 'Am',
+             'A', 'E', 'Am', 'Am'],
+    sections: [[2, 1], [4, 2], [4, 2], [4, 3], [4, 3], [4, 2], [4, 3], [4, 3], [4, 2]],
+    melody: [
+      null, null,
+      '0:B4*1 1:A4*1 2:G#4*1 3:A4*1 4:C5*4 8:D5*1 9:C5*1 10:B4*1 11:C5*1 12:E5*4',
+      '0:F5*1 1:E5*1 2:D#5*1 3:E5*1 4:B5*4 8:B5*1 9:A5*1 10:G#5*1 11:A5*1 12:C6*4',
+      '0:A5 2:C6 4:B5 6:A5 8:G5 10:A5 12:B5 14:A5',
+      '0:G5 2:A5 4:B5 6:A5 8:G5 10:F#5 12:E5*4',
+      '0:E5 2:F5 4:G5 6:G5 8:A5*1 9:G5*1 10:F5*1 11:E5*1 12:D5*4',
+      '0:E5 2:F5 4:G5 6:G5 8:A5*1 9:G5*1 10:F5*1 11:E5*1 12:D5*4',
+      '0:C5 2:D5 4:E5 6:E5 8:F5*1 9:E5*1 10:D5*1 11:C5*1 12:B4*4',
+      '0:C5 2:D5 4:E5 6:E5 8:F5*1 9:E5*1 10:D5*1 11:C5*1 12:B4 14:E4',
+      '0:A4*1 1:B4*1 2:C#5*1 3:D5*1 4:E5*4 8:A5*4 12:E5 14:D5',
+      '0:C#5 2:D5 4:E5 6:F#5 8:A5*8',
+      '0:E5 2:A5 4:B5 6:A5 8:G#5*4 12:E5*4',
+      '0:A5*8 8:G#5 10:A5 12:B5*4',
+      '0:E5*2 4:A5*4 8:G#5 10:A5 12:B5*4',
+      '0:C6*4 4:B5 6:A5 8:G#5*4 12:E5*4',
+      '0:B5*1 1:A5*1 2:G#5*1 3:A5*1 4:C6*4 8:B5*4 12:A5*4',
+      '0:A5*8 8:E5 10:G#5 12:A5*4',
+      '0:D5*4 4:F5*4 8:A5*4 12:F5*4',
+      '0:E5*4 4:G5*4 8:B5*4 12:G5*4',
+      '0:F5 2:E5 4:D5 6:E5 8:F5 10:E5 12:D5*4',
+      '0:C5*8 8:B4 10:C5 12:D5*4',
+      '0:B4*1 1:A4*1 2:G#4*1 3:A4*1 4:C5*4 8:D5*1 9:C5*1 10:B4*1 11:C5*1 12:E5*4',
+      '0:F5*1 1:E5*1 2:D#5*1 3:E5*1 4:B5*4 8:B5*1 9:A5*1 10:G#5*1 11:A5*1 12:C6*4',
+      '0:A5 2:C6 4:B5 6:A5 8:G5 10:A5 12:B5 14:A5',
+      '0:G5 2:A5 4:B5 6:A5 8:G5 10:F#5 12:E5*4',
+      '0:E5 2:F5 4:G5 6:G5 8:A5*1 9:G5*1 10:F5*1 11:E5*1 12:D5*4',
+      '0:E5 2:F5 4:G5 6:G5 8:A5*1 9:G5*1 10:F5*1 11:E5*1 12:D5*4',
+      '0:C5 2:D5 4:E5 6:E5 8:F5*1 9:E5*1 10:D5*1 11:C5*1 12:B4*4',
+      '0:A5*4 4:E5*4 8:A5*4 12:C6*4',
+      '0:B5*4 4:A5 6:G#5 8:A5*4 12:E5*4',
+      '0:A5*8 8:G5 10:A5 12:B5*4',
+      '0:A5*8 8:G#5 10:A5 12:B5*4',
+      '0:A5*16'
+    ]
   }
 ];
 
-/* 곡 메타 마무리: 채보 파싱 · 길이 · 강도 배열 */
+/* 곡 메타 마무리: 채보 파싱 · 멜로디 파싱 · 길이 · 강도 배열 */
 SONGS.forEach(function (song) {
-  var parsed = {};
-  Object.keys(song.patterns).forEach(function (k) { parsed[k] = parsePattern(song.patterns[k]); });
-  song.patterns = parsed;
+  if (song.patterns) {
+    var parsed = {};
+    Object.keys(song.patterns).forEach(function (k) { parsed[k] = parsePattern(song.patterns[k]); });
+    song.patterns = parsed;
+  }
+  if (song.melody) {
+    if (song.melody.length !== song.bars) {
+      throw new Error(song.id + ' 멜로디 마디 수 불일치: ' + song.melody.length + ' / ' + song.bars);
+    }
+    song.lead = song.melody.map(function (m) { return m ? parseMelody(m) : []; });
+  }
   song.stepDur = 60 / song.bpm / 4;
   song.length = song.bars * 16 * song.stepDur;
   song.intensity = expandSections(song.bars, song.sections);
-  if (song.arrangement.length !== song.bars) {
+  if (song.arrangement && song.arrangement.length !== song.bars) {
     throw new Error(song.id + ' 마디 수 불일치: ' + song.arrangement.length + ' / ' + song.bars);
   }
 });
@@ -622,28 +927,116 @@ SONGS.forEach(function (song) {
 /* ============================================================================
    채보 → 노트 배열
    ============================================================================ */
+function makeNote(t, lane, hold, bar) {
+  return {
+    t: t, lane: lane, hold: hold || 0, bar: bar,
+    hit: false, result: null, holding: false, holdDone: false, holdBroken: false
+  };
+}
+
+/* ---------- 멜로디 → 채보 (클래식 리믹스 곡) ----------------------------
+   멜로디의 음높이 방향(상행/하행/반복)을 레인으로 옮겼다.
+   - 상행 = 위쪽 파랑 (↖ / ↗), 하행 = 아래쪽 노랑 (↙ / ↘), 같은 음 반복 = 중앙 빨강
+   - 긴 음은 홀드, 마디 첫박·끝박에는 부딪히지 않게 드럼 액센트 노트를 보탠다
+   그래서 들리는 멜로디를 그대로 엄지로 따라가는 채보가 된다. */
+var ASCEND_LANES = [1, 3];
+var DESCEND_LANES = [0, 4];
+
+function melodyChart(song) {
+  var notes = [];
+  var stepDur = song.stepDur;
+  var prevMidi = null, alt = 0, lastLane = -1;
+  var GRID_HARD = [1, 3, 5, 7, 9, 11, 13, 15];
+  var GRID_MID = [2, 6, 10, 14];
+  var GRID_LOW = [4, 12];
+  var gridLane = [0, 4, 2, 4, 0, 2, 4, 0];
+
+  for (var bar = 0; bar < song.bars; bar++) {
+    var mel = song.lead[bar] || [];
+    var I = song.intensity[bar] || 0;
+    var used = {};
+    var sim = {};
+    var beat = bar * 16;
+
+    for (var k = 0; k < mel.length; k++) {
+      var n = mel[k];
+      var t = (beat + n.step) * stepDur;
+      var dir = (prevMidi === null) ? 0 : (n.midi > prevMidi ? 1 : (n.midi < prevMidi ? -1 : 0));
+      var pool = dir > 0 ? ASCEND_LANES : (dir < 0 ? DESCEND_LANES : [2]);
+      var lane;
+      if (pool.length === 1) lane = pool[0];
+      else { lane = pool[alt % 2]; alt++; }
+      if (lane === lastLane) lane = pool[(pool.indexOf(lane) + 1) % pool.length];
+      lastLane = lane;
+      prevMidi = n.midi;
+
+      var hold = n.len >= 6 ? Math.max(0.18, (n.len - 2) * stepDur) : 0;
+      notes.push(makeNote(t, lane, hold, bar));
+      used[n.step] = true;
+
+      /* 강한 마디의 박머리·긴 음에는 반대손 동시타로 점프를 만든다 */
+      if (I >= 3 && lane !== 2 && (hold > 0 || n.step % 8 === 0) && !sim[n.step]) {
+        notes.push(makeNote(t, 2, 0, bar));
+        sim[n.step] = true;
+      }
+    }
+
+    /* 멜로디가 비어 있는 마디: 약한 구간은 통째로 쉬어 가고, 강한 구간만 액센트로 채운다 */
+    if (!mel.length) {
+      if (I >= 2) {
+        notes.push(makeNote(beat * stepDur, 2, stepDur * 3, bar));
+        notes.push(makeNote((beat + 8) * stepDur, bar % 2 ? 0 : 4, 0, bar));
+      }
+      continue;
+    }
+
+    /* 리듬 레이어: 박자에 맞춰 반대편 레인을 채워 펌프 비트를 만든다 */
+    var grid = I >= 3 ? GRID_HARD : (I >= 2 ? GRID_MID : GRID_LOW);
+    for (var g = 0; g < grid.length; g++) {
+      var s = grid[g];
+      if (used[s]) continue;
+      var laneG = gridLane[(g + bar) % gridLane.length];
+      if (laneG === 2 && used[s - 1] && used[s + 1]) laneG = 0;
+      notes.push(makeNote((beat + s) * stepDur, laneG, 0, bar));
+    }
+  }
+
+  /* 같은 레인에 너무 가까운 노트는 이웃 레인으로 비켜 준다 */
+  notes.sort(function (a, b) { return a.t - b.t || a.lane - b.lane; });
+  var lastAt = [-9, -9, -9, -9, -9];
+  notes.forEach(function (n) {
+    var guard = 0;
+    while (n.t - lastAt[n.lane] < 0.075 && guard++ < 5) {
+      var cand = [0, 1, 2, 3, 4].filter(function (l) {
+        return l !== n.lane && n.t - lastAt[l] >= 0.075;
+      });
+      if (!cand.length) break;
+      var best = cand[0];
+      cand.forEach(function (l) { if (lastAt[l] < lastAt[best]) best = l; });
+      n.lane = best;
+    }
+    lastAt[n.lane] = n.t + n.hold;
+  });
+
+  return notes;
+}
+
 function buildChart(song) {
   var notes = [];
   var stepDur = song.stepDur;
-  song.arrangement.forEach(function (key, bar) {
-    if (!key) return;
-    var pat = song.patterns[key];
-    pat.forEach(function (p) {
-      p.lanes.forEach(function (lane) {
-        notes.push({
-          t: (bar * 16 + p.step) * stepDur,
-          lane: lane,
-          hold: p.hold * stepDur,
-          bar: bar,
-          hit: false,
-          result: null,
-          holding: false,
-          holdDone: false,
-          holdBroken: false
+  if (song.kind === 'melody') {
+    notes = melodyChart(song);
+  } else {
+    song.arrangement.forEach(function (key, bar) {
+      if (!key) return;
+      var pat = song.patterns[key];
+      pat.forEach(function (p) {
+        p.lanes.forEach(function (lane) {
+          notes.push(makeNote((bar * 16 + p.step) * stepDur, lane, p.hold * stepDur, bar));
         });
       });
     });
-  });
+  }
   notes.sort(function (a, b) { return a.t - b.t || a.lane - b.lane; });
   notes.forEach(function (n, i) { n.idx = i; });
 
@@ -703,8 +1096,9 @@ function emptyCounts() {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     LANE_DEF: LANE_DEF, LANE_ALIAS: LANE_ALIAS, JUDGE_DEF: JUDGE_DEF, JUDGE_ORDER: JUDGE_ORDER,
-    BAD_WIN: BAD_WIN, HOLD_GRACE: HOLD_GRACE,
-    judgeKey: judgeKey, parsePattern: parsePattern, SONGS: SONGS,
+    BAD_WIN: BAD_WIN, HOLD_GRACE: HOLD_GRACE, CHORDS: CHORDS,
+    judgeKey: judgeKey, parsePattern: parsePattern, parseMelody: parseMelody,
+    noteToMidi: noteToMidi, SONGS: SONGS,
     buildChart: buildChart, feverMult: feverMult, feverLabel: feverLabel,
     noteScore: noteScore, accuracyOf: accuracyOf, rankFor: rankFor, emptyCounts: emptyCounts
   };
@@ -722,14 +1116,23 @@ var AUDIO = {
   noise: null, comp: null, ready: false
 };
 
-function audioInit() {
-  if (AUDIO.ctx) return AUDIO.ctx;
-  var AC = window.AudioContext || window.webkitAudioContext;
-  if (!AC) return null;
-  var ctx = new AC({ latencyHint: 'interactive' });
+/* 마스터 버스 소프트 리미터 곡선: 0.72까지는 그대로, 그 위는 부드럽게 눌러 최대 0.985 */
+function softClipCurve() {
+  var n = 4096, c = new Float32Array(n), t = 0.72, top = 0.985;
+  for (var i = 0; i < n; i++) {
+    var x = (i / (n - 1)) * 2 - 1;
+    var ax = Math.abs(x), y;
+    if (ax <= t) y = ax;
+    else y = t + (top - t) * Math.tanh((ax - t) / (1 - t));
+    c[i] = x < 0 ? -y : y;
+  }
+  return c;
+}
 
+/* 마스터 그래프 (실시간/오프라인 렌더 공용) */
+function buildGraph(ctx) {
   var master = ctx.createGain();
-  master.gain.value = 0.92;
+  master.gain.value = 0.86;
 
   var comp = ctx.createDynamicsCompressor();
   comp.threshold.value = -16;
@@ -737,6 +1140,10 @@ function audioInit() {
   comp.ratio.value = 3.2;
   comp.attack.value = 0.004;
   comp.release.value = 0.22;
+
+  var shaper = ctx.createWaveShaper();
+  shaper.curve = softClipCurve();
+  shaper.oversample = '2x';
 
   var bgm = ctx.createGain(); bgm.gain.value = 0.78;
   var sfx = ctx.createGain(); sfx.gain.value = 0.85;
@@ -753,7 +1160,18 @@ function audioInit() {
   bgm.connect(master);
   sfx.connect(master);
   master.connect(comp);
-  comp.connect(ctx.destination);
+  comp.connect(shaper);
+  shaper.connect(ctx.destination);
+
+  return { master: master, comp: comp, shaper: shaper, bgm: bgm, sfx: sfx, send: send, delay: delay };
+}
+
+function audioInit() {
+  if (AUDIO.ctx) return AUDIO.ctx;
+  var AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  var ctx = new AC({ latencyHint: 'interactive' });
+  var g = buildGraph(ctx);
 
   /* 노이즈 버퍼 2초 */
   var len = Math.floor(ctx.sampleRate * 2);
@@ -761,8 +1179,8 @@ function audioInit() {
   var d = buf.getChannelData(0);
   for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
 
-  AUDIO.ctx = ctx; AUDIO.master = master; AUDIO.comp = comp;
-  AUDIO.bgm = bgm; AUDIO.sfx = sfx; AUDIO.send = send; AUDIO.delay = delay;
+  AUDIO.ctx = ctx; AUDIO.master = g.master; AUDIO.comp = g.comp;
+  AUDIO.bgm = g.bgm; AUDIO.sfx = g.sfx; AUDIO.send = g.send; AUDIO.delay = g.delay;
   AUDIO.noise = buf; AUDIO.ready = true;
   return ctx;
 }
@@ -917,6 +1335,31 @@ function iPad(t, root, tri, dur, v) {
   });
 }
 
+/* 클래식 리믹스 멜로디: 밝은 톱니 + 옥타브 삼각 + 딜레이 */
+function iTune(t, midi, dur, v) {
+  var ctx = AUDIO.ctx;
+  var f = midiFreq(midi);
+  var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), o3 = ctx.createOscillator();
+  var lp = ctx.createBiquadFilter(), g = ctx.createGain(), g3 = ctx.createGain(), sg = ctx.createGain();
+  o1.type = 'sawtooth'; o1.frequency.value = f;
+  o2.type = 'square'; o2.frequency.value = f; o2.detune.value = 9;
+  o3.type = 'triangle'; o3.frequency.value = f * 2;
+  lp.type = 'lowpass'; lp.Q.value = 0.9;
+  lp.frequency.setValueAtTime(4600, t);
+  lp.frequency.exponentialRampToValueAtTime(1700, t + Math.max(0.1, dur * 0.85));
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(v, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(v * 0.6, t + dur * 0.55);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  g3.gain.value = 0.16;
+  sg.gain.value = 0.34;
+  o1.connect(lp); o2.connect(lp); lp.connect(g);
+  o3.connect(g3); g3.connect(g);
+  g.connect(AUDIO.bgm); g.connect(sg); sg.connect(AUDIO.send);
+  o1.start(t); o2.start(t); o3.start(t);
+  o1.stop(t + dur + 0.06); o2.stop(t + dur + 0.06); o3.stop(t + dur + 0.06);
+}
+
 function iCrash(t, v) {
   var ctx = AUDIO.ctx;
   var n = noiseSrc(t, 1.3), hp = ctx.createBiquadFilter(), g = ctx.createGain();
@@ -939,28 +1382,106 @@ function iRiser(t, dur, v) {
   n.connect(bp); bp.connect(g); g.connect(AUDIO.bgm);
 }
 
-/* ---------- 버튼 타격음 ---------- */
+/* ---------- 문방구 오락기 버튼 타격음 ----------
+   실제 오락기 버튼처럼 "딸깍 + 톡" 두 층으로 만든다.
+   (1) 마이크로스위치 클릭 — 아주 짧은 노이즈 (2) 버튼 통 울림 — 낮은 사인
+   (3) 전자 블립 — 레인별 음높이 (판정이 좋을수록 한 옥타브 위)               */
+function sfxGate() {
+  if (!AUDIO.ctx || !AUDIO.sfx) return null;
+  if (typeof SETTINGS !== 'undefined' && SETTINGS && SETTINGS.sfx === false) return null;
+  return AUDIO.ctx;
+}
+
+function sfxClick(ctx, t, v) {
+  var n = noiseSrc(t, 0.02), bp = ctx.createBiquadFilter(), g = ctx.createGain();
+  bp.type = 'bandpass'; bp.frequency.value = 4200; bp.Q.value = 1.6;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(v, t + 0.001);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.016);
+  n.connect(bp); bp.connect(g); g.connect(AUDIO.sfx);
+}
+
 function sfxTap(lane, strong) {
-  if (!AUDIO.ctx || !AUDIO.sfx) return;
-  if (typeof SETTINGS !== 'undefined' && SETTINGS && SETTINGS.sfx === false) return;
-  var ctx = AUDIO.ctx;
-  var t = ctx.currentTime + 0.002;
-  var f = [700, 830, 990, 1180, 1320][lane] * (strong ? 1.34 : 1);
+  var ctx = sfxGate();
+  if (!ctx) return;
+  var t = ctx.currentTime + 0.001;
+
+  /* 1) 스위치 클릭 */
+  sfxClick(ctx, t, strong ? 0.13 : 0.10);
+
+  /* 2) 버튼 몸통 "통" */
+  var o0 = ctx.createOscillator(), g0 = ctx.createGain();
+  o0.type = 'sine';
+  o0.frequency.setValueAtTime(430, t);
+  o0.frequency.exponentialRampToValueAtTime(190, t + 0.045);
+  g0.gain.setValueAtTime(0.0001, t);
+  g0.gain.linearRampToValueAtTime(strong ? 0.13 : 0.10, t + 0.002);
+  g0.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+  o0.connect(g0); g0.connect(AUDIO.sfx);
+  o0.start(t); o0.stop(t + 0.07);
+
+  /* 3) 전자 블립 — 레인별 음높이 사다리 */
+  var f = [988, 1175, 1319, 1568, 1760][lane];
+  if (strong) f *= 1.5;
+  var o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'square';
+  o.frequency.setValueAtTime(f, t + 0.002);
+  o.frequency.exponentialRampToValueAtTime(f * 0.94, t + 0.05);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(strong ? 0.075 : 0.05, t + 0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.055);
+  o.connect(g); g.connect(AUDIO.sfx);
+  o.start(t); o.stop(t + 0.06);
+}
+
+/* 버튼에서 손을 떼는 "톡" */
+function sfxRelease(lane) {
+  var ctx = sfxGate();
+  if (!ctx) return;
+  var t = ctx.currentTime + 0.001;
   var o = ctx.createOscillator(), g = ctx.createGain();
   o.type = 'triangle';
-  o.frequency.setValueAtTime(f, t);
-  o.frequency.exponentialRampToValueAtTime(f * 0.68, t + 0.055);
+  o.frequency.setValueAtTime([660, 740, 880, 990, 1100][lane] * 0.72, t);
+  o.frequency.exponentialRampToValueAtTime(320, t + 0.03);
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.linearRampToValueAtTime(strong ? 0.15 : 0.10, t + 0.003);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.075);
+  g.gain.linearRampToValueAtTime(0.035, t + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
   o.connect(g); g.connect(AUDIO.sfx);
-  o.start(t); o.stop(t + 0.09);
+  o.start(t); o.stop(t + 0.05);
+}
 
-  var n = noiseSrc(t, 0.02), hp = ctx.createBiquadFilter(), ng = ctx.createGain();
-  hp.type = 'highpass'; hp.frequency.value = 2600;
-  ng.gain.setValueAtTime(0.05, t);
-  ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.025);
-  n.connect(hp); hp.connect(ng); ng.connect(AUDIO.sfx);
+/* 동전 투입 / 화면 이동 */
+function sfxCoin() {
+  var ctx = sfxGate();
+  if (!ctx) return;
+  var t = ctx.currentTime + 0.001;
+  [[1319, 0], [1760, 0.075], [2093, 0.15]].forEach(function (p) {
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.value = p[0];
+    var st = t + p[1];
+    g.gain.setValueAtTime(0.0001, st);
+    g.gain.linearRampToValueAtTime(0.07, st + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, st + 0.09);
+    o.connect(g); g.connect(AUDIO.sfx);
+    o.start(st); o.stop(st + 0.1);
+  });
+}
+
+/* 메뉴 선택 삐빅 */
+function sfxNav() {
+  var ctx = sfxGate();
+  if (!ctx) return;
+  var t = ctx.currentTime + 0.001;
+  var o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'square';
+  o.frequency.setValueAtTime(1046, t);
+  o.frequency.setValueAtTime(1568, t + 0.045);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(0.05, t + 0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+  o.connect(g); g.connect(AUDIO.sfx);
+  o.start(t); o.stop(t + 0.12);
 }
 
 function sfxMiss() {
@@ -1034,7 +1555,18 @@ function musicStep(song, step, time) {
     iBass(time, ch.root + bassOct, bassDur, I >= 2 ? 0.30 : 0.24);
   }
 
-  /* ---- 리드 아르페지오 ---- */
+  /* ---- 멜로디 (클래식 리믹스 곡) ---- */
+  var melBar = (song.lead && song.lead[bar]) ? song.lead[bar] : null;
+  var barHasMel = !!(melBar && melBar.length);
+  if (barHasMel) {
+    for (var mi = 0; mi < melBar.length; mi++) {
+      var mn = melBar[mi];
+      if (mn.step !== s) continue;
+      iTune(time, mn.midi, Math.max(sd * 1.2, mn.len * sd * 0.94), 0.108);
+    }
+  }
+
+  /* ---- 리드 아르페지오 (멜로디가 있는 마디에서는 비켜 준다) ---- */
   var leadOn = false, li = 0, lkind = (mood === 'hard' ? 'hard' : mood === 'warm' ? 'soft' : 'square');
   var ldur = sd * 0.9;
   if (I <= 0) { leadOn = (s === 0 || s === 8); li = (s === 0) ? 0 : 2; ldur = sd * 5; }
@@ -1048,7 +1580,7 @@ function musicStep(song, step, time) {
     ldur = sd * 0.72;
     if (s === 15 && bar % 4 !== 3) leadOn = false;
   }
-  if (leadOn) {
+  if (leadOn && !barHasMel) {
     iLead(time, chordTone(ch, li), ldur, I >= 3 ? 0.115 : 0.105, lkind);
   }
 
@@ -1148,11 +1680,13 @@ var MUSIC = {
 };
 'use strict';
 /* ============================================================================
-   🕹️ 엄지 펌프 — UI : 화면 · 캔버스 렌더링 · 입력 · 판정 런타임
+   🕹️ 엄지 펌프 PUMP MINI — UI
+   문방구 미니 손펌프 캐비닛 · 동그란 3D 버튼 5개 · 레일 안내선 · 판정 런타임
    ============================================================================ */
 
 var $ = function (s) { return document.querySelector(s); };
 var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+var VERSION = 'v2.0';
 
 /* ---------- 저장소 ---------- */
 var STORE_KEY = 'thumbpump.v1';
@@ -1203,44 +1737,103 @@ var G = {
 
 var selIdx = 0;
 
+/* ---------- 패드 정의 (문방구 손펌프 초기형: 동그란 버튼 5개 X자) ----------
+   0=좌하 · 1=좌상 · 2=중앙 · 3=우상 · 4=우하  (필드 레인 순서와 동일) */
+var PAD = [
+  { lane: 0, glyph: '↙', c1: '#ffa726', c2: '#9c5400', rot: -135, key: 'Z' },
+  { lane: 1, glyph: '↖', c1: '#35d2ff', c2: '#0a6ea6', rot: -45, key: 'Q' },
+  { lane: 2, glyph: '◉', c1: '#ff2f5e', c2: '#8f0b25', rot: 0, key: 'S' },
+  { lane: 3, glyph: '↗', c1: '#35d2ff', c2: '#0a6ea6', rot: 45, key: 'E' },
+  { lane: 4, glyph: '↘', c1: '#ffa726', c2: '#9c5400', rot: 135, key: 'C' }
+];
+/* 데크 중심에서의 상대 위치 (Cw, Ch 대비 비율) */
+var PAD_POS = [
+  { x: -0.30, y: 0.30 }, { x: -0.30, y: -0.30 }, { x: 0, y: 0 },
+  { x: 0.30, y: -0.30 }, { x: 0.30, y: 0.30 }
+];
+
 /* ---------- DOM ---------- */
 var app = $('#app');
 var cv = $('#cv');
 var C = cv.getContext('2d');
 var padEl = $('#pad');
-var padBtns = $$('.padbtn');
+var padzoneEl = $('#padzone');
+var fieldEl = $('#field');
+var padBtns = [];
+var PAD_D = 96;
+var btnRect = [];       /* 페이지 좌표 중심 (히트 판정용) */
 
 /* ---------- 캔버스 레이아웃 ---------- */
 var W = 1, H = 1, DPR = 1;
-var LX = [], LY = [], LNOTE = 54, LBOT = 400;
+var LX = [], LY = [], BTX = [];
+var LNOTE = 54, LBOT = 400;
+
+function buildPad() {
+  padEl.innerHTML = PAD.map(function (p) {
+    var face = (p.lane === 2)
+      ? '<svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="9.6" fill="none" stroke="currentColor" stroke-width="5"/>' +
+        '<circle cx="18" cy="18" r="3.1" fill="currentColor"/></svg>'
+      : '<svg viewBox="0 0 36 36" aria-hidden="true"><g transform="rotate(' + p.rot + ' 18 18)">' +
+        '<path d="M18 31 L18 11" stroke="currentColor" stroke-width="7.4" stroke-linecap="round"/>' +
+        '<path d="M18 3.5 L7.6 15.4 L28.4 15.4 Z" fill="currentColor"/></g></svg>';
+    return '<button class="padbtn" data-lane="' + p.lane + '" aria-label="' + p.glyph + ' 버튼"' +
+      ' style="--c1:' + p.c1 + ';--c2:' + p.c2 + '">' +
+      '<span class="led"></span><span class="cap">' + face + '</span>' +
+      '<span class="kk">' + p.key + '</span></button>';
+  }).join('');
+  padBtns = $$('.padbtn');
+}
 
 function layout() {
-  var field = $('#field');
-  var r = field.getBoundingClientRect();
-  W = Math.max(1, Math.round(r.width));
-  H = Math.max(1, Math.round(r.height));
+  var fr = fieldEl.getBoundingClientRect();
+  W = Math.max(1, Math.round(fr.width));
+  H = Math.max(1, Math.round(fr.height));
   DPR = Math.min(3, window.devicePixelRatio || 1);
   cv.width = Math.round(W * DPR);
   cv.height = Math.round(H * DPR);
   C.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-  var margin = Math.min(30, W * 0.075);
+  /* --- 데크 버튼 배치 (안전영역 패딩을 뺀 실제 데크 크기 기준) --- */
+  var dk = $('#deck').getBoundingClientRect();
+  var Cw = Math.max(120, dk.width);
+  var Ch = Math.max(120, dk.height);
+  PAD_D = Math.round(Math.max(62, Math.min(118, Math.min(Cw * 0.35, Ch * 0.38))));
+  btnRect = [];
+  for (var i = 0; i < 5; i++) {
+    var b = padBtns[i];
+    b.style.setProperty('--d', PAD_D + 'px');
+    var cx = Cw / 2 + PAD_POS[i].x * Cw;
+    var cy = Ch / 2 + PAD_POS[i].y * Ch;
+    b.style.left = cx + 'px';
+    b.style.top = cy + 'px';
+  }
+  /* 측정은 스타일 적용 뒤에 */
+  for (var j = 0; j < 5; j++) {
+    var r = padBtns[j].getBoundingClientRect();
+    btnRect[j] = { cx: r.left + r.width / 2, cy: r.top + r.height / 2, r: r.width / 2 };
+  }
+
+  /* --- 필드 레인 --- */
+  var margin = Math.min(34, W * 0.085);
   var span = W - margin * 2;
   LX = [];
-  for (var i = 0; i < 5; i++) LX.push(margin + span * i / 4);
+  for (var k = 0; k < 5; k++) LX.push(margin + span * k / 4);
 
-  /* HUD(세이프 에어리어 포함) 아래로 판정선을 내려 겹치지 않게 한다 */
   var hud = $('#hud');
-  var hudBottom = hud ? hud.getBoundingClientRect().bottom - $('#field').getBoundingClientRect().top : 62;
-  var baseY = Math.min(H * 0.36, Math.max(hudBottom + 46, H * 0.25));
-  var off = [20, -14, 0, -14, 20];
+  var hudBottom = hud ? hud.getBoundingClientRect().bottom - fr.top : 62;
+  var baseY = Math.min(H * 0.34, Math.max(hudBottom + 42, H * 0.23));
+  var off = [16, -12, 0, -12, 16];
   LY = off.map(function (o) { return baseY + o; });
-  LNOTE = Math.min(52, (span / 4) * 0.58);
-  LBOT = H + LNOTE * 1.3;
+  LNOTE = Math.min(48, (span / 4) * 0.56);
+  LBOT = H + LNOTE * 1.5;
 
-  var pz = $('#padzone').getBoundingClientRect();
-  var cell = Math.min((W - 22 - 14) / 3, (pz.height - 12 - 14) / 3);
-  padEl.style.setProperty('--fs', Math.max(28, Math.round(cell * 0.54)) + 'px');
+  /* 버튼 중심 x → 필드 좌표 (레일이 버튼에서 올라와 눈과 손을 잇는다) */
+  BTX = [];
+  for (var m = 0; m < 5; m++) {
+    var br = padBtns[m].getBoundingClientRect();
+    var x = br.left + br.width / 2 - fr.left;
+    BTX.push(Math.max(12, Math.min(W - 12, x)));
+  }
 }
 
 /* ---------- 색 유틸 ---------- */
@@ -1265,48 +1858,65 @@ function roundRect(x, y, w, h, r) {
   C.quadraticCurveTo(x, y, x + rr, y);
   C.closePath();
 }
-function chevronPath(x, y, s) {
+
+/* 문방구 버튼과 같은 두꺼운 화살표 (위쪽 기준) */
+function arrowShape(s) {
   C.beginPath();
-  C.moveTo(x, y - s);
-  C.lineTo(x + s * 0.95, y + s * 0.02);
-  C.lineTo(x + s * 0.95, y + s * 0.88);
-  C.lineTo(x, y + s * 0.24);
-  C.lineTo(x - s * 0.95, y + s * 0.88);
-  C.lineTo(x - s * 0.95, y + s * 0.02);
+  C.moveTo(0, -s * 1.00);
+  C.lineTo(s * 0.74, -s * 0.08);
+  C.lineTo(s * 0.31, -s * 0.08);
+  C.lineTo(s * 0.31, s * 0.94);
+  C.lineTo(-s * 0.31, s * 0.94);
+  C.lineTo(-s * 0.31, -s * 0.08);
+  C.lineTo(-s * 0.74, -s * 0.08);
   C.closePath();
 }
+
+/* 노트/수용구 모양 */
 function shapePath(lane, x, y, s) {
   if (lane === 2) {
     C.beginPath();
-    C.arc(x, y, s * 0.74, 0, Math.PI * 2);
+    C.arc(x, y, s * 0.82, 0, Math.PI * 2);
   } else {
-    chevronPath(x, y, s);
+    C.save();
+    C.translate(x, y);
+    C.rotate(PAD[lane].rot * Math.PI / 180);
+    arrowShape(s);
+    C.restore();
   }
+}
+
+/* ---------- 레일 곡선 ---------- */
+function posAt(lane, q) {
+  var y = LY[lane] + q * (LBOT - LY[lane]);
+  var t = Math.max(0, (q - 0.10) / 0.90);
+  var k = t * t * (3 - 2 * t);
+  return { x: LX[lane] + (BTX[lane] - LX[lane]) * k, y: y };
 }
 
 /* ---------- 그리기 ---------- */
 function drawBg(t) {
   var g1 = C.createLinearGradient(0, 0, 0, H);
-  g1.addColorStop(0, '#0a0418');
-  g1.addColorStop(0.55, '#0d0620');
-  g1.addColorStop(1, '#160728');
+  g1.addColorStop(0, '#070a14');
+  g1.addColorStop(0.45, '#05070f');
+  g1.addColorStop(1, '#0a0d18');
   C.fillStyle = g1;
   C.fillRect(0, 0, W, H);
 
-  var r1 = C.createRadialGradient(W * 0.16, H * 0.08, 0, W * 0.16, H * 0.08, W * 0.95);
-  r1.addColorStop(0, 'rgba(255,47,109,.17)');
-  r1.addColorStop(1, 'rgba(255,47,109,0)');
-  C.fillStyle = r1;
-  C.fillRect(0, 0, W, H);
-
-  var r2 = C.createRadialGradient(W * 0.92, H * 0.38, 0, W * 0.92, H * 0.38, W * 0.85);
-  r2.addColorStop(0, 'rgba(40,200,255,.12)');
-  r2.addColorStop(1, 'rgba(40,200,255,0)');
+  var r2 = C.createRadialGradient(W * 0.5, H * 1.02, 0, W * 0.5, H * 1.02, W * 0.9);
+  r2.addColorStop(0, 'rgba(47,208,255,.13)');
+  r2.addColorStop(1, 'rgba(47,208,255,0)');
   C.fillStyle = r2;
   C.fillRect(0, 0, W, H);
 
-  var st = 46, off = (t * 26) % st;
-  C.strokeStyle = 'rgba(255,255,255,.022)';
+  var r1 = C.createRadialGradient(W * 0.08, H * 0.06, 0, W * 0.08, H * 0.06, W * 0.8);
+  r1.addColorStop(0, 'rgba(255,47,94,.10)');
+  r1.addColorStop(1, 'rgba(255,47,94,0)');
+  C.fillStyle = r1;
+  C.fillRect(0, 0, W, H);
+
+  var st = 40, off = (t * 18) % st;
+  C.strokeStyle = 'rgba(120,180,255,.045)';
   C.lineWidth = 1;
   for (var y = -st + off; y < H; y += st) {
     C.beginPath(); C.moveTo(0, y); C.lineTo(W, y); C.stroke();
@@ -1322,85 +1932,108 @@ function drawBeats(t) {
   for (; k * beat <= limit; k++) {
     var bt = k * beat;
     if (bt > G.chart.duration) break;
-    var y = y0 + ((bt - t) / G.travel) * (LBOT - y0);
-    if (y < y0 - 34 || y > H + 8) continue;
+    var q = (bt - t) / G.travel;
+    if (q < 0 || q > 1) continue;
+    var y = posAt(2, q).y;
     var bar = (k % 4 === 0);
-    C.strokeStyle = bar ? 'rgba(175,205,255,.15)' : 'rgba(150,180,255,.055)';
-    C.lineWidth = bar ? 1.6 : 1;
-    C.beginPath(); C.moveTo(8, y); C.lineTo(W - 8, y); C.stroke();
+    C.strokeStyle = bar ? 'rgba(150,200,255,.16)' : 'rgba(130,170,255,.06)';
+    C.lineWidth = bar ? 1.4 : 1;
+    C.beginPath(); C.moveTo(4, y); C.lineTo(W - 4, y); C.stroke();
   }
 }
 
-function drawLanes() {
+/* 레일: 수용구에서 아래 버튼까지 이어지는 색 테이프 + 흐르는 전류 */
+function drawRails(t) {
+  var flow = (performance.now() / 42) % 28;
   for (var i = 0; i < 5; i++) {
-    var col = LANE_DEF[i].color;
-    var x = LX[i], w = LNOTE * 1.62;
-    var top = LY[i] - 36;
-    var grd = C.createLinearGradient(0, top, 0, H);
-    grd.addColorStop(0, hexA(col, 0.13));
-    grd.addColorStop(0.45, hexA(col, 0.035));
-    grd.addColorStop(1, hexA(col, 0));
-    C.fillStyle = grd;
-    C.fillRect(x - w / 2, top, w, H - top);
-    C.strokeStyle = hexA(col, 0.075);
-    C.lineWidth = 1;
-    C.beginPath(); C.moveTo(x - w / 2, top); C.lineTo(x - w / 2, H); C.stroke();
-    C.beginPath(); C.moveTo(x + w / 2, top); C.lineTo(x + w / 2, H); C.stroke();
+    var col = PAD[i].c1;
+    var on = G.pressed[i];
+
+    C.beginPath();
+    var p0 = posAt(i, 0);
+    C.moveTo(p0.x, p0.y);
+    for (var k = 1; k <= 18; k++) {
+      var p = posAt(i, k / 18);
+      C.lineTo(p.x, p.y);
+    }
+    C.lineCap = 'butt';
+
+    /* 색 테이프 */
+    var grd = C.createLinearGradient(0, LY[i], 0, H);
+    grd.addColorStop(0, hexA(col, on ? 0.34 : 0.11));
+    grd.addColorStop(0.50, hexA(col, on ? 0.26 : 0.08));
+    grd.addColorStop(1, hexA(col, on ? 0.38 : 0.19));
+    C.strokeStyle = grd;
+    C.lineWidth = LNOTE * 0.96;
+    C.stroke();
+
+    /* 양 옆 얇은 테두리 */
+    C.strokeStyle = hexA(col, on ? 0.5 : 0.22);
+    C.lineWidth = 1.2;
+    C.stroke();
+
+    /* 흐르는 점선 (버튼 → 수용구) */
+    C.setLineDash([9, 15]);
+    C.lineDashOffset = flow;
+    C.strokeStyle = hexA(col, on ? 0.65 : 0.34);
+    C.lineWidth = 2.2;
+    C.stroke();
+    C.setLineDash([]);
+
+    /* 레일 끝 소켓: 버튼 위쪽에서 빛무리 */
+    var pb = posAt(i, 1);
+    var gl = C.createRadialGradient(pb.x, H - 6, 0, pb.x, H - 6, LNOTE * 1.1);
+    gl.addColorStop(0, hexA(col, on ? 0.55 : 0.30));
+    gl.addColorStop(1, hexA(col, 0));
+    C.fillStyle = gl;
+    C.fillRect(pb.x - LNOTE * 1.2, H - LNOTE * 1.4, LNOTE * 2.4, LNOTE * 1.4);
   }
-  C.beginPath();
-  C.moveTo(LX[0], LY[0]);
-  C.lineTo(LX[1], LY[1]);
-  C.lineTo(LX[2], LY[2]);
-  C.lineTo(LX[3], LY[3]);
-  C.lineTo(LX[4], LY[4]);
-  C.strokeStyle = 'rgba(255,255,255,.11)';
-  C.lineWidth = 1.5;
-  C.stroke();
 }
 
-function drawNoteShape(n, x, y, alpha) {
-  var col = LANE_DEF[n.lane].color;
-  var s = LNOTE * 0.45;
+function drawNoteShape(n, q, alpha) {
+  var col = PAD[n.lane].c1;
+  var pos = posAt(n.lane, q);
+  var x = pos.x, y = pos.y;
+  var s = LNOTE * 0.44;
 
-  if (n.hold > 0) {
-    var yTail = LY[n.lane] + (((n.t + n.hold) - songNow()) / G.travel) * (LBOT - LY[n.lane]);
-    if (!n.hit || n.holding) {
-      var bw = Math.max(9, LNOTE * 0.30);
-      var gb = C.createLinearGradient(0, y, 0, yTail);
-      gb.addColorStop(0, hexA(col, 0.9));
-      gb.addColorStop(1, hexA(col, 0.16));
-      C.globalAlpha = alpha * (n.holding ? 0.95 : 0.7);
-      C.fillStyle = gb;
-      roundRect(x - bw / 2, y, bw, Math.max(8, yTail - y), bw / 2);
-      C.fill();
-      C.globalAlpha = alpha * 0.85;
-      shapePath(n.lane, x, yTail - s * 0.15, s * 0.5);
-      C.fillStyle = hexA(col, 0.55);
-      C.fill();
-      C.globalAlpha = 1;
-    }
+  if (n.hold > 0 && (!n.hit || n.holding)) {
+    var qEnd = q + (n.hold / G.travel);
+    var pe = posAt(n.lane, qEnd);
+    var bw = Math.max(9, LNOTE * 0.30);
+    var gb = C.createLinearGradient(0, y, 0, pe.y);
+    gb.addColorStop(0, hexA(col, 0.92));
+    gb.addColorStop(1, hexA(col, 0.18));
+    C.globalAlpha = alpha * (n.holding ? 0.95 : 0.72);
+    C.fillStyle = gb;
+    roundRect(x - bw / 2, y, bw, Math.max(8, pe.y - y), bw / 2);
+    C.fill();
+    C.globalAlpha = alpha * 0.9;
+    shapePath(n.lane, pe.x, pe.y - s * 0.1, s * 0.55);
+    C.fillStyle = hexA(col, 0.6);
+    C.fill();
+    C.globalAlpha = 1;
   }
   if (n.hit) return;
 
   C.save();
   C.globalAlpha = alpha;
   C.shadowColor = hexA(col, 0.95);
-  C.shadowBlur = 14;
+  C.shadowBlur = 16;
   shapePath(n.lane, x, y, s);
   var gr = C.createLinearGradient(x, y - s, x, y + s);
   gr.addColorStop(0, '#ffffff');
-  gr.addColorStop(0.42, col);
-  gr.addColorStop(1, hexA(col, 0.7));
+  gr.addColorStop(0.40, col);
+  gr.addColorStop(1, hexA(col, 0.66));
   C.fillStyle = gr;
   C.fill();
   C.shadowBlur = 0;
-  C.lineWidth = 1.5;
-  C.strokeStyle = 'rgba(255,255,255,.72)';
+  C.lineWidth = 2;
+  C.strokeStyle = 'rgba(255,255,255,.85)';
   C.stroke();
   if (n.lane === 2) {
     C.beginPath();
-    C.arc(x, y, s * 0.30, 0, Math.PI * 2);
-    C.fillStyle = 'rgba(10,3,12,.75)';
+    C.arc(x, y, s * 0.34, 0, Math.PI * 2);
+    C.fillStyle = 'rgba(12,3,6,.8)';
     C.fill();
   }
   C.restore();
@@ -1414,10 +2047,10 @@ function drawNotes(t) {
     var dt = n.t - t;
     if (dt < -0.30) continue;
     if (dt > maxDt) break;
-    var y = LY[n.lane] + (dt / G.travel) * (LBOT - LY[n.lane]);
+    var q = dt / G.travel;
     var alpha = 1;
     if (dt > G.travel * 0.93) alpha = Math.max(0, (maxDt - dt) / (G.travel * 0.13));
-    drawNoteShape(n, LX[n.lane], y, alpha);
+    drawNoteShape(n, Math.max(0, q), alpha);
   }
 }
 
@@ -1426,20 +2059,33 @@ function drawReceptors(t) {
   var ph = ((t % beat) + beat) % beat / beat;
   var pulse = Math.exp(-ph * 5) * 0.5;
   for (var i = 0; i < 5; i++) {
-    var col = LANE_DEF[i].color;
+    var col = PAD[i].c1;
     var x = LX[i], y = LY[i];
-    var s = LNOTE * 0.5;
+    var s = LNOTE * 0.50;
     var on = G.pressed[i];
     C.save();
-    if (on) { C.shadowColor = col; C.shadowBlur = 24; }
-    shapePath(i, x, y, s * (1 + pulse * 0.05 + (on ? 0.07 : 0)));
-    C.lineWidth = on ? 3 : 2;
-    C.strokeStyle = on ? '#ffffff' : hexA(col, 0.5 + pulse * 0.3);
-    C.fillStyle = on ? hexA(col, 0.5) : hexA(col, 0.06);
+    if (on) { C.shadowColor = col; C.shadowBlur = 22; }
+    shapePath(i, x, y, s * (1 + pulse * 0.05 + (on ? 0.08 : 0)));
+    C.lineWidth = on ? 3 : 2.2;
+    C.strokeStyle = on ? '#ffffff' : hexA(col, 0.62 + pulse * 0.25);
+    C.fillStyle = on ? hexA(col, 0.55) : hexA(col, 0.07);
     C.fill();
     C.stroke();
     C.restore();
   }
+  /* 판정선 */
+  C.strokeStyle = 'rgba(140,190,255,.10)';
+  C.lineWidth = 1;
+  C.beginPath();
+  C.moveTo(LX[0] - LNOTE * 0.6, LY[0]);
+  C.lineTo(LX[1] - LNOTE * 0.6, LY[1]);
+  C.moveTo(LX[1] + LNOTE * 0.6, LY[1]);
+  C.lineTo(LX[2] - LNOTE * 0.6, LY[2]);
+  C.moveTo(LX[2] + LNOTE * 0.6, LY[2]);
+  C.lineTo(LX[3] - LNOTE * 0.6, LY[3]);
+  C.moveTo(LX[3] + LNOTE * 0.6, LY[3]);
+  C.lineTo(LX[4] - LNOTE * 0.6, LY[4]);
+  C.stroke();
 }
 
 function drawRings() {
@@ -1449,7 +2095,7 @@ function drawRings() {
   for (var i = 0; i < G.rings.length; i++) {
     var r = G.rings[i];
     var p = (now - r.at) / 380;
-    var col = (r.key === 'miss' || r.key === 'holdmiss') ? '#ff4d6d' : LANE_DEF[r.lane].color;
+    var col = (r.key === 'miss' || r.key === 'holdmiss') ? '#ff4d6d' : PAD[r.lane].c1;
     C.beginPath();
     C.arc(LX[r.lane], LY[r.lane], LNOTE * (0.30 + p * 0.8), 0, Math.PI * 2);
     C.strokeStyle = hexA(col, (1 - p) * 0.65);
@@ -1477,19 +2123,19 @@ function drawJudge() {
   else if (p.key === 'revive') { text = 'REVIVE!'; col = '#ffe066'; }
   else { text = info.label; col = info.color; }
 
-  var jy = Math.min(H * 0.62, LY[0] + 64);
+  var jy = Math.min(H * 0.64, LY[0] + 62);
   C.save();
   C.globalAlpha = alpha;
   C.translate(W * 0.5, jy);
   C.scale(sc, sc);
   C.textAlign = 'center';
   C.textBaseline = 'middle';
-  C.font = '900 ' + Math.round(Math.min(33, W * 0.092)) + 'px system-ui, -apple-system, sans-serif';
+  C.font = '900 ' + Math.round(Math.min(30, W * 0.085)) + 'px system-ui, -apple-system, sans-serif';
   C.lineWidth = 7;
-  C.strokeStyle = 'rgba(6,2,12,.72)';
+  C.strokeStyle = 'rgba(4,2,8,.75)';
   C.strokeText(text, 0, 0);
   C.shadowColor = hexA(col, 0.95);
-  C.shadowBlur = 22;
+  C.shadowBlur = 20;
   C.fillStyle = col;
   C.fillText(text, 0, 0);
   C.shadowBlur = 0;
@@ -1501,24 +2147,24 @@ function drawCombo() {
   var now = performance.now();
   var age = (now - G.lastComboAt) / 1000;
   var pop = Math.max(0, 1 - age / 0.16);
-  var sc = 1 + pop * 0.3;
-  var col = G.combo >= 40 ? '#ffe066' : (G.combo >= 20 ? '#ff9f43' : '#ffffff');
+  var sc = 1 + pop * 0.28;
+  var col = G.combo >= 40 ? '#ffe066' : (G.combo >= 20 ? '#ff9f1f' : '#ffffff');
   C.save();
-  C.globalAlpha = 0.62;
-  C.translate(W * 0.5, H * 0.56);
+  C.globalAlpha = 0.55;
+  C.translate(W * 0.5, H * 0.55);
   C.scale(sc, sc);
   C.textAlign = 'center';
   C.textBaseline = 'middle';
-  C.font = '900 ' + Math.round(Math.min(54, W * 0.148)) + 'px system-ui, -apple-system, sans-serif';
-  C.shadowColor = 'rgba(255,47,109,.85)';
-  C.shadowBlur = 26;
+  C.font = '900 ' + Math.round(Math.min(48, W * 0.132)) + 'px ui-monospace, Menlo, monospace';
+  C.shadowColor = 'rgba(255,47,94,.85)';
+  C.shadowBlur = 24;
   C.fillStyle = col;
   C.fillText(String(G.combo), 0, 0);
   C.shadowBlur = 0;
-  C.globalAlpha = 0.42;
-  C.font = '900 ' + Math.round(Math.min(12, W * 0.033)) + 'px system-ui, sans-serif';
+  C.globalAlpha = 0.40;
+  C.font = '900 ' + Math.round(Math.min(10, W * 0.028)) + 'px ui-monospace, Menlo, monospace';
   C.fillStyle = '#fff';
-  C.fillText('COMBO', 0, Math.min(36, W * 0.098));
+  C.fillText('COMBO', 0, Math.min(34, W * 0.09));
   C.restore();
 }
 
@@ -1537,22 +2183,21 @@ function drawCountdown(t) {
   } else {
     return;
   }
-  var frac = (txt === 'GO!') ? 1 : 0;
   C.save();
   C.textAlign = 'center';
   C.textBaseline = 'middle';
   C.globalAlpha = 0.95;
-  C.font = '900 ' + Math.round(Math.min(96, W * 0.26)) + 'px system-ui, -apple-system, sans-serif';
-  C.shadowColor = 'rgba(40,200,255,.9)';
-  C.shadowBlur = 34;
+  C.font = '900 ' + Math.round(Math.min(92, W * 0.24)) + 'px ui-monospace, Menlo, monospace';
+  C.shadowColor = 'rgba(47,208,255,.9)';
+  C.shadowBlur = 30;
   C.fillStyle = txt === 'GO!' ? '#7dff9b' : '#ffffff';
   C.fillText(txt, W * 0.5, H * 0.44);
   C.shadowBlur = 0;
   if (sub) {
     C.globalAlpha = 0.55;
-    C.font = '900 ' + Math.round(Math.min(13, W * 0.036)) + 'px system-ui, sans-serif';
+    C.font = '900 ' + Math.round(Math.min(12, W * 0.034)) + 'px ui-monospace, Menlo, monospace';
     C.fillStyle = '#fff';
-    C.fillText(sub, W * 0.5, H * 0.44 + Math.min(70, W * 0.19));
+    C.fillText(sub, W * 0.5, H * 0.44 + Math.min(66, W * 0.18));
   }
   C.restore();
 }
@@ -1568,16 +2213,16 @@ function drawFlash() {
 }
 
 function drawVignette() {
-  var gr = C.createRadialGradient(W / 2, H * 0.5, Math.min(W, H) * 0.35, W / 2, H * 0.5, Math.max(W, H) * 0.82);
+  var gr = C.createRadialGradient(W / 2, H * 0.5, Math.min(W, H) * 0.36, W / 2, H * 0.5, Math.max(W, H) * 0.84);
   gr.addColorStop(0, 'rgba(0,0,0,0)');
-  gr.addColorStop(1, 'rgba(0,0,0,.5)');
+  gr.addColorStop(1, 'rgba(0,0,0,.55)');
   C.fillStyle = gr;
   C.fillRect(0, 0, W, H);
-  var top = C.createLinearGradient(0, 0, 0, H * 0.16);
-  top.addColorStop(0, 'rgba(4,2,10,.85)');
-  top.addColorStop(1, 'rgba(4,2,10,0)');
+  var top = C.createLinearGradient(0, 0, 0, H * 0.15);
+  top.addColorStop(0, 'rgba(3,4,9,.9)');
+  top.addColorStop(1, 'rgba(3,4,9,0)');
   C.fillStyle = top;
-  C.fillRect(0, 0, W, H * 0.16);
+  C.fillRect(0, 0, W, H * 0.15);
 }
 
 function songNow() {
@@ -1592,7 +2237,7 @@ function draw() {
   drawBg(t);
   if (!G.chart || !G.song) { drawVignette(); return; }
   drawBeats(t);
-  drawLanes();
+  drawRails(t);
   drawNotes(t);
   drawReceptors(t);
   drawRings();
@@ -1604,8 +2249,13 @@ function draw() {
 }
 
 /* ---------- HUD ---------- */
+function padScore(n) {
+  var s = String(Math.max(0, Math.round(n)));
+  while (s.length < 7) s = '0' + s;
+  return s;
+}
 function updateHud() {
-  $('#score').textContent = G.score.toLocaleString('ko-KR');
+  $('#score').textContent = padScore(G.score);
   var pct = Math.max(0, Math.min(100, G.life));
   $('#lifeBar').style.width = pct + '%';
   $('#lifeWrap').classList.toggle('low', pct <= 25);
@@ -1613,6 +2263,36 @@ function updateHud() {
   var tag = $('#feverTag');
   if (f) { tag.textContent = f; tag.classList.add('on'); }
   else tag.classList.remove('on');
+  var ct = $('#comboTag');
+  if (G.combo >= 2) {
+    ct.innerHTML = '<b>' + G.combo + '</b> COMBO';
+    ct.classList.add('on');
+  } else ct.classList.remove('on');
+}
+
+var hintOn = [false, false, false, false, false];
+function clearHints() {
+  for (var i = 0; i < 5; i++) {
+    if (hintOn[i]) { hintOn[i] = false; if (padBtns[i]) padBtns[i].classList.remove('hint'); }
+  }
+}
+/* 곧 닥칠 노트의 버튼을 미리 살짝 밝혀 준다 */
+function updateHintGlow(t) {
+  if (!G.chart) return;
+  for (var i = 0; i < 5; i++) {
+    var arr = G.chart.lanes[i], on = false;
+    for (var k = G.laneHead[i]; k < arr.length; k++) {
+      var n = arr[k];
+      if (n.hit) continue;
+      var d = n.t - t;
+      on = (d >= 0 && d < 0.30);
+      break;
+    }
+    if (on !== hintOn[i]) {
+      hintOn[i] = on;
+      if (padBtns[i]) padBtns[i].classList.toggle('hint', on);
+    }
+  }
 }
 
 function padLight(lane, on) {
@@ -1713,7 +2393,7 @@ function press(lane) {
   G.pressed[lane] = true;
   padLight(lane, true);
   var t = MUSIC.songTime();
-  if (t < -0.03) return;
+  if (t < -0.03) { sfxRelease(lane); return; }
 
   var arr = G.chart.lanes[lane];
   var i = G.laneHead[lane];
@@ -1726,7 +2406,7 @@ function press(lane) {
     var ad = Math.abs(d);
     if (ad <= BAD_WIN && ad < bestD) { best = n; bestD = ad; }
   }
-  if (!best) return;
+  if (!best) { sfxRelease(lane); return; }
   hitNote(best, t);
 }
 
@@ -1734,6 +2414,7 @@ function release(lane) {
   if (!G.pressed[lane]) return;
   G.pressed[lane] = false;
   padLight(lane, false);
+  sfxRelease(lane);
   var n = G.holds[lane];
   if (!n) return;
   G.holds[lane] = null;
@@ -1770,7 +2451,7 @@ function frame(ts) {
     G.mode = 'playing';
     G.readyAt = ts;
   }
-  if (G.mode === 'playing') updatePlay();
+  if (G.mode === 'playing') { updatePlay(); updateHintGlow(MUSIC.songTime()); }
   if (G.mode === 'playing' || G.mode === 'paused' || G.mode === 'resuming' || G.mode === 'result') {
     draw();
   }
@@ -1816,14 +2497,15 @@ function startSong(idx) {
 
   $('#pause').classList.add('hidden');
   $('#hudTitle').textContent = song.emoji + ' ' + song.title;
-  $('#hudSub').textContent = 'BPM ' + song.bpm + ' · ' + song.diff + ' · ' + SETTINGS.speed + 'x';
+  $('#hudSub').textContent = 'BPM ' + song.bpm + ' ' + song.diff + ' ' + SETTINGS.speed + 'x';
   $('#readyHint').classList.add('on');
   showScreen('play');
   layout();
   updateHud();
-  setTimeout(function () { $('#readyHint').classList.remove('on'); }, 2400);
+  setTimeout(function () { $('#readyHint').classList.remove('on'); }, 2600);
 
   audioResume();
+  sfxCoin();
   MUSIC.start(song, 2.6);
   G.readyAt = performance.now();
 }
@@ -1853,12 +2535,12 @@ function finishSong(failed) {
   }
 
   var st = $('#resState');
-  st.textContent = failed ? 'STAGE FAILED' : (allPerfect ? 'ALL PERFECT!' : 'STAGE CLEAR');
+  st.textContent = failed ? 'GAME OVER' : (allPerfect ? 'ALL PERFECT!' : 'STAGE CLEAR');
   st.className = 'rescrown ' + (failed ? 'fail' : 'clear');
 
   var rankEl = $('#resRank');
   rankEl.textContent = rank;
-  rankEl.className = 'rank ' + (rank === 'S+' || rank === 'S' ? 'r-s' : rank === 'A' ? 'r-a' : rank === 'B' ? 'r-b' : rank === 'C' ? 'r-c' : 'r-f');
+  rankEl.className = 'rank ' + (rank === 'S+' || rank === 'S' ? '' : rank === 'A' ? 'r-a' : rank === 'B' ? 'r-b' : rank === 'C' ? 'r-c' : 'r-f');
 
   $('#resSong').textContent = G.song.emoji + ' ' + G.song.title + ' · ' + G.song.diff + ' · ' + SETTINGS.speed + 'x';
   $('#resScore').innerHTML = G.score.toLocaleString('ko-KR') + '<small>SCORE</small>';
@@ -1879,19 +2561,22 @@ function finishSong(failed) {
   $('#resNew').innerHTML = isNew ? '<span class="newrec">NEW RECORD</span>' : '';
 
   showScreen('result');
+  if (!failed && rank === 'S+') sfxCoin();
 }
 
 /* ---------- 화면 전환 ---------- */
 function showScreen(name) {
   app.setAttribute('data-screen', name);
+  clearHints();
   $('#title').classList.toggle('hidden', name !== 'title');
   $('#select').classList.toggle('hidden', name !== 'select');
   $('#result').classList.toggle('hidden', name !== 'result');
   var playing = (name === 'play');
   $('#hud').classList.toggle('idle', !playing);
+  $('#comboTag').classList.toggle('on', playing && G.combo >= 2);
   $('#feverTag').classList.toggle('on', playing && !!feverLabel(G.combo));
-  $('#padzone').style.opacity = playing ? '1' : '0';
-  $('#padzone').style.pointerEvents = playing ? 'auto' : 'none';
+  padzoneEl.style.opacity = playing ? '1' : '0';
+  padzoneEl.style.pointerEvents = playing ? 'auto' : 'none';
 }
 
 function goTitle() {
@@ -1899,6 +2584,7 @@ function goTitle() {
   MUSIC.hush();
   releaseAll();
   updateHomeBest();
+  renderQuick();
   showScreen('title');
 }
 
@@ -1923,31 +2609,49 @@ function updateHomeBest() {
     : '아직 기록이 없어 · 첫 판을 노려봐';
 }
 
+function stars(n) {
+  var s = '';
+  for (var i = 0; i < 5; i++) s += (i < n ? '★' : '☆');
+  return s;
+}
+
+/* 타이틀: 1탭으로 바로 시작하는 곡 줄 */
+function renderQuick() {
+  $('#quickList').innerHTML = SONGS.map(function (s, i) {
+    var b = BEST[s.id];
+    return '<button class="qrow" data-i="' + i + '">' +
+      '<span class="qe">' + s.emoji + '</span>' +
+      '<span class="qt"><span class="qn">' + s.title + '</span>' +
+      '<span class="qm">BPM ' + s.bpm + ' · ' + s.diff + ' ' + stars(s.stars) + '</span></span>' +
+      '<span class="qs' + (b ? '' : ' none') + '">' + (b ? b.rank : 'NEW') + '</span>' +
+      '</button>';
+  }).join('');
+}
+
 function renderSongs() {
-  var html = SONGS.map(function (s, i) {
+  $('#songCount').textContent = SONGS.length + ' TRACKS';
+  $('#songList').innerHTML = SONGS.map(function (s, i) {
     var b = BEST[s.id];
     return '<button class="songcard' + (i === selIdx ? ' sel' : '') + '" data-i="' + i + '">' +
       '<div class="semoji">' + s.emoji + '</div>' +
       '<div class="sinfo">' +
         '<div class="stitle">' + s.title + '</div>' +
-        '<div class="smeta">BPM ' + s.bpm + ' · ' + s.diff + ' ' + new Array(s.stars + 1).join('★') + ' · ' + Math.round(s.length) + '초</div>' +
-        '<div class="sdesc">' + s.desc + '</div>' +
+        '<div class="smeta">BPM ' + s.bpm + ' · ' + s.diff + ' ' + stars(s.stars) + ' · ' + Math.round(s.length) + '초 · 노트 ' + buildChart(s).heads + '</div>' +
       '</div>' +
       '<div class="sbest">' + (b
         ? '<b>' + b.rank + '</b><span>' + b.score.toLocaleString('ko-KR') + '</span>'
         : '<span class="none">미도전</span>') + '</div>' +
     '</button>';
   }).join('');
-  $('#songList').innerHTML = html;
 }
 
 function syncChips() {
   $('#sfxChip').classList.toggle('on', SETTINGS.sfx);
-  $('#sfxChip').textContent = SETTINGS.sfx ? '🔊 효과음 ON' : '🔇 효과음 OFF';
+  $('#sfxChip').textContent = SETTINGS.sfx ? '🔊 버튼음 ON' : '🔇 버튼음 OFF';
   $('#nofailChip').classList.toggle('on', SETTINGS.noFail);
   $('#nofailChip').textContent = SETTINGS.noFail ? '🛡 노 페일 ON' : '🛡 노 페일 OFF';
   $('#selectSfx').classList.toggle('on', SETTINGS.sfx);
-  $('#selectSfx').textContent = SETTINGS.sfx ? '🔊 효과음 ON' : '🔇 효과음 OFF';
+  $('#selectSfx').textContent = SETTINGS.sfx ? '🔊 버튼음 ON' : '🔇 버튼음 OFF';
   $('#selectNofail').classList.toggle('on', SETTINGS.noFail);
   $('#selectNofail').textContent = SETTINGS.noFail ? '🛡 노 페일 ON' : '🛡 노 페일 OFF';
   $$('#speedChips .chip').forEach(function (c) {
@@ -1979,9 +2683,21 @@ function laneOfEl(el) {
   var b = el && el.closest ? el.closest('.padbtn') : null;
   return b ? +b.dataset.lane : -1;
 }
+/* 버튼 사이 빈 곳을 눌러도 가장 가까운 버튼으로 (엄지 관대 판정) */
 function laneAtPoint(x, y) {
   var el = document.elementFromPoint(x, y);
-  return laneOfEl(el);
+  var lane = laneOfEl(el);
+  if (lane >= 0) return lane;
+  var best = -1, bd = Infinity;
+  for (var i = 0; i < 5; i++) {
+    var r = btnRect[i];
+    if (!r) continue;
+    var dx = x - r.cx, dy = y - r.cy;
+    var dd = dx * dx + dy * dy;
+    if (dd < bd) { bd = dd; best = i; }
+  }
+  var maxR = PAD_D * 0.62;
+  return (bd <= maxR * maxR) ? best : -1;
 }
 
 padEl.addEventListener('touchstart', function (ev) {
@@ -2075,14 +2791,24 @@ document.addEventListener('visibilitychange', function () {
 });
 
 /* ---------- 버튼 ---------- */
-$('#startBtn').addEventListener('click', function () { audioResume(); goSelect(); });
-$('#backBtn').addEventListener('click', function () { goTitle(); });
+$('#startBtn').addEventListener('click', function () {
+  audioResume(); sfxCoin(); goSelect();
+});
+$('#backBtn').addEventListener('click', function () { sfxNav(); goTitle(); });
 $('#playBtn').addEventListener('click', function () { startSong(selIdx); });
+
+$('#quickList').addEventListener('click', function (ev) {
+  var row = ev.target.closest ? ev.target.closest('.qrow') : null;
+  if (!row) return;
+  selIdx = +row.dataset.i;
+  startSong(selIdx);
+});
 
 $('#songList').addEventListener('click', function (ev) {
   var card = ev.target.closest ? ev.target.closest('.songcard') : null;
   if (!card) return;
   selIdx = +card.dataset.i;
+  sfxNav();
   renderSongs();
 });
 
@@ -2092,10 +2818,11 @@ $('#speedChips').addEventListener('click', function (ev) {
   SETTINGS.speed = +chip.dataset.sp;
   saveStore();
   syncChips();
+  sfxNav();
 });
 
-function toggleSfx() { SETTINGS.sfx = !SETTINGS.sfx; saveStore(); syncChips(); }
-function toggleNofail() { SETTINGS.noFail = !SETTINGS.noFail; saveStore(); syncChips(); }
+function toggleSfx() { SETTINGS.sfx = !SETTINGS.sfx; saveStore(); syncChips(); if (SETTINGS.sfx) sfxNav(); }
+function toggleNofail() { SETTINGS.noFail = !SETTINGS.noFail; saveStore(); syncChips(); sfxNav(); }
 $('#sfxChip').addEventListener('click', toggleSfx);
 $('#selectSfx').addEventListener('click', toggleSfx);
 $('#nofailChip').addEventListener('click', toggleNofail);
@@ -2130,20 +2857,31 @@ if (window.visualViewport) window.visualViewport.addEventListener('resize', onRe
 
 /* ---------- 부트 ---------- */
 loadStore();
+buildPad();
 syncChips();
 updateHomeBest();
+renderQuick();
 renderSongs();
-layout();
 showScreen('title');
+layout();
 requestAnimationFrame(frame);
 
 /* 디버그/테스트 훅 */
 window.PUMP = {
-  G: G, SETTINGS: SETTINGS, SONGS: SONGS, BEST: BEST,
+  VERSION: VERSION,
+  G: G, SETTINGS: SETTINGS, SONGS: SONGS, BEST: BEST, PAD: PAD, PAD_POS: PAD_POS,
   startSong: startSong, press: press, release: release, pauseGame: pauseGame, resumeGame: resumeGame,
   finishSong: finishSong, goSelect: goSelect, goTitle: goTitle, layout: layout,
   songNow: songNow, MUSIC: MUSIC, AUDIO: AUDIO, judgeKey: judgeKey, musicStep: musicStep,
-  hitNote: hitNote, buildChart: buildChart
+  buildGraph: buildGraph,
+  hitNote: hitNote, buildChart: buildChart,
+  geom: function () {
+    return {
+      W: W, H: H, LNOTE: LNOTE, LX: LX.slice(), LY: LY.slice(), BTX: BTX.slice(),
+      padD: PAD_D, buttons: btnRect.map(function (b) { return { cx: b.cx, cy: b.cy, r: b.r }; }),
+      posAt: function (lane, q) { return posAt(lane, q); }
+    };
+  }
 };
 
 </script>
