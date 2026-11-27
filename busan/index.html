@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v16.0">
+<meta name="busan-build" content="v16.1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -218,7 +218,7 @@
   #hint b{color:#ffe08a}
 
   /* ---------- toast ---------- */
-  /* ---------- 아이템 안내 (타이틀 · 4×3 컴팩트 10종) ---------- */
+  /* ---------- 아이템 안내 (타이틀 · 4열 컴팩트 18종) ---------- */
   #itemGuide{
     display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.5);
     width:100%;box-sizing:border-box;margin:calc(var(--u)*1.2) 0 calc(var(--u)*.3);
@@ -808,7 +808,7 @@
     <div class="tEmoji">🚗💨</div>
     <h1>전국일주<em>칼치기</em></h1>
     <div class="tRoute">🗺️ <b>경부선 → 남해·호남선 → 강원·동해선 → 제주 환상도로</b><br>400km마다 풍경·색감·배경음이 바뀐다</div>
-    <div id="itemGuide" aria-label="도로 위 아이템 10종 · 미션 캡슐 안내">
+    <div id="itemGuide" aria-label="도로 위 아이템 18종 · 미션 캡슐 안내">
       <div class="ig"><b>🛡️</b><em>실드</em><span>충돌·함정 1회 방어</span></div>
       <div class="ig"><b>🔥</b><em>스피드업</em><span>10초 폭발 가속·돌파</span></div>
       <div class="ig"><b>🧲</b><em>자석</em><span>10초 아이템 흡인</span></div>
@@ -816,9 +816,17 @@
       <div class="ig new"><b>👻</b><em>유령 모드</em><span>10초 차·꼬깔 통과</span></div>
       <div class="ig new"><b>💥</b><em>전방 올클리어</em><span>앞차 일제 폭파</span></div>
       <div class="ig new"><b>🪙</b><em>피버 타임</em><span>10초 무적 동전 밭</span></div>
+      <div class="ig new"><b>🚀</b><em>워프 점프</em><span>즉시 +6km·착지 무적</span></div>
+      <div class="ig new"><b>⛽</b><em>거리 2배</em><span>10초 주행 거리 2배</span></div>
+      <div class="ig new"><b>🏎️</b><em>1등 추격</em><span>10초 최대 1.75배</span></div>
+      <div class="ig new"><b>⏱️</b><em>블릿 타임</em><span>10초 세상 0.55배</span></div>
       <div class="ig fx"><b>🎲</b><em>랜덤 박스</em><span>좋은 것/함정 랜덤</span></div>
       <div class="ig bad"><b>📸</b><em>과속카메라</em><span>3.5초 80km/h</span></div>
       <div class="ig bad"><b>🛢️</b><em>기름웅덩이</em><span>1.5초 미끈덩</span></div>
+      <div class="ig bad"><b>🚧</b><em>포트홀</em><span>1.5초 핸들 반전</span></div>
+      <div class="ig bad"><b>🐦</b><em>비둘기 테러</em><span>3초 시야 가림</span></div>
+      <div class="ig bad"><b>📱</b><em>가짜 재난문자</em><span>2초 배너 가림</span></div>
+      <div class="ig bad"><b>🛞</b><em>타이어 펑크</em><span>3초 조향 둔해짐</span></div>
     </div>
     <div class="missionGuide"><b>🎯 미션 캡슐</b> 먹으면 미션 즉시 시작 · 진행 중엔 진행 +1 · 시간 +2초</div>
     <div class="prof">
@@ -978,7 +986,7 @@ const SPD_SCALE = 3.9;                  // world units per (km/h) per second
 const KM_DIV = 100;                     // (km/h) → km/s (아케이드 압축)
 const PLAYER = { w: 54, h: 110 };
 const PLAYER_Y_OFF = 300;               // above the bottom edge
-const HIT = 0.88;                       // 충돌 판정 배율 (약 88%)
+const HIT = 0.86;                       // 충돌 판정 배율 (v16.1: 88% → 86% — 억울한 사고 완화)
 const NEAR_MISS = 30;                   // 칼치기 판정 시각 간격 (world units)
 const LEG_KM = 400;                     // 서울→부산 한 회차
 const COMBO_WINDOW = 4.2;               // 칼치기 콤보 유지 시간
@@ -1004,12 +1012,17 @@ const ITEM_TYPES = [
   { id:'bumper', emoji:'🛡️', color:'#ffa33d', label:'무적 범퍼',  dur:ITEM_DUR, impact:'무적 범퍼!',    impactEmoji:'🛡️', impactColor:'#ffc46b', hint:'10초 무적·들이받아 튕김' },
   { id:'ghost',  emoji:'👻', color:'#b8a8ff', label:'유령 모드',  dur:ITEM_DUR, impact:'유령 모드!',    impactEmoji:'👻', impactColor:'#d3c8ff', hint:'10초 차·꼬깔 통과' },
   { id:'clear',  emoji:'💥', color:'#ff7a4d', label:'전방 올클리어', dur:0, impact:'올클리어!',    impactEmoji:'💥', impactColor:'#ffb08a', hint:'전방 차량 일제 폭파' },
-  { id:'fever',  emoji:'🪙', color:'#ffcf3d', label:'피버 타임',  dur:ITEM_DUR, impact:'피버 타임!',    impactEmoji:'🪙', impactColor:'#ffe07a', hint:'10초 무적 동전 밭·점수 폭발' }
+  { id:'fever',  emoji:'🪙', color:'#ffcf3d', label:'피버 타임',  dur:ITEM_DUR, impact:'키로수 피버!',  impactEmoji:'🪙', impactColor:'#ffe07a', hint:'10초 무적 동전 밭·키로수 1.5배' },
+  /* --- v16.1 신규 3종 --- */
+  { id:'warp',    emoji:'🚀', color:'#8fd0ff', label:'워프 점프',  dur:0, impact:'워프 점프!',    impactEmoji:'🚀', impactColor:'#bfe8ff', hint:'즉시 +6km 순간이동' },
+  { id:'dist2x',  emoji:'⛽', color:'#7dffc0', label:'거리 2배',   dur:ITEM_DUR, impact:'거리 2배!',      impactEmoji:'⛽', impactColor:'#a8ffd4', hint:'10초 주행 거리 2배' },
+  { id:'catchup', emoji:'🏎️', color:'#ff9f43', label:'1등 추격',  dur:ITEM_DUR, impact:'1등 추격!',      impactEmoji:'🏎️', impactColor:'#ffc06b', hint:'10초 격차만큼 최대 1.75배' },
+  { id:'bullet',  emoji:'⏱️', color:'#8ad7ff', label:'블릿 타임',  dur:ITEM_DUR, impact:'블릿 타임!',     impactEmoji:'⏱️', impactColor:'#bfeaff', hint:'10초 세상이 0.55배·거리 1.4배' }
 ];
-/* 랜덤 박스: 좋은 아이템 7종 + 함정 2종 중 하나가 무작위로 터진다 */
+/* 랜덤 박스: 좋은 아이템 10종 + 함정 6종 중 하나가 무작위로 터진다 */
 const MYSTERY = { id:'mystery', emoji:'🎲', color:'#c9a7ff', label:'랜덤 박스', dur:0,
   impact:'랜덤 박스!', impactEmoji:'🎲', impactColor:'#d9c2ff', hint:'? 좋은 것/함정 랜덤' };
-const GOOD_IDS = ['shield','nitro','magnet','bumper','ghost','clear','fever'];
+const GOOD_IDS = ['shield','nitro','magnet','bumper','ghost','clear','fever','warp','dist2x','catchup','bullet'];
 const ITEM_R = 30;                      // 아이템 픽업 반경
 /* 추월 보너스 기본점 (리무진은 +15%) */
 const OVERTAKE_BONUS = 150;
@@ -1034,13 +1047,38 @@ const OIL_FIRST = 14;                   // 첫 기름웅덩이까지
 const MAGNET_PULL = 760;                // 자석 흡인 속도 (world/s)
 const MAGNET_RANGE_Y = 620;             // 자석이 잡는 앞뒤 거리
 const MAGNET_RANGE_X = LANE_W * 4.2;    // 자석이 잡는 좌우 폭
-/* 함정 2종 (과속카메라 · 기름웅덩이) */
-const TRAP_TYPES = [CAMERA, OIL];
-/* 타이틀 아이템 안내·검증용 카탈로그 (좋은 7 + 랜덤 박스 + 함정 2 = 10종) */
+/* --- v16.1 신규 함정 4종 (모두 죽지 않는 방해 함정) --- */
+const POTHOLE = {
+  id:'pothole', emoji:'🚧', color:'#ff9f43', label:'포트홀',
+  impact:'핸들 반전!', impactEmoji:'🚧', impactColor:'#ffb066', dur: 1.5
+};
+const PIGEON = {
+  id:'pigeon', emoji:'🐦', color:'#cfd8e3', label:'비둘기 테러',
+  impact:'비둘기 테러!', impactEmoji:'🐦', impactColor:'#e6edf6', dur: 3.0
+};
+const ALERT = {
+  id:'alert', emoji:'📱', color:'#ffd12e', label:'가짜 재난문자',
+  impact:'가짜 재난문자!', impactEmoji:'📱', impactColor:'#ffe37a', dur: 2.0
+};
+const FLAT = {
+  id:'flat', emoji:'🛞', color:'#b0b7c3', label:'타이어 펑크',
+  impact:'타이어 펑크!', impactEmoji:'🛞', impactColor:'#c8d0dc', dur: 3.0
+};
+const TRAP_R = 40;                      /* 신규 함정 밟는 판정 반경 */
+/* 함정 6종 (과속카메라 · 기름웅덩이 + 신규 4종) */
+const TRAP_TYPES = [CAMERA, OIL, POTHOLE, PIGEON, ALERT, FLAT];
+const TRAP_IDS = TRAP_TYPES.map(function(t){ return t.id; });
+/* v16.1: 함정 스폰 가중치 — 과속카메라·기름웅덩이를 조금 더 자주, 신규 4종은 드물게 */
+const TRAP_SPAWN_POOL = ['camera','camera','camera','oil','oil','oil',
+  'pothole','pothole','pigeon','pigeon','alert','pigeon','flat','flat'];
+/* 함정 통합 스폰 주기 — 6종이 한 타이머를 나눠 쓰므로 예전보다 여유 있게 */
+const TRAP_FIRST = 9, TRAP_CD_MIN = 8.0, TRAP_CD_MAX = 13.0;
+/* 타이틀 아이템 안내·검증용 카탈로그 (좋은 11 + 랜덤 박스 + 함정 6 = 18종) */
 const ITEM_CATALOG = ITEM_TYPES.concat([MYSTERY], TRAP_TYPES);
-/* v15: 16칸 가중 풀 — 점수 2배·사이렌·헬기를 빼고 남은 7종 + 랜덤 박스로 재구성 */
+/* v16.1: 24칸 가중 풀 — 기존 15칸 + 신규 4종(워프·거리2배·추격·블릿) 각 2칸 + 실드 1칸 */
 const ITEM_SPAWN_POOL = ['shield','nitro','magnet','magnet','magnet',
-  'bumper','bumper','bumper','ghost','ghost','ghost','clear','fever','fever','fever','mystery'];
+  'bumper','bumper','bumper','ghost','ghost','ghost','clear','fever','fever','mystery',
+  'warp','warp','dist2x','dist2x','catchup','catchup','bullet','bullet','shield'];
 /* v13: 아이템 스폰 주기 (v12 6.5~11.5초 → 4.6~8.0초, 화면 동시 2 → 3개) */
 const ITEM_SPAWN_MIN = 4.6, ITEM_SPAWN_RND = 3.4, ITEM_MAX_ON_ROAD = 3; 
 /* --- v13 신규 아이템 수치 --- */
@@ -1052,6 +1090,19 @@ const FEVER_COIN_EVERY = 0.085;         // 피버 코인 스폰 간격(초)
 const FEVER_COIN_MAX = 64;              // 화면에 동시에 뜨는 코인 상한
 const FEVER_SAFE_AFTER = 0.9;           // 피버 종료 뒤 스폰·충돌 유예(초) — 막 풀리자마자 코앞 차에 죽지 않게
 const FEVER_CLEAR_PAD = 220;            // 피버 시작 때 정리할 화면 밖 여유(px)
+/* --- v16.1: 🪙 피버 타임 = '키로수 보너스 타임' --- */
+const FEVER_SPEED_MUL = 1.35;           // 피버 중 목표 속도·최고 상한 배율 (쾌속 주행)
+const FEVER_DIST_MUL = 1.5;             // 피버 중 주행 거리 획득 배율
+const FEVER_COIN_KM = 0.02;             // 피버 코인 1개당 추가 거리(km)
+/* --- v16.1: 🚀 워프 점프 · ⛽ 거리 2배 · 🏎️ 1등 추격 슬립스트림 --- */
+const WARP_KM = 6;                      // 워프 점프 즉시 이동 거리(km)
+const WARP_INVULN = 1.5;                // 착지 직후 무적(초)
+const DIST2X_MUL = 2;                   // 거리 2배 부스터 배율
+const CATCHUP_BASE = 1.25;              // 1등 추격 최소 배율 (격차 0)
+const CATCHUP_MAX = 1.75;               // 1등 추격 최대 배율
+const CATCHUP_PER_KM = 0.05;            // 격차 1km당 추가 배율
+const BULLET_SLOW = 0.55;               // ⏱️ 블릿 타임: 도로 스크롤·접근 속도 배율
+const BULLET_DIST_MUL = 1.4;            // ⏱️ 블릿 타임: 내 거리 획득 배율
 const IMPACT_LIFE = 1.15;               // 화면 중앙 임팩트 팝업 수명(초)
 /* --- v12: 아이템 획득 임팩트 · 스피드업 속도 연출 --- */
 const PICK_FX_LIFE = 0.46;              // 먹은 자리 → 내 차로 빨려오는 아이콘 수명(초)
@@ -1392,61 +1443,70 @@ const UNITS_PER_KM = SPD_SCALE * KM_DIV;     // 1km = 390 world units (거리↔
          comboStep(칼치기 1회당 콤보 상승) itemGrab(아이템 수집 판정) itemTime(아이템 효과 +초)
          cutGap(끼어들기 예고 거리) slip(비·눈 미끄러짐 상쇄) camCut(과속카메라 단속 -초)
          overtake(추월 보너스 배율) laneHeavy(묵직한 차선변경 연출)
-   ※ 꼬깔콘 무시/분쇄·기본 실드·사이렌 양보 같은 판세를 뒤집는 특혜 능력은 없다 (12종 공통 규칙). */
+   ※ 꼬깔콘 무시·분쇄·사이렌 양보 같은 판세를 뒤집는 특혜 능력은 없다 (13종 공통 규칙). */
 const CAR_SPEC_DEFAULT = {
   top:1, topAdd:0, accel:1, accelLow:1, lane:1, nitro:1, danger:1, hitbox:1, score:1,
   kalchi:1, kalchiGap:1, combo:1, comboBonus:0, comboStep:1, itemGrab:1, itemTime:0,
-  cutGap:1, slip:1, camCut:0, overtake:1, laneHeavy:0
+  cutGap:1, slip:1, camCut:0, overtake:1, laneHeavy:0,
+  /* v16.1 신규 특성 */
+  trapTime:1,      /* 함정 효과 시간 배율 (0.5 = 절반) */
+  coinBonus:1,     /* 피버 코인 점수·거리 보너스 배율 */
+  boost:1          /* 스피드업(니트로)·칼치기 부스트 효율 */
 };
 const CARS = [
   { id:'sport',   name:'빨간 스포츠카', emoji:'🏎️', color:'#ff3b47', short:'스포츠카',
     tag:'레이싱 스트라이프 · 듀얼 배기 불꽃',
-    ability:'균형형 · 칼치기 점수 +15%',
-    spec:{ kalchi:1.15 }, eng:0.90, horn:'high' },
+    ability:'칼치기 점수 +30% · 가속·최고속 균형 상향',
+    spec:{ kalchi:1.30, accel:1.05, top:1.01 }, eng:0.90, horn:'high' },
   { id:'taxi',    name:'노란 총알택시', emoji:'🚕', color:'#ffd12e', short:'택시',
     tag:'빈차 갓등 · 칼치기 본능',
-    ability:'빠른 차선 변경 · 콤보 유지 +1.0초',
-    spec:{ lane:1.08, accel:1.015, comboBonus:1.0 }, eng:1.02, horn:'double' },
+    ability:'차선 이동 +20% · 콤보 유지 +2.0초',
+    spec:{ lane:1.20, accel:1.02, comboBonus:2.0, nitro:1.10 }, eng:1.02, horn:'double' },
   { id:'porter',  name:'파란 배달 포터', emoji:'🚚', color:'#2f7bff', short:'포터',
     tag:'만재 적재함 · 슬림한 차폭',
-    ability:'슬림 차폭 · 아이템 수집 판정 +15%',
-    spec:{ top:0.99, accel:0.985, hitbox:0.96, itemGrab:1.15 }, eng:0.70, horn:'low' },
+    ability:'아이템 수집 반경 +35% · 기본 점수 +10%',
+    spec:{ top:0.99, accel:0.98, hitbox:0.96, itemGrab:1.35, score:1.10 }, eng:0.70, horn:'low' },
   { id:'police',  name:'경광등 경찰차', emoji:'🚓', color:'#eef3fb', short:'경찰차',
     tag:'빨강/파랑 점멸 · 사이렌 경적',
-    ability:'앞차 끼어들기 예고를 25% 일찍 표시',
-    spec:{ top:0.995, lane:1.02, cutGap:1.25 }, eng:1.06, horn:'siren' },
+    ability:'끼어들기 예고 45% 일찍 · 과속카메라 단속 1.6초 단축',
+    spec:{ top:0.995, lane:1.02, cutGap:1.45, camCut:1.6 }, eng:1.06, horn:'siren' },
   { id:'tractor', name:'시골 경운기', emoji:'🚜', color:'#57b34a', short:'경운기',
     tag:'왕바퀴 · 연기 두 통 · 논두렁 감성',
-    ability:'부드러운 핸들링 · 저속 가속 보정',
-    spec:{ top:0.985, accel:0.975, accelLow:1.30, lane:1.05 }, eng:0.62, horn:'rattle' },
+    ability:'비·눈길 미끄러짐 상쇄 · 기름·포트홀 저항',
+    spec:{ top:0.97, accel:0.95, accelLow:1.35, lane:1.06, slip:0.20, trapTime:0.50 }, eng:0.62, horn:'rattle' },
   { id:'ambulance', name:'119 구급차', emoji:'🚑', color:'#f4f8ff', short:'구급차',
     tag:'적십자 표식 · 회전 사이렌등',
-    ability:'아이템 효과 시간 +1.2초',
-    spec:{ top:0.995, itemTime:1.2 }, eng:0.95, horn:'wail' },
+    ability:'모든 버프 아이템 지속 +2.5초 · 함정 20% 단축',
+    spec:{ top:0.995, itemTime:2.5, trapTime:0.80 }, eng:0.95, horn:'wail' },
   { id:'supercar', name:'블랙 슈퍼카', emoji:'🚘', color:'#1b1d26', short:'슈퍼카',
     tag:'블랙 카본 · 네온 언더글로우',
-    ability:'최고속 +10km/h · 날카로운 조향',
-    spec:{ topAdd:10, accel:0.99, lane:1.04 }, eng:1.10, horn:'hyper' },
+    ability:'최고속 +25km/h · 폭발적 가속',
+    spec:{ top:1.0, topAdd:25, accel:1.12, lane:1.05 }, eng:1.10, horn:'hyper' },
   { id:'armored', name:'국방 장갑차', emoji:'🚛', color:'#55613f', short:'장갑차',
     tag:'리벳 판금 · 철제 범퍼',
-    ability:'비·눈길 미끄러짐 완화 · 단속 0.8초 단축',
-    spec:{ top:0.995, accel:0.99, lane:0.96, slip:0.55, camCut:0.8 }, eng:0.78, horn:'air' },
+    ability:'함정 지속 50% 단축 · 튼튼한 차체',
+    spec:{ top:0.98, accel:0.98, lane:0.95, hitbox:0.94, slip:0.55, trapTime:0.50, camCut:1.6 }, eng:0.78, horn:'air' },
   { id:'scooter', name:'네온 스쿠터', emoji:'🛵', color:'#00e5c0', short:'스쿠터',
     tag:'배달 박스 · 네온 언더글로우',
-    ability:'날렵한 차선 이동 · 칼치기 판정 소폭 여유',
-    spec:{ top:0.985, lane:1.10, kalchiGap:1.20, hitbox:0.99 }, eng:0.82, horn:'bell' },
+    ability:'칼치기 판정 여유 +35% · 좁은 차폭',
+    spec:{ top:0.98, lane:1.12, kalchiGap:1.35, hitbox:0.94 }, eng:0.82, horn:'bell' },
   { id:'limo',    name:'블랙 리무진', emoji:'🚙', color:'#0c0c10', short:'리무진',
     tag:'검정 차체 · 크롬 사이드몰딩',
-    ability:'직진 안정감 · 추월 보너스 점수 +15%',
-    spec:{ top:1.005, accel:0.995, lane:0.975, overtake:1.15 }, eng:0.88, horn:'deep' },
+    ability:'추월 보너스 +30% · 기본 점수 +5%',
+    spec:{ top:1.02, accel:0.995, lane:0.97, overtake:1.30, score:1.05, danger:0.85 }, eng:0.88, horn:'deep' },
   { id:'foodtruck', name:'노란 푸드트럭', emoji:'🚐', color:'#ffa726', short:'푸드트럭',
     tag:'서빙 창 · 어닝 스트라이프',
-    ability:'기본 점수 +8% · 묵직한 코너링',
-    spec:{ top:0.99, accel:0.975, lane:0.945, score:1.08 }, eng:0.74, horn:'honk' },
+    ability:'기본 점수 +20% · 피버 코인 보너스 강화',
+    spec:{ top:0.99, accel:0.97, lane:0.94, score:1.20, coinBonus:1.30 }, eng:0.74, horn:'honk' },
   { id:'drift',   name:'화이트 드리프트카', emoji:'🚗', color:'#e9eef6', short:'드리프트',
     tag:'화이트 리버리 · 와이드 리어',
-    ability:'연속 칼치기 콤보 2배 상승 · 기본 균형형',
-    spec:{ top:0.995, lane:1.02, comboStep:2 }, eng:0.94, horn:'rev' }
+    ability:'칼치기 콤보 2배 상승 · 칼치기 부스트 대폭',
+    spec:{ top:0.995, lane:1.02, comboStep:2, kalchi:1.10, boost:1.35 }, eng:0.94, horn:'rev' },
+  /* v16.1: 13번째 차량 — 좁은 틈 칼치기 최강 */
+  { id:'moto',    name:'폭주 오토바이', emoji:'🏍️', color:'#ff6b1a', short:'오토바이',
+    tag:'슬림 바디 · 라이더 헬멧 · 앞뒤 바퀴',
+    ability:'초슬림 차폭 · 번개 차선 이동 · 최고속 우수',
+    spec:{ top:1.04, accel:1.06, lane:1.25, hitbox:0.86, danger:1.05 }, eng:1.08, horn:'roar' }
 ];
 function carSpec(id){
   const c = carById(id);
@@ -2594,17 +2654,19 @@ function difficulty(sim){
   const others = truckW + coneW + cutW + zigW;
   const packW = Math.max(0.06, 1 - others);
   const sumW = packW + others;
+  /* v16.1: "너무 어렵다" 피드백 — 차량 밀도·길막·꼬깔을 12~15% 완화해 숨통을 튜다 */
   return {
     t: t,
-    blockMax: clamp(Math.round(2 + 5 * t), 2, 6),
+    blockMax: clamp(Math.round(2 + 4.2 * t), 2, 5),
     coneMax:  clamp(1 + Math.round(2 * t), 1, 3),
-    coneLen:  clamp(3 + Math.round(2.6 * t), 3, 6),
-    gapScale: clamp(1 - 0.66 * t, 0.34, 1),
+    coneLen:  clamp(3 + Math.round(1.8 * t), 3, 5),
+    /* v16.1: "너무 어렵다" 피드백 — 간격 배율은 v13 곡선에 1.14배(14% 넉넉)를 곱해 완화 */
+    gapScale: clamp((1 - 0.66 * t) * 1.14, 0.38, 1),
     truckMax: clamp(1 + Math.round(2 * t), 1, 3),
     blinker:  lerp(0.32, 0.05, t),
     cutDur:   lerp(0.28, 0.15, t),
     weights:  { pack: packW / sumW, truck: truckW / sumW, cone: coneW / sumW, cut: cutW / sumW, zig: zigW / sumW },
-    dangerRate: 0.13 + 0.19 * t
+    dangerRate: 0.12 + 0.16 * t
   };
 }
 
@@ -2738,8 +2800,8 @@ function itemDef(id){
   for (let i=0;i<ITEM_CATALOG.length;i++) if (ITEM_CATALOG[i].id === id) return ITEM_CATALOG[i];
   return ITEM_TYPES[0];
 }
-/* 함정인지 (과속카메라 · 기름웅덩이) */
-function isTrapItem(id){ return id === CAMERA.id || id === OIL.id; }
+/* 함정인지 (과속카메라 · 기름웅덩이 + v16.1 신규 4종) */
+function isTrapItem(id){ return TRAP_IDS.indexOf(id) >= 0; }
 /* opts.lane  : 그 차선에 확정 스폰 (미션 보장용)
    opts.force : 빈 밴드가 없어도 스폰한다 (아이템은 충돌 판정이 없어 겹쳐도 안전)
    opts.type  : 아이템 종류 지정 */
@@ -2786,12 +2848,23 @@ function applyItemEffect(sim, typeId, ev){
     sim.feverT = Math.max(sim.feverT || 0, dur);
     sim.coinT = 0;
     feverStart(sim, evs);        /* 길 위 위험 요소 정리 + 동전 전용 모드 */
+  } else if (typeId === 'warp'){
+    warpJump(sim, evs);          /* 즉시 +6km 순간이동 + 착지 무적 */
+  } else if (typeId === 'dist2x'){
+    sim.dist2xT = Math.max(sim.dist2xT || 0, dur);
+  } else if (typeId === 'catchup'){
+    sim.catchupT = Math.max(sim.catchupT || 0, dur);
+  } else if (typeId === 'bullet'){
+    sim.bulletT = Math.max(sim.bulletT || 0, dur);
   } else if (typeId === 'clear'){
     waveClear(sim, evs);
   } else if (typeId === CAMERA.id){
     hitCamera(sim, { id: -1, x: playerX(sim), y: playerY(sim) }, evs);
   } else if (typeId === OIL.id){
     hitOil(sim, { id: -1, x: playerX(sim), y: playerY(sim) }, evs);
+  } else if (isTrapItem(typeId)){
+    /* v16.1: 신규 함정 4종도 랜덤 박스에서 나오면 그 자리에서 효과가 터진다 */
+    applyTrap(sim, typeId, evs);
   }
   return def;
 }
@@ -2845,8 +2918,8 @@ function itemPickup(sim, it, ev){
   let def;
   let picked = it.type;
   if (isMystery){
-    /* 좋은 아이템 6종 또는 함정 2종 — 한 번만 뽑아 그 효과를 바로 발동한다 */
-    const pool = GOOD_IDS.concat([CAMERA.id, OIL.id]);
+    /* 좋은 아이템 10종 또는 함정 6종 — 한 번만 뽑아 그 효과를 바로 발동한다 */
+    const pool = GOOD_IDS.concat(TRAP_IDS);
     picked = pool[Math.floor(sim.rng() * pool.length)];
     def = applyItemEffect(sim, picked, ev);
     if (isTrapItem(picked)){
@@ -2915,6 +2988,8 @@ function spawnCamera(sim, opts){
 }
 function hitCamera(sim, cam, ev){
   const evs = ev || [];
+  /* 무적(실드 방어·워프 착지) 중에는 함정도 그대로 지나간다 */
+  if ((sim.invuln || 0) > 0) return 'immune';
   if ((sim.shield || 0) > 0){
     sim.shield -= 1;
     sim.camBlocks = (sim.camBlocks || 0) + 1;
@@ -2922,9 +2997,10 @@ function hitCamera(sim, cam, ev){
     evs.push({ type:'camBlock', x: cam.x, y: cam.y, left: sim.shield });
     return 'blocked';
   }
-  /* 장갑차 등 camCut 보유 차량은 단속 시간이 짧다 (0.8초 단축) */
-  const cut = Math.min(CAMERA.dur - 1, (sim.spec && sim.spec.camCut) || 0);
-  const dur = Math.max(1, CAMERA.dur - cut);
+  /* 장갑차 등 camCut 보유 차량은 단속 시간이 짧다 (최대 1.6초 단축) */
+  const cut = Math.min(CAMERA.dur - 0.5, (sim.spec && sim.spec.camCut) || 0);
+  const tt = (sim.spec && sim.spec.trapTime) || 1;
+  const dur = Math.max(0.8, CAMERA.dur * tt - cut);
   sim.camT = dur;
   sim.camHits = (sim.camHits || 0) + 1;
   missionTrapHit(sim);
@@ -2979,6 +3055,7 @@ function spawnOil(sim, opts){
 }
 function hitOil(sim, oil, ev){
   const evs = ev || [];
+  if ((sim.invuln || 0) > 0) return 'immune';
   if ((sim.shield || 0) > 0){
     sim.shield -= 1;
     sim.oilBlocks = (sim.oilBlocks || 0) + 1;
@@ -2986,7 +3063,7 @@ function hitOil(sim, oil, ev){
     evs.push({ type:'oilBlock', x: oil.x, y: oil.y, left: sim.shield });
     return 'blocked';
   }
-  sim.oilT = OIL.dur;
+  sim.oilT = OIL.dur * ((sim.spec && sim.spec.trapTime) || 1);
   sim.oilPhase = 0;
   sim.oilHits = (sim.oilHits || 0) + 1;
   missionTrapHit(sim);
@@ -2994,6 +3071,134 @@ function hitOil(sim, oil, ev){
   evs.push({ type:'oilHit', x: oil.x, y: oil.y, dur: OIL.dur });
   return 'slipped';
 }
+/* =========================================================
+   v16.1 신규 함정 4종 (🚧 포트홀 · 🐦 비둘기 · 📱 재난문자 · 🛞 펑크)
+   - 기존 과속카메라·기름웅덩이처럼 '죽지 않는' 방해 함정이다.
+   - 유령(ghostT)·피버(fSafe)·무적(invuln) 중에는 그대로 통과한다.
+   - 실드가 있으면 1개를 써서 막는다.
+   ========================================================= */
+const ALERT_MSGS = [
+  '[긴급재난문자] 전방 칼치기 주의! 안전운전 하세요',
+  '[긴급재난문자] 8차로 공사구간 · 꼬깔콘 접근 금지',
+  '[긴급재난문자] 비둘기 출몰 · 유리창 주의',
+  '[긴급재난문자] 과속 단속 중 · 핸들 똑바로'
+];
+/* 함정 지속시간 — 차량 특성(trapTime)이 0.5면 절반으로 줄어든다 */
+function trapDur(sim, def){
+  const tt = (sim && sim.spec && sim.spec.trapTime) || 1;
+  return Math.max(0.4, (def.dur || 1.5) * tt);
+}
+/* 함정 효과 발동 (시야·조작 방해) — 죽지는 않는다 */
+function applyTrap(sim, typeId, ev){
+  const def = itemDef(typeId);
+  const evs = ev || [];
+  const dur = trapDur(sim, def);
+  if (typeId === POTHOLE.id){
+    sim.invertT = Math.max(sim.invertT || 0, dur);
+  } else if (typeId === PIGEON.id){
+    sim.pigeonT = Math.max(sim.pigeonT || 0, dur);
+  } else if (typeId === ALERT.id){
+    sim.alertT = Math.max(sim.alertT || 0, dur);
+    sim.alertMsg = ALERT_MSGS[Math.floor(sim.rng() * ALERT_MSGS.length)];
+  } else if (typeId === FLAT.id){
+    sim.flatT = Math.max(sim.flatT || 0, dur);
+  } else {
+    return null;
+  }
+  sim.trapHits = (sim.trapHits || 0) + 1;
+  addImpact(sim, def.impactEmoji || def.emoji, def.impact || (def.label + '!'), def.impactColor || def.color);
+  evs.push({ type:'trapHit', trap: def, dur: dur });
+  return dur;
+}
+/* 도로 위 신규 함정 배치 — 빈 차로·탈출로 확보 규칙은 기름웅덩이와 같다 */
+function spawnRoadTrap(sim, typeId, opts){
+  const o = opts || {};
+  const def = itemDef(typeId);
+  const y = (o.y === undefined) ? -300 : o.y;
+  const free = freeInBand(sim, y - 200, y + 200);
+  if (free.length < 3) return null;
+  for (let i=0;i<(sim.cams || []).length;i++) if (Math.abs(sim.cams[i].y - y) < 620) return null;
+  for (let i=0;i<(sim.oils || []).length;i++) if (Math.abs(sim.oils[i].y - y) < 620) return null;
+  for (let i=0;i<(sim.traps || []).length;i++) if (Math.abs(sim.traps[i].y - y) < 620) return null;
+  for (let i=0;i<sim.items.length;i++) if (Math.abs(sim.items[i].y - y) < 320) return null;
+  const mine = clamp(Math.round(sim.lanePos), 0, LANES - 1);
+  let cand = free.filter(function(l){ return l !== mine; });
+  if (!cand.length) cand = free.slice();
+  let lane;
+  if (o.lane !== undefined && o.lane !== null){
+    lane = clamp(Math.round(o.lane), 0, LANES - 1);
+    if (free.indexOf(lane) < 0) return null;
+  } else {
+    lane = cand[Math.floor(sim.rng() * cand.length)];
+  }
+  const escape = free.some(function(l){ return l !== lane && Math.abs(l - mine) <= 2; });
+  if (!escape) return null;
+  if (!sim.traps) sim.traps = [];
+  const tr = { id: sim.nextId++, type: def.id, x: laneCenter(lane), y: y, lane: lane, t: 0, dead: false };
+  sim.traps.push(tr);
+  return tr;
+}
+/* 함정 밟기 — 실드가 있으면 1개 소모로 막고, 없으면 효과만 받는다 (죽지 않는다) */
+function hitRoadTrap(sim, tr, ev){
+  const evs = ev || [];
+  const def = itemDef(tr.type);
+  if ((sim.shield || 0) > 0){
+    sim.shield -= 1;
+    sim.trapBlocks = (sim.trapBlocks || 0) + 1;
+    addImpact(sim, '🛡️', def.label + ' 방어!', '#7dffc0');
+    evs.push({ type:'trapBlock', trap: def, x: tr.x, y: tr.y, left: sim.shield });
+    return 'blocked';
+  }
+  applyTrap(sim, tr.type, evs);
+  return 'hit';
+}
+/* 함정 통합 스폰 — 6종이 한 타이머를 나눠 쓴다 (동시에 우수수 쏟아지지 않게) */
+function spawnAnyTrap(sim){
+  for (let attempt = 0; attempt < 4; attempt++){
+    const typeId = TRAP_SPAWN_POOL[Math.floor(sim.rng() * TRAP_SPAWN_POOL.length)];
+    const def = itemDef(typeId);
+    let made = null;
+    if (typeId === CAMERA.id) made = spawnCamera(sim);
+    else if (typeId === OIL.id) made = spawnOil(sim);
+    else made = spawnRoadTrap(sim, typeId);
+    if (made) return def;
+  }
+  return null;
+}
+/* 신규 함정 이동·충돌 처리 (피버/유령/무적은 통과) */
+function updateTraps(sim, dt, ev){
+  const evs = ev || [];
+  const list = sim.traps || [];
+  if (!list.length) return 0;
+  const px = playerX(sim), py = playerY(sim);
+  const ghostOn = (sim.ghostT || 0) > 0;
+  const safe = feverSafeWindow(sim);
+  let hit = 0;
+  for (let i=list.length-1;i>=0;i--){
+    const tr = list[i];
+    tr.t += dt;
+    tr.y += sim.speed * SPD_SCALE * dt * ((sim.bulletT || 0) > 0 ? BULLET_SLOW : 1);
+    if (tr.y > (sim.worldH || 1422) + 160){ list.splice(i,1); continue; }
+    if (ghostOn || safe || (sim.invuln || 0) > 0) continue;
+    if (Math.abs(tr.x - px) < TRAP_R + PLAYER.w / 2 && Math.abs(tr.y - py) < TRAP_R + PLAYER.h / 2){
+      hitRoadTrap(sim, tr, evs);
+      list.splice(i,1);
+      hit++;
+    }
+  }
+  return hit;
+}
+/* 화면 상단 경고줄용 목록 (조작 방해 상태를 한눈에) */
+function trapWarnList(sim){
+  if (!sim) return [];
+  const out = [];
+  if ((sim.invertT || 0) > 0) out.push({ id:'invert', emoji:'🚧', text:'핸들 반전!', sec: sim.invertT, color:'#ffb066' });
+  if ((sim.flatT || 0) > 0) out.push({ id:'flat', emoji:'🛞', text:'타이어 펑크 · 조향 둔함', sec: sim.flatT, color:'#c8d0dc' });
+  if ((sim.pigeonT || 0) > 0) out.push({ id:'pigeon', emoji:'🐦', text:'비둘기 테러!', sec: sim.pigeonT, color:'#e6edf6' });
+  if ((sim.alertT || 0) > 0) out.push({ id:'alert', emoji:'📱', text:'가짜 재난문자', sec: sim.alertT, color:'#ffe37a' });
+  return out;
+}
+
 /* 미끄러지는 좌우 흔들림 폭 (옆 차로에 차가 바짝 붙어 있으면 줄여 억울한 사고를 막는다) */
 function oilWobbleAmp(sim){
   const px = playerX(sim), py = playerY(sim);
@@ -3022,6 +3227,9 @@ function oilLabel(sim){
    ========================================================= */
 const FX_BADGES = [
   { id:'fever',  emoji:'🪙', label:'피버',   key:'feverT',  color:'#ffcf3d' },
+  { id:'dist2x', emoji:'⛽', label:'거리2배', key:'dist2xT', color:'#7dffc0' },
+  { id:'catchup',emoji:'🏎️', label:'추격',   key:'catchupT',color:'#ff9f43' },
+  { id:'bullet', emoji:'⏱️', label:'블릿',   key:'bulletT', color:'#8ad7ff' },
   { id:'ghost',  emoji:'👻', label:'유령',   key:'ghostT',  color:'#b8a8ff' },
   { id:'bumper', emoji:'🛡️', label:'범퍼',   key:'bumperT', color:'#ffa33d' },
   { id:'magnet', emoji:'🧲', label:'자석',   key:'magnetT', color:'#ff7bd5' },
@@ -3078,16 +3286,18 @@ function feverClearRoad(sim, ev){
   }
   /* 화면에 보이는 차량·꼬깔은 작게 터뜨려 '사라지는 순간'을 보여 준다 */
   for (let k=0;k<puff.length;k++) explosionAt(sim, puff[k].x, puff[k].y, 6, false);
-  /* 함정(과속카메라·기름웅덩이)과 길 위 아이템도 함께 정리 — 피버 중엔 코인만 보인다 */
+  /* 함정(과속카메라·기름웅덩이·포트홀·비둘기·재난문자·펑크)과 길 위 아이템도 함께 정리 — 피버 중엔 코인만 보인다 */
   const cams = (sim.cams || []).length;
   const oils = (sim.oils || []).length;
+  const traps = (sim.traps || []).length;
   const items = (sim.items || []).length;
   if (cams) sim.cams.length = 0;
   if (oils) sim.oils.length = 0;
+  if (traps) sim.traps.length = 0;
   if (items) sim.items.length = 0;
   sim.feverCleared = (sim.feverCleared || 0) + obst;
-  if (obst || cams || oils || items){
-    evs.push({ type:'feverClear', obstacles: obst, cams: cams, oils: oils, items: items });
+  if (obst || cams || oils || traps || items){
+    evs.push({ type:'feverClear', obstacles: obst, cams: cams, oils: oils, traps: traps, items: items });
   }
   return obst;
 }
@@ -3153,13 +3363,17 @@ function updateFever(sim, dt, ev){
   for (let i=sim.coins.length-1;i>=0;i--){
     const c = sim.coins[i];
     c.t += dt;
-    c.y += sim.speed * SPD_SCALE * dt;
+    c.y += sim.speed * SPD_SCALE * dt * ((sim.bulletT || 0) > 0 ? BULLET_SLOW : 1);
     if (c.y > (sim.worldH || 1422) + 90){ sim.coins.splice(i,1); continue; }
     if (Math.abs(c.x - px) < 42 + PLAYER.w / 2 && Math.abs(c.y - py) < 42 + PLAYER.h / 2){
-      const g = addBonus(sim, FEVER_COIN_BONUS);
+      const coinK = (sim.spec && sim.spec.coinBonus) || 1;
+      const g = addBonus(sim, FEVER_COIN_BONUS * coinK);
+      const km = FEVER_COIN_KM * coinK;
+      sim.dist += km;                        /* 동전 1개 = +0.02km (키로수 보너스 타임) */
+      sim.feverKm = (sim.feverKm || 0) + km;
       sim.feverCoins = (sim.feverCoins || 0) + 1;
       got++;
-      evs.push({ type:'coin', x: c.x, y: c.y, gain: g, total: sim.feverCoins });
+      evs.push({ type:'coin', x: c.x, y: c.y, gain: g, total: sim.feverCoins, km: km });
       sim.coins.splice(i,1);
     }
   }
@@ -3169,6 +3383,41 @@ function updateFever(sim, dt, ev){
 function feverLabel(sim){
   if (!sim || !(sim.feverT > 0)) return '';
   return '🪙 피버 ' + sim.feverT.toFixed(1) + 's';
+}
+
+/* --- v16.1: 🏎️ 1등 추격 슬립스트림 ---
+   현재 레이스의 1등(가장 앞선 라이벌)과의 격차(km)가 클수록 더 빠르게 추격한다.
+   이미 1등이면 기본 1.25배 부스트만 붙는다. */
+function leaderGapKm(sim){
+  if (!sim) return 0;
+  const list = sim.rivals || [];
+  let lead = 0;
+  for (let i=0;i<list.length;i++){
+    const km = Number(list[i] && list[i].km);
+    if (isFinite(km) && km > lead) lead = km;
+  }
+  return Math.max(0, lead - (sim.dist || 0));
+}
+function catchupMul(gapKm){
+  const g = Math.max(0, Number(gapKm) || 0);
+  return clamp(CATCHUP_BASE + g * CATCHUP_PER_KM, CATCHUP_BASE, CATCHUP_MAX);
+}
+/* --- v16.1: 🚀 워프 점프 — 즉시 6km 순간이동 + 착지 무적 1.5초 --- */
+function warpJump(sim, ev){
+  const evs = ev || [];
+  const from = sim.dist;
+  sim.dist += WARP_KM;
+  sim.warpKm = (sim.warpKm || 0) + WARP_KM;
+  sim.invuln = Math.max(sim.invuln || 0, WARP_INVULN);
+  sim.flashT = Math.max(sim.flashT || 0, 0.34);
+  sim.boostT = BOOST_FX_LIFE;
+  sim.boostPunch = BOOST_PUNCH_LIFE;
+  sim.shake = Math.max(sim.shake || 0, 0.55);
+  sim.hitstop = Math.max(sim.hitstop || 0, 0.05);
+  /* 도로가 밀려 들어오는 연출 — 착지 뒤 1.5초 무적으로 앞차를 그냥 통과한다 */
+  sim.scroll = (sim.scroll || 0) + 900;
+  evs.push({ type:'warp', km: WARP_KM, from: from, to: sim.dist });
+  return WARP_KM;
 }
 
 /* =========================================================
@@ -3529,9 +3778,14 @@ function newGame(opts){
     items: [], itemTimer: 5.5, itemCount: 0,
     cams: [], camTimer: CAMERA_FIRST, camT: 0, camHits: 0, camBlocks: 0,
     oils: [], oilTimer: OIL_FIRST, oilT: 0, oilPhase: 0, oilHits: 0, oilBlocks: 0,
+    /* v16.1: 신규 함정 4종 — 도로 위 함정 목록과 효과 상태 */
+    traps: [], trapHits: 0, trapBlocks: 0,
+    invertT: 0, pigeonT: 0, alertT: 0, flatT: 0, alertMsg: '',
     magnetT: 0,
     /* v13: 신규 아이템 상태 */
     bumperT: 0, ghostT: 0, feverT: 0, safeT: 0,
+    /* v16.1: 거리 2배 · 1등 추격 · 워프 */
+    dist2xT: 0, catchupT: 0, catchupMul: 1, warpKm: 0, bulletT: 0,
     coins: [], coinT: 0, feverCoins: 0, bumperSmash: 0, clearKills: 0,
     feverSafeT: 0, feverWasOn: false, feverCleared: 0,
     impacts: [],
@@ -3575,8 +3829,13 @@ function start(sim){
   sim.nitro = 0; sim.invuln = 0;
   sim.hitstop = 0; sim.flashT = 0;
   sim.items = []; sim.itemTimer = 5.5;
-  sim.cams = []; sim.camTimer = CAMERA_FIRST; sim.camT = 0; sim.camHits = 0; sim.camBlocks = 0;
+  sim.cams = []; sim.camTimer = TRAP_FIRST; sim.camT = 0; sim.camHits = 0; sim.camBlocks = 0;
   sim.oils = []; sim.oilTimer = OIL_FIRST; sim.oilT = 0; sim.oilPhase = 0; sim.oilHits = 0; sim.oilBlocks = 0;
+  /* v16.1: 신규 함정 4종 상태 */
+  sim.traps = []; sim.trapHits = 0; sim.trapBlocks = 0;
+  sim.invertT = 0; sim.pigeonT = 0; sim.alertT = 0; sim.flatT = 0; sim.alertMsg = '';
+  /* v16.1: 거리 2배 · 1등 추격 · 워프 */
+  sim.dist2xT = 0; sim.catchupT = 0; sim.catchupMul = 1; sim.warpKm = 0; sim.bulletT = 0;
   sim.magnetT = 0;
   sim.bumperT = 0; sim.ghostT = 0; sim.feverT = 0; sim.safeT = 0;
   sim.coins = []; sim.coinT = 0; sim.feverCoins = 0; sim.bumperSmash = 0; sim.clearKills = 0;
@@ -3594,7 +3853,9 @@ function start(sim){
 
 function steer(sim, dir){
   if (sim.state !== 'playing' || sim.paused) return false;
-  const t = clamp(Math.round(sim.targetLane) + dir, 0, LANES - 1);
+  /* 🚧 포트홀: 핸들이 반전된 동안은 좌우가 뒤집힌다 (입력 경로가 하나라 여기서만 뒤집으면 된다) */
+  const d = ((sim.invertT || 0) > 0) ? -dir : dir;
+  const t = clamp(Math.round(sim.targetLane) + d, 0, LANES - 1);
   if (t === sim.targetLane) return false;
   sim.targetLane = t;
   missionLaneChanged(sim);
@@ -4206,6 +4467,16 @@ function update(sim, dt){
   feverCycle(sim, ev);        /* 피버가 끝나는 프레임에 그 자리에서 안전 여백을 깔아 둔다 */
   sim.safeT = Math.max(0, (sim.safeT || 0) - dt);
   sim.oilT = Math.max(0, (sim.oilT || 0) - dt);
+  /* v16.1: 신규 아이템·함정 타이머 */
+  sim.dist2xT = Math.max(0, (sim.dist2xT || 0) - dt);
+  sim.catchupT = Math.max(0, (sim.catchupT || 0) - dt);
+  sim.bulletT = Math.max(0, (sim.bulletT || 0) - dt);
+  sim.invertT = Math.max(0, (sim.invertT || 0) - dt);
+  sim.pigeonT = Math.max(0, (sim.pigeonT || 0) - dt);
+  sim.alertT = Math.max(0, (sim.alertT || 0) - dt);
+  sim.flatT = Math.max(0, (sim.flatT || 0) - dt);
+  /* ⏱️ 블릿 타임: 도로 위 모든 것(차량·꼬깔·함정·아이템)의 접근이 0.55배로 느려진다 */
+  const worldK = (sim.bulletT || 0) > 0 ? BULLET_SLOW : 1;
   const ghostOn = (sim.ghostT || 0) > 0;
   const bumperOn = (sim.bumperT || 0) > 0;
   /* 🪙 피버 타임(+종료 직후 여백): 위험 요소 스폰·충돌을 함께 멈춘다 */
@@ -4220,13 +4491,21 @@ function update(sim, dt){
   const nitroOn = sim.nitro > 0;
 
   /* --- 끝없는 가속 (차종·날씨 반영) --- */
-  sim.maxSpeed = Math.min(TOP_KMH * 1.2, (maxSpeedAt(sim.dist) * spec.top + (spec.topAdd || 0)) * wxMul(sim, 'top'));
+  const feverBoostOn = (sim.feverT || 0) > 0;
+  /* 🏎️ 1등 추격: 1등(가장 앞선 라이벌)과의 격차가 클수록 빠르게 붙는다 (1.25 ~ 1.75배) */
+  const catchMul = (sim.catchupT || 0) > 0 ? catchupMul(leaderGapKm(sim)) : 1;
+  sim.catchupMul = catchMul;
+  /* 🪙 피버: 목표 속도·상한을 1.35배로 끌어올려 쾌속 주행 */
+  const spdMul = (feverBoostOn ? FEVER_SPEED_MUL : 1) * catchMul;
+  sim.maxSpeed = Math.min(TOP_KMH * 1.2, (maxSpeedAt(sim.dist) * spec.top + (spec.topAdd || 0)) * wxMul(sim, 'top')) * spdMul;
 
   /* --- lane movement (차종·날씨에 따른 반응/미끄러짐) --- */
   const prevLane = sim.lanePos;
-  /* slip: 비·눈길에서 차선 반응 저하와 관성 미끄러짐을 줄여 준다 (장갑차 0.55) */
+  /* slip: 비·눈길에서 차선 반응 저하와 관성 미끄러짐을 줄여 준다 (경운기 0.2 ~ 장갑차 0.55) */
   const slipK = (spec.slip === undefined) ? 1 : spec.slip;
-  const laneK = 14 * spec.lane * lerp(1, wxMul(sim, 'lane'), slipK);
+  /* 🛞 타이어 펑크: 3초 동안 조향 반응이 0.4배로 둔해진다 */
+  const flatK = (sim.flatT || 0) > 0 ? 0.4 : 1;
+  const laneK = 14 * spec.lane * lerp(1, wxMul(sim, 'lane'), slipK) * flatK;
   const k = 1 - Math.exp(-dt * laneK);
   /* 기름웅덩이: 1.5초간 좌우로 미끈덩 (차선은 목표 차선으로 돌아오려 한다) */
   let oilWob = 0;
@@ -4295,7 +4574,8 @@ function update(sim, dt){
   const camLimited = (sim.camT || 0) > 0;
   if (camLimited) goal = Math.min(goal, CAMERA.limitKmh);
   const accelK = spec.accel * (sim.speed < sim.maxSpeed * 0.65 ? (spec.accelLow || 1) : 1);
-  const rate = (goal < sim.speed) ? 420 * lerp(1, wxMul(sim, 'brake'), slipK) : 78 * accelK * (nitroOn ? 2.6 : 1);
+  /* 피버·추격 중에는 가속도 같이 끌어올린다 (쾌속 주행 체감) */
+  const rate = (goal < sim.speed) ? 420 * lerp(1, wxMul(sim, 'brake'), slipK) : 78 * accelK * (nitroOn ? 2.6 : 1) * spdMul;
   if (goal > sim.speed) sim.speed = Math.min(goal, sim.speed + rate * dt);
   else sim.speed = Math.max(goal, sim.speed - rate * dt);
   /* 감속은 자연스럽게: 80까지는 제동으로 떨어뜨리고, 그 아래로는 못 내려간다 */
@@ -4305,8 +4585,11 @@ function update(sim, dt){
   sim.braking = (speedBefore - sim.speed > 1.2) || (!!blocker && blocker.speed < sim.speed * 0.9);
 
   /* --- distance / scroll --- */
-  sim.scroll = (sim.scroll || 0) + sim.speed * SPD_SCALE * dt;
-  const dGain = (sim.speed / KM_DIV) * dt;
+  sim.scroll = (sim.scroll || 0) + sim.speed * SPD_SCALE * dt * worldK;
+  /* 🪙 피버 ×1.5 · ⛽ 거리 2배 ×2 · 🏎️ 1등 추격 ×1.25~1.75 · ⏱️ 블릿 ×1.4 — 겹칠수록 더 쑥쑥 */
+  const distMul = (feverBoostOn ? FEVER_DIST_MUL : 1) * ((sim.dist2xT || 0) > 0 ? DIST2X_MUL : 1) * catchMul *
+    ((sim.bulletT || 0) > 0 ? BULLET_DIST_MUL : 1);
+  const dGain = (sim.speed / KM_DIV) * dt * distMul;
   sim.dist += dGain;
 
   /* --- v6.2 권역 전환 (400km 경계): 풍경·색감·이정표·HUD · BGM이 바뀐다 --- */
@@ -4409,13 +4692,15 @@ function update(sim, dt){
     if (sim.spawnTimer <= 0){
       spawnWave(sim);
       const rel = Math.max(150, sim.speed * 0.42 * SPD_SCALE);
-      const gap = lerp(310, 530, sim.rng()) * d.gapScale;
-      sim.spawnTimer = clamp(gap / rel, 0.23, 1.65);
+      /* v16.1: 웨이브 간격을 조금 더 넉넉하게 (310~530 → 350~600) — 12~15% 완화 */
+      const gap = lerp(350, 600, sim.rng()) * d.gapScale;
+      sim.spawnTimer = clamp(gap / rel, 0.23, 1.75);
     }
   }
 
-  /* --- obstacles --- */
-  const relK = 1;                           /* v13: 감속 아이템 폐지 — 주변 차량도 항상 정상 속도 */
+  /* --- obstacles ---
+     v16.1: ⏱️ 블릿 타임에서는 도로 위 모든 것이 0.55배로 느리게 흘러간다 */
+  const relK = worldK;
   /* v12: 가까워지는 뒤차는 앞차 속도로 따라간다 (추돌·겹침 방지) */
   computeFollowLimits(sim);
   for (let i=0;i<sim.obstacles.length;i++){
@@ -4499,7 +4784,7 @@ function update(sim, dt){
   for (let i=sim.mcaps.length-1;i>=0;i--){
     const cap = sim.mcaps[i];
     cap.t += dt;
-    cap.y += sim.speed * SPD_SCALE * dt;
+    cap.y += sim.speed * SPD_SCALE * dt * relK;
     if (cap.y > sim.worldH + 150){ sim.mcaps.splice(i,1); continue; }
     if (Math.abs(cap.x - px) < MISSION_CAP_R + PLAYER.w / 2 && Math.abs(cap.y - py) < MISSION_CAP_R + PLAYER.h / 2){
       collectMissionCap(sim, cap, ev);
@@ -4513,7 +4798,7 @@ function update(sim, dt){
     const it = sim.items[i];
     if (!it) continue;                     /* 피버 발동이 같은 프레임에 길 위 아이템을 쓸어 간 경우 */
     it.t += dt;
-    it.y += sim.speed * SPD_SCALE * dt;
+    it.y += sim.speed * SPD_SCALE * dt * relK;
     if (it.y > sim.worldH + 140){ sim.items.splice(i,1); continue; }
     if (Math.abs(it.x - px) < grabR + PLAYER.w / 2 && Math.abs(it.y - py) < grabR + PLAYER.h / 2){
       itemPickup(sim, it, ev);
@@ -4525,40 +4810,40 @@ function update(sim, dt){
   /* --- v13: 🪙 피버 타임 — 코인·별이 쏟아지며 점수가 폭발한다 --- */
   updateFever(sim, dt, ev);
 
-  /* --- 과속카메라 함정 (피해야 하는 나쁜 아이템) --- */
-  sim.camTimer = ((sim.camTimer === undefined) ? CAMERA_FIRST : sim.camTimer) - dt;
+  /* --- 함정 6종 통합 스폰 (과속카메라·기름웅덩이 + 신규 4종) ---
+     함정이 6종으로 늘어 한 타이머를 나눠 쓰게 했다 — 한꺼번에 쏟아지지 않게 주기는 여유 있게(8~13초). */
+  sim.camTimer = ((sim.camTimer === undefined) ? TRAP_FIRST : sim.camTimer) - dt;
   if (sim.camTimer <= 0 && sim.dist > 0.4 && !fSafe){
-    if (spawnCamera(sim)) sim.camTimer = CAMERA_CD_MIN + sim.rng() * (CAMERA_CD_MAX - CAMERA_CD_MIN);
-    else sim.camTimer = 1.0;                     /* 자리가 없으면 조금 뒤 재시도 */
+    if (spawnAnyTrap(sim)) sim.camTimer = TRAP_CD_MIN + sim.rng() * (TRAP_CD_MAX - TRAP_CD_MIN);
+    else sim.camTimer = 1.2;                     /* 자리가 없으면 조금 뒤 재시도 */
   }
   for (let i=sim.cams.length-1;i>=0;i--){
     const cam = sim.cams[i];
     cam.t += dt;
-    cam.y += sim.speed * SPD_SCALE * dt;
+    cam.y += sim.speed * SPD_SCALE * dt * relK;
     if (cam.y > sim.worldH + 160){ sim.cams.splice(i,1); continue; }
-    if (!ghostOn && !fSafe && Math.abs(cam.x - px) < CAMERA_R + PLAYER.w / 2 && Math.abs(cam.y - py) < CAMERA_R + PLAYER.h / 2){
+    if (!ghostOn && !fSafe && (sim.invuln || 0) <= 0 && Math.abs(cam.x - px) < CAMERA_R + PLAYER.w / 2 && Math.abs(cam.y - py) < CAMERA_R + PLAYER.h / 2){
       hitCamera(sim, cam, ev);
       sim.cams.splice(i,1);
     }
   }
 
-  /* --- 기름웅덩이 함정 (밟으면 미끈덩, 죽지는 않음) --- */
+  /* --- 기름웅덩이 (밟으면 미끈덩, 죽지는 않음) --- */
   sim.oilTimer = ((sim.oilTimer === undefined) ? OIL_FIRST : sim.oilTimer) - dt;
-  if (sim.oilTimer <= 0 && sim.dist > 0.6 && !fSafe){
-    if (spawnOil(sim)) sim.oilTimer = OIL_CD_MIN + sim.rng() * (OIL_CD_MAX - OIL_CD_MIN);
-    else sim.oilTimer = 1.2;                     /* 자리가 없으면 조금 뒤 재시도 */
-  }
   if (!sim.oils) sim.oils = [];
   for (let i=sim.oils.length-1;i>=0;i--){
     const oil = sim.oils[i];
     oil.t += dt;
     oil.y += sim.speed * SPD_SCALE * dt * relK;
     if (oil.y > sim.worldH + 160){ sim.oils.splice(i,1); continue; }
-    if (!ghostOn && !fSafe && Math.abs(oil.x - px) < OIL_R + PLAYER.w / 2 && Math.abs(oil.y - py) < OIL_R + PLAYER.h / 2){
+    if (!ghostOn && !fSafe && (sim.invuln || 0) <= 0 && Math.abs(oil.x - px) < OIL_R + PLAYER.w / 2 && Math.abs(oil.y - py) < OIL_R + PLAYER.h / 2){
       hitOil(sim, oil, ev);
       sim.oils.splice(i,1);
     }
   }
+
+  /* --- v16.1 신규 함정 4종: 이동·피격 판정 --- */
+  updateTraps(sim, dt, ev);
 
   /* --- v6.0: 돌발 미션 --- */
   updateMission(sim, dt, ev);
@@ -4579,8 +4864,9 @@ function update(sim, dt){
     /* 👻 유령 모드: 차체를 그대로 통과한다 (사고 없음) */
     if (contact && ghostOn) continue;
     if (!sim.god && contact){
-      /* 착지 보호(safeT): 잠깐 어떤 충돌도 통과 */
-      if ((sim.safeT || 0) > 0) continue;
+      /* 착지 보호(safeT) · 실드 방어/워프 착지 무적(invuln): 잠깐 어떤 충돌도 통과
+         (예전엔 invuln 을 주기만 하고 검사하지 않아 연속 꼬깔에서 바로 죽었다) */
+      if ((sim.safeT || 0) > 0 || (sim.invuln || 0) > 0) continue;
       /* 🪙 피버 타임(+종료 직후 여백): 동전만 쏟아지는 구간 — 장애물에 부딪혀 죽지 않는다 */
       if (fSafe) continue;
       /* 어떤 차량도 꼬깔콘을 무시하거나 분쇄하지 못한다 (단, 무적 범퍼는 예외) */
@@ -5891,6 +6177,55 @@ function drawVehicle(ctx, o){
     return;
   }
 
+  /* ---------------- v16.1 폭주 오토바이 ---------------- */
+  if (kind === 'moto'){
+    /* 앞뒤 바퀴 (슬림) */
+    ctx.fillStyle = '#101318';
+    rr(ctx, -w*0.11, h*0.24, w*0.22, h*0.24, w*0.10); ctx.fill();
+    rr(ctx, -w*0.10, -h*0.50, w*0.20, h*0.22, w*0.09); ctx.fill();
+    /* 바퀴 테두리 하이라이트 */
+    ctx.strokeStyle = 'rgba(180,190,205,0.55)'; ctx.lineWidth = 1.6;
+    rr(ctx, -w*0.11, h*0.24, w*0.22, h*0.24, w*0.10); ctx.stroke();
+    rr(ctx, -w*0.10, -h*0.50, w*0.20, h*0.22, w*0.09); ctx.stroke();
+
+    /* 프레임 · 연료탱크 */
+    const bg = cachedGrad('veh|moto|body', function(){
+      const gg = ctx.createLinearGradient(-w/2, 0, w/2, 0);
+      gg.addColorStop(0, '#a33a00'); gg.addColorStop(0.42, '#ff7a1f'); gg.addColorStop(1, '#a33a00');
+      return gg;
+    });
+    ctx.fillStyle = bg;
+    rr(ctx, -w*0.20, -h*0.28, w*0.40, h*0.50, w*0.16); ctx.fill();
+    /* 시트 */
+    ctx.fillStyle = '#1b1f26';
+    rr(ctx, -w*0.17, h*0.02, w*0.34, h*0.20, w*0.10); ctx.fill();
+
+    /* 핸들바 */
+    ctx.fillStyle = '#22262e';
+    rr(ctx, -w*0.46, -h*0.36, w*0.92, h*0.05, 3); ctx.fill();
+    ctx.fillStyle = '#0e1116';
+    rr(ctx, -w*0.50, -h*0.375, w*0.12, h*0.08, 3); ctx.fill();
+    rr(ctx, w*0.38, -h*0.375, w*0.12, h*0.08, 3); ctx.fill();
+
+    /* 라이더 헬멧 · 등 */
+    ctx.fillStyle = '#2a323d';
+    rr(ctx, -w*0.19, -h*0.12, w*0.38, h*0.18, w*0.09); ctx.fill();
+    ctx.fillStyle = '#f4f8ff';
+    ctx.beginPath(); ctx.arc(0, -h*0.16, w*0.15, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(18,28,44,0.92)';
+    rr(ctx, -w*0.13, -h*0.22, w*0.26, h*0.055, 3); ctx.fill();
+    /* 헬멧 손잡이 줄 */
+    ctx.strokeStyle = 'rgba(255,122,31,0.9)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(-w*0.10, -h*0.09); ctx.lineTo(w*0.10, -h*0.09); ctx.stroke();
+
+    /* 휠리 스모크 · 등화 */
+    ctx.fillStyle = 'rgba(255,252,230,0.98)';
+    rr(ctx, -w*0.09, -h*0.50, w*0.18, h*0.035, 2); ctx.fill();
+    ctx.fillStyle = brake ? '#ff2a2a' : '#d41f2e';
+    rr(ctx, -w*0.10, h*0.46, w*0.20, h*0.04, 2); ctx.fill();
+    return;
+  }
+
   /* ---------------- 블랙 리무진 ---------------- */
   if (kind === 'limo'){
     const bg = cachedGrad('veh|limo|body', function(){
@@ -6147,7 +6482,14 @@ function drawExhaust(ctx, w, h, t, boost, pipes){
 
 /* ---------- 내 차 ---------- */
 function drawPlayer(ctx, sim, now){
-  const x = playerX(sim), y = playerY(sim);
+  /* 🛞 타이어 펑크: 차체가 좌우·상하로 덜컹거린다 */
+  let jx = 0, jy = 0;
+  if ((sim.flatT || 0) > 0){
+    const k = Math.min(1, sim.flatT / 0.4);
+    jx = (Math.sin(now * 47.3) * 4.2 + Math.sin(now * 81.7) * 2.1) * k;
+    jy = Math.sin(now * 63.1) * 3.4 * k;
+  }
+  const x = playerX(sim) + jx, y = playerY(sim) + jy;
   const ghostOn = (sim.ghostT || 0) > 0;
   const spec = sim.spec || carSpec(sim.car);
   const tilt = clamp(-(sim.laneVel || 0) * 0.16 * (1 + 0.3 * (spec.laneHeavy || 0)), -0.4, 0.4);
@@ -6745,7 +7087,8 @@ function drawStreaks(ctx, sim){
 
 const ITEM_GLOW = { shield:'111,201,255', nitro:'255,140,66',
   magnet:'255,123,213', mystery:'201,167,255',
-  bumper:'255,163,61', ghost:'184,168,255', clear:'255,122,77', fever:'255,207,61' };
+  bumper:'255,163,61', ghost:'184,168,255', clear:'255,122,77', fever:'255,207,61',
+  warp:'143,208,255', dist2x:'125,255,192', catchup:'255,159,67', bullet:'138,215,255' };
 
 /* ---------- 도로 위 아이템 (반짝이는 아이콘) ---------- */
 function drawItems(ctx, sim){
@@ -6798,6 +7141,129 @@ function drawItems(ctx, sim){
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(def.emoji, 0, 1);
+    }
+    ctx.restore();
+  }
+}
+
+/* ---------- v16.1 신규 함정 4종 — 도로에 깔린 방해물 ---------- */
+const TRAP_STYLE = {
+  pothole: { ring:'255,159,67', fill:'rgba(14,10,6,0.86)' },
+  pigeon:  { ring:'210,222,236', fill:'rgba(30,34,40,0.74)' },
+  alert:   { ring:'255,209,46', fill:'rgba(26,22,10,0.86)' },
+  flat:    { ring:'176,183,195', fill:'rgba(16,18,24,0.86)' }
+};
+function drawRoadTraps(ctx, sim){
+  const list = sim.traps || [];
+  const H = sim.worldH || 1422;
+  for (let i=0;i<list.length;i++){
+    const tr = list[i];
+    if (tr.y < -140 || tr.y > H + 140) continue;
+    const def = itemDef(tr.type);
+    const st = TRAP_STYLE[tr.type] || TRAP_STYLE.pothole;
+    const pulse = 0.55 + 0.45 * Math.abs(Math.sin(tr.t * 4.6 + i));
+    ctx.save();
+    ctx.translate(tr.x, tr.y);
+    /* 빨간 점선 경고 테 — 함정임을 한눈에 */
+    ctx.strokeStyle = 'rgba(255,59,71,' + (0.34 + 0.34 * pulse).toFixed(3) + ')';
+    ctx.lineWidth = 3;
+    if (ctx.setLineDash) ctx.setLineDash([8, 7]);
+    ctx.beginPath(); ctx.arc(0, 0, TRAP_R + 4, 0, 7); ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    ctx.fillStyle = st.fill;
+    ctx.beginPath(); ctx.ellipse(0, 0, TRAP_R, TRAP_R * 0.76, 0, 0, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(' + st.ring + ',' + (0.72 + 0.28 * pulse).toFixed(3) + ')';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, 0, TRAP_R - 4, 0, 7); ctx.stroke();
+    ctx.font = '700 30px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(def.emoji, 0, 1);
+    ctx.restore();
+  }
+}
+
+/* ---------- v16.1 함정 연출: 🐦 비둘기 얼룩 · 📱 가짜 재난문자 · 상단 경고 ---------- */
+/* 비둘기 깃털·얼룩 좌표 (화면 비율) — 프레임마다 같게 고정해 깜박이지 않게 한다 */
+const PIGEON_SPLATS = [
+  { x:0.50, y:0.34, r:76, c:'236,241,248', a:0.30 },
+  { x:0.42, y:0.27, r:40, c:'255,255,255', a:0.26 },
+  { x:0.59, y:0.28, r:30, c:'206,214,224', a:0.30 },
+  { x:0.36, y:0.42, r:26, c:'255,255,255', a:0.22 },
+  { x:0.64, y:0.43, r:33, c:'228,233,240', a:0.26 },
+  { x:0.50, y:0.50, r:46, c:'248,250,255', a:0.20 },
+  { x:0.47, y:0.62, r:22, c:'214,221,231', a:0.24 },
+  { x:0.55, y:0.20, r:18, c:'255,255,255', a:0.20 }
+];
+function drawTrapOverlay(ctx, sim){
+  if (!sim || sim.state === 'title') return;
+  const W = WORLD_W, H = sim.worldH || 1422;
+  /* 🐦 비둘기 테러 — 앞유리에 묻은 얼룩이 중앙 시야를 가린다 */
+  if ((sim.pigeonT || 0) > 0){
+    const k = Math.min(1, sim.pigeonT / 0.35);
+    ctx.save();
+    ctx.globalAlpha = 0.92 * k;
+    for (let i=0;i<PIGEON_SPLATS.length;i++){
+      const sp = PIGEON_SPLATS[i];
+      ctx.fillStyle = 'rgba(' + sp.c + ',' + sp.a.toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.ellipse(W * sp.x, H * sp.y, sp.r, sp.r * 0.72, 0.2 * i, 0, 7);
+      ctx.fill();
+    }
+    /* 작은 깃털 획 */
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 2;
+    for (let i=0;i<4;i++){
+      const bx = W * (0.34 + i * 0.09), by = H * 0.36 + Math.sin(i * 2.1) * 50;
+      ctx.beginPath(); ctx.moveTo(bx - 16, by - 8); ctx.lineTo(bx + 16, by + 8); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  /* 📱 가짜 재난문자 — 화면 중앙 병맛 알림 배너 */
+  if ((sim.alertT || 0) > 0){
+    const k = Math.min(1, sim.alertT / 0.25);
+    const bw = Math.min(W - 80, 660), bh = 176;
+    const bx = (W - bw) / 2, by = H * 0.42 - bh / 2;
+    ctx.save();
+    ctx.globalAlpha = 0.95 * k;
+    ctx.fillStyle = 'rgba(10,14,22,0.94)';
+    rr(ctx, bx, by, bw, bh, 18); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,209,46,0.9)';
+    ctx.lineWidth = 3;
+    rr(ctx, bx, by, bw, bh, 18); ctx.stroke();
+    ctx.fillStyle = '#ffd12e';
+    ctx.font = '900 26px system-ui,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('📱 긴급재난문자', bx + 26, by + 42);
+    ctx.fillStyle = '#eaf2ff';
+    ctx.font = '700 24px system-ui,sans-serif';
+    const msg = sim.alertMsg || ALERT_MSGS[0];
+    ctx.fillText(msg.length > 30 ? msg.slice(0, 30) + '…' : msg, bx + 26, by + 96);
+    ctx.fillStyle = 'rgba(255,209,46,0.7)';
+    ctx.font = '600 18px system-ui,sans-serif';
+    ctx.fillText('확인', bx + bw - 70, by + bh - 30);
+    ctx.restore();
+  }
+  /* 🚧 핸들 반전 · 🛞 펑크 — 화면 상단 경고줄 */
+  const warns = trapWarnList(sim);
+  if (warns.length){
+    ctx.save();
+    ctx.font = '900 22px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (let i=0;i<warns.length;i++){
+      const wn = warns[i];
+      const label = wn.emoji + ' ' + wn.text + ' ' + wn.sec.toFixed(1) + 's';
+      const wid = (ctx.measureText ? ctx.measureText(label).width : label.length * 11) + 34;
+      const x = (W - wid) / 2, y = 86 + i * 46;
+      ctx.fillStyle = 'rgba(8,12,20,0.82)';
+      rr(ctx, x, y, wid, 36, 18); ctx.fill();
+      ctx.strokeStyle = hexRgba(wn.color, 0.9);
+      ctx.lineWidth = 2;
+      rr(ctx, x, y, wid, 36, 18); ctx.stroke();
+      ctx.fillStyle = wn.color;
+      ctx.fillText(label, W / 2, y + 19);
     }
     ctx.restore();
   }
@@ -7449,6 +7915,7 @@ function drawSim(ctx, sim, now){
     if (ghostsVisible(sim)) drawGhosts(ctx, sim, { tags: !overChill });
     drawOils(ctx, sim);
     drawCameras(ctx, sim);
+    drawRoadTraps(ctx, sim);
     drawMissionCaps(ctx, sim);
     drawItems(ctx, sim);
     drawCoins(ctx, sim);
@@ -7483,6 +7950,7 @@ function drawSim(ctx, sim, now){
   drawSpeedFlash(ctx, sim);
   drawEdgePulse(ctx, sim);
   drawFeverFx(ctx, sim);
+  drawTrapOverlay(ctx, sim);
   drawWarnings(ctx, sim);
   drawCrashOverlay(ctx, sim);
   ctx.restore();
@@ -7629,7 +8097,8 @@ const Sfx = (function(){
     scooter:   { base:88, mult:0.190, wave:'square',   filter:2.6 },
     limo:      { base:44, mult:0.118, wave:'triangle', filter:1.1 },
     foodtruck: { base:40, mult:0.116, wave:'square',   filter:0.85 },
-    drift:     { base:62, mult:0.164, wave:'sawtooth', filter:2.1 }
+    drift:     { base:62, mult:0.164, wave:'sawtooth', filter:2.1 },
+    moto:      { base:96, mult:0.205, wave:'sawtooth', filter:2.8 }
   };
 
   function ensure(){
@@ -7839,6 +8308,11 @@ const Sfx = (function(){
         /* 드리프트카: 짧게 치솟는 배기음 경적 */
         tone(392, 0.08, 'sawtooth', 0.055, 784, 0);
         tone(523, 0.13, 'sawtooth', 0.05, 1046, 0.09);
+      } else if (kind === 'moto'){
+        /* 폭주 오토바이: 고회전 두 번 끊는 엔진 경적 */
+        tone(620, 0.10, 'sawtooth', 0.07, 1180, 0);
+        tone(1180, 0.09, 'sawtooth', 0.05, 700, 0.10);
+        tone(620, 0.12, 'sawtooth', 0.065, 1320, 0.20);
       } else {
         tone(523, 0.12, 'square', 0.07, null, 0);
         tone(659, 0.12, 'square', 0.06, null, 0);
@@ -7955,6 +8429,30 @@ const Sfx = (function(){
       tone(1046, 0.20, 'triangle', 0.045, null, 0.40);
     },
     coin: function(){ tone(1568, 0.05, 'triangle', 0.03, 2093, 0); },
+    /* v16.1: 신규 아이템·함정 전용 효과음 */
+    warp: function(){
+      tone(220, 0.24, 'sawtooth', 0.09, 1600, 0);
+      noise(0.34, 0.12, 1200, 5200, 'bandpass');
+      tone(1760, 0.18, 'triangle', 0.05, null, 0.07);
+    },
+    dist2x: function(){
+      tone(784, 0.09, 'square', 0.06, null, 0);
+      tone(1046, 0.09, 'square', 0.055, null, 0.08);
+      tone(1568, 0.16, 'triangle', 0.05, null, 0.16);
+    },
+    catchup: function(){
+      tone(320, 0.30, 'sawtooth', 0.08, 780, 0);
+      noise(0.40, 0.09, 900, 3200, 'bandpass');
+    },
+    bullet: function(){
+      tone(1600, 0.10, 'sine', 0.05, 420, 0);
+      tone(900, 0.18, 'triangle', 0.045, 300, 0.08);
+      noise(0.28, 0.05, 5200, 900, 'bandpass');
+    },
+    trap: function(){
+      tone(180, 0.16, 'square', 0.07, 120, 0);
+      noise(0.22, 0.10, 900, 260, 'lowpass');
+    },
     mission: function(){
       tone(587, 0.11, 'square', 0.06, null, 0);
       tone(784, 0.11, 'square', 0.06, null, 0.1);
@@ -8316,6 +8814,18 @@ const API = {
   WX_TYPES: WX_TYPES, ITEM_TYPES: ITEM_TYPES, MISSION_DEFS: MISSION_DEFS,
   ITEM_R: ITEM_R, ITEM_TYPES: ITEM_TYPES, ITEM_CATALOG: ITEM_CATALOG, ITEM_SPAWN_POOL: ITEM_SPAWN_POOL,
   MYSTERY: MYSTERY, GOOD_IDS: GOOD_IDS, TRAP_TYPES: TRAP_TYPES, isTrapItem: isTrapItem,
+  /* v16.1: 신규 함정 4종 · 아이템 3종 */
+  TRAP_IDS: TRAP_IDS, TRAP_R: TRAP_R, TRAP_SPAWN_POOL: TRAP_SPAWN_POOL,
+  TRAP_FIRST: TRAP_FIRST, TRAP_CD_MIN: TRAP_CD_MIN, TRAP_CD_MAX: TRAP_CD_MAX,
+  POTHOLE: POTHOLE, PIGEON: PIGEON, ALERT: ALERT, FLAT: FLAT, ALERT_MSGS: ALERT_MSGS,
+  applyTrap: applyTrap, trapDur: trapDur, spawnRoadTrap: spawnRoadTrap, hitRoadTrap: hitRoadTrap,
+  spawnAnyTrap: spawnAnyTrap, updateTraps: updateTraps, trapWarnList: trapWarnList,
+  drawRoadTraps: drawRoadTraps, drawTrapOverlay: drawTrapOverlay, PIGEON_SPLATS: PIGEON_SPLATS,
+  WARP_KM: WARP_KM, WARP_INVULN: WARP_INVULN, DIST2X_MUL: DIST2X_MUL,
+  CATCHUP_BASE: CATCHUP_BASE, CATCHUP_MAX: CATCHUP_MAX, CATCHUP_PER_KM: CATCHUP_PER_KM,
+  FEVER_SPEED_MUL: FEVER_SPEED_MUL, FEVER_DIST_MUL: FEVER_DIST_MUL, FEVER_COIN_KM: FEVER_COIN_KM,
+  BULLET_SLOW: BULLET_SLOW, BULLET_DIST_MUL: BULLET_DIST_MUL,
+  warpJump: warpJump, leaderGapKm: leaderGapKm, catchupMul: catchupMul,
   itemDef: itemDef, spawnItem: spawnItem, itemPickup: itemPickup, applyItemEffect: applyItemEffect, grantShield: grantShield,
   OIL: OIL, OIL_R: OIL_R, OIL_FIRST: OIL_FIRST, OIL_CD_MIN: OIL_CD_MIN, OIL_CD_MAX: OIL_CD_MAX,
   spawnOil: spawnOil, hitOil: hitOil, oilWobbleAmp: oilWobbleAmp, oilLabel: oilLabel,
@@ -9573,6 +10083,10 @@ if (typeof document !== 'undefined'){
           else if (e.item.id === 'ghost'){ Sfx.ghost(); Haptics.buzz([14, 26]); }
           else if (e.item.id === 'clear'){ Sfx.clearWave(); Haptics.buzz([40, 30, 60]); }
           else if (e.item.id === 'fever'){ Sfx.fever(); Haptics.buzz([16, 22, 16, 22, 30]); }
+          else if (e.item.id === 'warp'){ Sfx.warp(); Haptics.buzz([20, 26, 20, 26, 40]); }
+          else if (e.item.id === 'dist2x'){ Sfx.dist2x(); Haptics.buzz([18, 24, 34]); }
+          else if (e.item.id === 'catchup'){ Sfx.catchup(); Haptics.buzz([26, 30, 46]); }
+          else if (e.item.id === 'bullet'){ Sfx.bullet(); Haptics.buzz([20, 24, 30]); }
           else { Sfx.itemBig(); Haptics.buzz([16, 22, 34]); }
           pop(e.item.emoji + ' ' + e.item.label + '!', e.x, e.y, e.item.color, 26);
           if (e.item.id === 'nitro') toast('🔥 스피드업 · ' + itemDef('nitro').dur + '초 무적 광속 돌진');
@@ -9580,8 +10094,25 @@ if (typeof document !== 'undefined'){
           else if (e.item.id === 'bumper') toast('🛡️ 무적 범퍼 · ' + itemDef('bumper').dur + '초 충돌 무적 · 앞차 튕기기');
           else if (e.item.id === 'ghost') toast('👻 유령 모드 · ' + itemDef('ghost').dur + '초 차·꼬깔 통과');
           else if (e.item.id === 'clear') toast('💥 전방 올클리어 · 앞차를 모조리 정리');
-          else if (e.item.id === 'fever') toast('🪙 피버 타임 · ' + itemDef('fever').dur + '초 무적 동전 밭');
+          else if (e.item.id === 'fever') toast('🪙 피버 타임 · ' + itemDef('fever').dur + '초 무적 동전 밭 · 키로수 1.5배');
+          else if (e.item.id === 'warp') toast('🚀 워프 점프 · ' + WARP_KM + 'km 순간이동 · 착지 ' + WARP_INVULN + '초 무적');
+          else if (e.item.id === 'dist2x') toast('⛽ 거리 2배 · ' + itemDef('dist2x').dur + '초 주행 거리 2배');
+          else if (e.item.id === 'catchup') toast('🏎️ 1등 추격 · ' + itemDef('catchup').dur + '초 격차만큼 최대 1.75배');
+          else if (e.item.id === 'bullet') toast('⏱️ 블릿 타임 · ' + itemDef('bullet').dur + '초 세상이 느려지고 거리 1.4배');
           else toast('🛡️ 실드 장착 · 충돌 1회 방어');
+        } else if (e.type === 'warp'){
+          Haptics.buzz([18, 26, 46]);
+          pop('🚀 워프 +' + e.km + 'km!', playerX(sim), playerY(sim) - 120, '#bfe8ff', 30);
+          sim.shake = Math.max(sim.shake || 0, 0.6);
+        } else if (e.type === 'trapHit'){
+          Sfx.trap();
+          Haptics.buzz([40, 26, 46]);
+          sim.shake = Math.max(sim.shake || 0, 0.5);
+          toast((e.trap.impactEmoji || e.trap.emoji) + ' ' + e.trap.label + '! ' + e.dur.toFixed(1) + '초');
+        } else if (e.type === 'trapBlock'){
+          Sfx.shield();
+          Haptics.buzz(30);
+          pop('🛡️ ' + e.trap.label + ' 방어!', playerX(sim), playerY(sim) - 90, '#9fe8ff', 24);
         } else if (e.type === 'bumperSmash'){
           Haptics.buzz(20);
           pop('+' + e.gain + (e.cone ? ' 꼬깔 날렸다!' : ' 범퍼 강타!'), e.x, e.y - 26, '#ffb066', 22);
@@ -9592,7 +10123,9 @@ if (typeof document !== 'undefined'){
         } else if (e.type === 'coin'){
           if (e.total <= 3 || e.total % 6 === 0) Sfx.coin();
           /* 코인이 초당 수십 개라 매번 띄우면 시끄럽다 — 4개마다 한 번만 */
-          if (e.total <= 3 || e.total % 4 === 0) pop('+' + e.gain, e.x, e.y - 12, '#ffe07a', 20);
+          if (e.total <= 3 || e.total % 4 === 0){
+            pop('+' + e.gain + (e.km ? ' · +' + e.km.toFixed(2) + 'km' : ''), e.x, e.y - 12, '#ffe07a', 20);
+          }
         } else if (e.type === 'shield'){
           Haptics.buzz(40);
           Sfx.shield();
