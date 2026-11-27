@@ -1012,15 +1012,15 @@ function musicStep(song, step, time) {
 
   /* ---- 하이햇 ---- */
   if (I <= 0) {
-    if (s === 2 || s === 6 || s === 10 || s === 14) iHat(time, 0.10, false);
+    if (s === 2 || s === 6 || s === 10 || s === 14) iHat(time, 0.075, false);
   } else if (I === 1) {
-    if (s % 2 === 0) iHat(time, 0.10, false);
+    if (s % 2 === 0) iHat(time, 0.075, false);
   } else if (I === 2) {
-    if (s % 2 === 0) iHat(time, 0.12, false);
-    else if (s === 3 || s === 7 || s === 11 || s === 15) iHat(time, 0.07, false);
+    if (s % 2 === 0) iHat(time, 0.085, false);
+    else if (s === 3 || s === 7 || s === 11 || s === 15) iHat(time, 0.05, false);
   } else {
-    iHat(time, (s % 2 === 0) ? 0.13 : 0.08, false);
-    if (s === 6 || s === 14) iHat(time, 0.09, true);
+    iHat(time, (s % 2 === 0) ? 0.095 : 0.055, false);
+    if (s === 6 || s === 14) iHat(time, 0.07, true);
   }
 
   /* ---- 베이스 ---- */
@@ -1049,11 +1049,11 @@ function musicStep(song, step, time) {
     if (s === 15 && bar % 4 !== 3) leadOn = false;
   }
   if (leadOn) {
-    iLead(time, chordTone(ch, li), ldur, I >= 3 ? 0.085 : 0.075, lkind);
+    iLead(time, chordTone(ch, li), ldur, I >= 3 ? 0.115 : 0.105, lkind);
   }
 
   /* ---- 코드 스탭 ---- */
-  if (I >= 2 && (s === 2 || s === 10)) iStab(time, ch.root, ch.tri, sd * 1.2, 0.07);
+  if (I >= 2 && (s === 2 || s === 10)) iStab(time, ch.root, ch.tri, sd * 1.2, 0.085);
 
   /* ---- 패드 ---- */
   if (s === 0 && bar % 2 === 0) iPad(time, ch.root, ch.tri, sd * 32, I <= 1 ? 0.05 : 0.038);
@@ -1061,7 +1061,7 @@ function musicStep(song, step, time) {
   /* ---- 섹션 전환 FX ---- */
   if (s === 0) {
     var prevI = bar > 0 ? (song.intensity[bar - 1] || 0) : 0;
-    if (bar === 0) iCrash(time, 0.20);
+    if (bar === 0) iCrash(time, 0.16);
     else if (I >= 3 && prevI < 3) iCrash(time, 0.26);
     else if (I > prevI + 1) iCrash(time, 0.18);
     var nextI = (bar + 1 < song.intensity.length) ? song.intensity[bar + 1] : 0;
@@ -2142,7 +2142,7 @@ window.PUMP = {
   G: G, SETTINGS: SETTINGS, SONGS: SONGS, BEST: BEST,
   startSong: startSong, press: press, release: release, pauseGame: pauseGame, resumeGame: resumeGame,
   finishSong: finishSong, goSelect: goSelect, goTitle: goTitle, layout: layout,
-  songNow: songNow, MUSIC: MUSIC, AUDIO: AUDIO, judgeKey: judgeKey,
+  songNow: songNow, MUSIC: MUSIC, AUDIO: AUDIO, judgeKey: judgeKey, musicStep: musicStep,
   hitNote: hitNote, buildChart: buildChart
 };
 
