@@ -2061,31 +2061,38 @@ function drawReceptors(t) {
   for (var i = 0; i < 5; i++) {
     var col = PAD[i].c1;
     var x = LX[i], y = LY[i];
-    var s = LNOTE * 0.50;
     var on = G.pressed[i];
+    var R = LNOTE * 0.54;
     C.save();
-    if (on) { C.shadowColor = col; C.shadowBlur = 22; }
-    shapePath(i, x, y, s * (1 + pulse * 0.05 + (on ? 0.08 : 0)));
-    C.lineWidth = on ? 3 : 2.2;
-    C.strokeStyle = on ? '#ffffff' : hexA(col, 0.62 + pulse * 0.25);
-    C.fillStyle = on ? hexA(col, 0.55) : hexA(col, 0.07);
+    /* 수용구 = 버튼처럼 생긴 '홈' */
+    C.beginPath();
+    C.arc(x, y, R, 0, Math.PI * 2);
+    C.fillStyle = on ? hexA(col, 0.55) : 'rgba(5,7,13,.74)';
     C.fill();
+    if (on) { C.shadowColor = col; C.shadowBlur = 22; }
+    C.lineWidth = on ? 2.8 : 1.8;
+    C.strokeStyle = on ? '#ffffff' : hexA(col, 0.55 + pulse * 0.30);
     C.stroke();
+    C.shadowBlur = 0;
+    /* 홈 안에 인쇄된 화살표 */
+    C.globalAlpha = on ? 0.95 : 0.62;
+    if (i === 2) {
+      C.beginPath();
+      C.arc(x, y, R * 0.52, 0, Math.PI * 2);
+      C.lineWidth = 2.4;
+      C.strokeStyle = col;
+      C.stroke();
+      C.beginPath();
+      C.arc(x, y, R * 0.18, 0, Math.PI * 2);
+      C.fillStyle = col;
+      C.fill();
+    } else {
+      shapePath(i, x, y, R * 0.62);
+      C.fillStyle = col;
+      C.fill();
+    }
     C.restore();
   }
-  /* 판정선 */
-  C.strokeStyle = 'rgba(140,190,255,.10)';
-  C.lineWidth = 1;
-  C.beginPath();
-  C.moveTo(LX[0] - LNOTE * 0.6, LY[0]);
-  C.lineTo(LX[1] - LNOTE * 0.6, LY[1]);
-  C.moveTo(LX[1] + LNOTE * 0.6, LY[1]);
-  C.lineTo(LX[2] - LNOTE * 0.6, LY[2]);
-  C.moveTo(LX[2] + LNOTE * 0.6, LY[2]);
-  C.lineTo(LX[3] - LNOTE * 0.6, LY[3]);
-  C.moveTo(LX[3] + LNOTE * 0.6, LY[3]);
-  C.lineTo(LX[4] - LNOTE * 0.6, LY[4]);
-  C.stroke();
 }
 
 function drawRings() {
@@ -2238,8 +2245,8 @@ function draw() {
   if (!G.chart || !G.song) { drawVignette(); return; }
   drawBeats(t);
   drawRails(t);
-  drawNotes(t);
   drawReceptors(t);
+  drawNotes(t);
   drawRings();
   drawJudge();
   drawCombo();
