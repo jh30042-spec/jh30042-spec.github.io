@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="busan-build" content="v16.1">
+<meta name="busan-build" content="v16.2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -818,7 +818,7 @@
       <div class="ig new"><b>🪙</b><em>피버 타임</em><span>10초 무적 동전 밭·키로수</span></div>
       <div class="ig new"><b>🚀</b><em>워프 점프</em><span>즉시 +6km·착지 무적</span></div>
       <div class="ig new"><b>⛽</b><em>거리 2배</em><span>10초 주행 거리 2배</span></div>
-      <div class="ig new"><b>🏎️</b><em>1등 추격</em><span>10초 최대 1.75배</span></div>
+      <div class="ig new"><b>🏎️</b><em>1등 추격</em><span>10초 무적·최대 1.75배</span></div>
       <div class="ig new"><b>⏱️</b><em>블릿 타임</em><span>10초 세상 0.55배</span></div>
       <div class="ig fx"><b>🎲</b><em>랜덤 박스</em><span>좋은 것/함정 랜덤</span></div>
       <div class="ig bad"><b>📸</b><em>과속카메라</em><span>3.5초 80km/h</span></div>
@@ -1016,7 +1016,7 @@ const ITEM_TYPES = [
   /* --- v16.1 신규 3종 --- */
   { id:'warp',    emoji:'🚀', color:'#8fd0ff', label:'워프 점프',  dur:0, impact:'워프 점프!',    impactEmoji:'🚀', impactColor:'#bfe8ff', hint:'즉시 +6km 순간이동' },
   { id:'dist2x',  emoji:'⛽', color:'#7dffc0', label:'거리 2배',   dur:ITEM_DUR, impact:'거리 2배!',      impactEmoji:'⛽', impactColor:'#a8ffd4', hint:'10초 주행 거리 2배' },
-  { id:'catchup', emoji:'🏎️', color:'#ff9f43', label:'1등 추격',  dur:ITEM_DUR, impact:'1등 추격!',      impactEmoji:'🏎️', impactColor:'#ffc06b', hint:'10초 격차만큼 최대 1.75배' },
+  { id:'catchup', emoji:'🏎️', color:'#ff9f43', label:'1등 추격',  dur:ITEM_DUR, impact:'1등 추격!',      impactEmoji:'🏎️', impactColor:'#ffc06b', hint:'10초 무적·격차만큼 최대 1.75배' },
   { id:'bullet',  emoji:'⏱️', color:'#8ad7ff', label:'블릿 타임',  dur:ITEM_DUR, impact:'블릿 타임!',     impactEmoji:'⏱️', impactColor:'#bfeaff', hint:'10초 세상이 0.55배·거리 1.4배' }
 ];
 /* 랜덤 박스: 좋은 아이템 10종 + 함정 6종 중 하나가 무작위로 터진다 */
@@ -1101,6 +1101,9 @@ const DIST2X_MUL = 2;                   // 거리 2배 부스터 배율
 const CATCHUP_BASE = 1.25;              // 1등 추격 최소 배율 (격차 0)
 const CATCHUP_MAX = 1.75;               // 1등 추격 최대 배율
 const CATCHUP_PER_KM = 0.05;            // 격차 1km당 추가 배율
+/* v16.2: 🏎️ 1등 추격 = 10초 완전 무적. 발동 중에는 최고 1.75배로 달리므로
+   앞차·꼬깔·함정을 그대로 통과하고, 끝나는 순간 1초 착지 보호를 남긴다. */
+const CATCHUP_INVULN_AFTER = 1.0;       // 추격 종료 직후 착지 보호(초)
 const BULLET_SLOW = 0.55;               // ⏱️ 블릿 타임: 도로 스크롤·접근 속도 배율
 const BULLET_DIST_MUL = 1.4;            // ⏱️ 블릿 타임: 내 거리 획득 배율
 const IMPACT_LIFE = 1.15;               // 화면 중앙 임팩트 팝업 수명(초)
@@ -2853,6 +2856,7 @@ function applyItemEffect(sim, typeId, ev){
   } else if (typeId === 'dist2x'){
     sim.dist2xT = Math.max(sim.dist2xT || 0, dur);
   } else if (typeId === 'catchup'){
+    /* v16.2: 발동 중 10초는 완전 무적 (catchupSafe) — 차·꼬깔·함정·단속 전부 통과 */
     sim.catchupT = Math.max(sim.catchupT || 0, dur);
   } else if (typeId === 'bullet'){
     sim.bulletT = Math.max(sim.bulletT || 0, dur);
@@ -2988,8 +2992,8 @@ function spawnCamera(sim, opts){
 }
 function hitCamera(sim, cam, ev){
   const evs = ev || [];
-  /* 무적(실드 방어·워프 착지) 중에는 함정도 그대로 지나간다 */
-  if ((sim.invuln || 0) > 0) return 'immune';
+  /* 무적(실드 방어·워프 착지·1등 추격) 중에는 함정도 그대로 지나간다 */
+  if ((sim.invuln || 0) > 0 || catchupSafe(sim)) return 'immune';
   if ((sim.shield || 0) > 0){
     sim.shield -= 1;
     sim.camBlocks = (sim.camBlocks || 0) + 1;
@@ -3055,7 +3059,7 @@ function spawnOil(sim, opts){
 }
 function hitOil(sim, oil, ev){
   const evs = ev || [];
-  if ((sim.invuln || 0) > 0) return 'immune';
+  if ((sim.invuln || 0) > 0 || catchupSafe(sim)) return 'immune';
   if ((sim.shield || 0) > 0){
     sim.shield -= 1;
     sim.oilBlocks = (sim.oilBlocks || 0) + 1;
@@ -3092,6 +3096,8 @@ function trapDur(sim, def){
 function applyTrap(sim, typeId, ev){
   const def = itemDef(typeId);
   const evs = ev || [];
+  /* v16.2: 1등 추격 무적 중엔 함정 효과도 통째로 무시 (랜덤 박스에서 나와도) */
+  if (catchupSafe(sim)) return null;
   const dur = trapDur(sim, def);
   if (typeId === POTHOLE.id){
     sim.invertT = Math.max(sim.invertT || 0, dur);
@@ -3142,6 +3148,7 @@ function spawnRoadTrap(sim, typeId, opts){
 function hitRoadTrap(sim, tr, ev){
   const evs = ev || [];
   const def = itemDef(tr.type);
+  if ((sim.invuln || 0) > 0 || catchupSafe(sim)) return 'immune';
   if ((sim.shield || 0) > 0){
     sim.shield -= 1;
     sim.trapBlocks = (sim.trapBlocks || 0) + 1;
@@ -3179,7 +3186,7 @@ function updateTraps(sim, dt, ev){
     tr.t += dt;
     tr.y += sim.speed * SPD_SCALE * dt * ((sim.bulletT || 0) > 0 ? BULLET_SLOW : 1);
     if (tr.y > (sim.worldH || 1422) + 160){ list.splice(i,1); continue; }
-    if (ghostOn || safe || (sim.invuln || 0) > 0) continue;
+    if (ghostOn || safe || (sim.invuln || 0) > 0 || catchupSafe(sim)) continue;
     if (Math.abs(tr.x - px) < TRAP_R + PLAYER.w / 2 && Math.abs(tr.y - py) < TRAP_R + PLAYER.h / 2){
       hitRoadTrap(sim, tr, evs);
       list.splice(i,1);
@@ -3228,7 +3235,7 @@ function oilLabel(sim){
 const FX_BADGES = [
   { id:'fever',  emoji:'🪙', label:'피버',   key:'feverT',  color:'#ffcf3d' },
   { id:'dist2x', emoji:'⛽', label:'거리2배', key:'dist2xT', color:'#7dffc0' },
-  { id:'catchup',emoji:'🏎️', label:'추격',   key:'catchupT',color:'#ff9f43' },
+  { id:'catchup',emoji:'🏎️', label:'추격무적', key:'catchupT',color:'#ff9f43' },
   { id:'bullet', emoji:'⏱️', label:'블릿',   key:'bulletT', color:'#8ad7ff' },
   { id:'ghost',  emoji:'👻', label:'유령',   key:'ghostT',  color:'#b8a8ff' },
   { id:'bumper', emoji:'🛡️', label:'범퍼',   key:'bumperT', color:'#ffa33d' },
@@ -3401,6 +3408,10 @@ function leaderGapKm(sim){
 function catchupMul(gapKm){
   const g = Math.max(0, Number(gapKm) || 0);
   return clamp(CATCHUP_BASE + g * CATCHUP_PER_KM, CATCHUP_BASE, CATCHUP_MAX);
+}
+/* v16.2: 🏎️ 1등 추격 발동 중(10초)인가 — 이 동안은 어떤 충돌·함정도 통과한다 (완전 무적) */
+function catchupSafe(sim){
+  return !!sim && (sim.catchupT || 0) > 0;
 }
 /* --- v16.1: 🚀 워프 점프 — 즉시 6km 순간이동 + 착지 무적 1.5초 --- */
 function warpJump(sim, ev){
@@ -4469,7 +4480,12 @@ function update(sim, dt){
   sim.oilT = Math.max(0, (sim.oilT || 0) - dt);
   /* v16.1: 신규 아이템·함정 타이머 */
   sim.dist2xT = Math.max(0, (sim.dist2xT || 0) - dt);
-  sim.catchupT = Math.max(0, (sim.catchupT || 0) - dt);
+  /* v16.2: 추격이 끝나는 프레임에 1초 착지 보호 — 막 풀린 순간 코앞 차에 억울하게 죽지 않게 */
+  const prevCatchupT = sim.catchupT || 0;
+  sim.catchupT = Math.max(0, prevCatchupT - dt);
+  if (prevCatchupT > 0 && sim.catchupT <= 0){
+    sim.invuln = Math.max(sim.invuln || 0, CATCHUP_INVULN_AFTER);
+  }
   sim.bulletT = Math.max(0, (sim.bulletT || 0) - dt);
   sim.invertT = Math.max(0, (sim.invertT || 0) - dt);
   sim.pigeonT = Math.max(0, (sim.pigeonT || 0) - dt);
@@ -4674,14 +4690,14 @@ function update(sim, dt){
   /* 단속 중 감속은 억울하게 위험 게이지를 채우지 않는다 (80km/h 제한은 벌칙이 아니라 시간 제한) */
   const crawling = (sim.camT || 0) <= 0 && sim.speed < sim.maxSpeed * 0.55;
   /* 🪙 피버 중에 길이 텅 비었는데 '막혔다'고 위험 게이지가 차 사망하면 더 억울하다 — 감소만 한다 */
-  if (!fSafe && (stuck || crawling)) sim.danger = Math.min(1, sim.danger + dt * d.dangerRate * spec.danger);
+  if (!fSafe && !catchupSafe(sim) && (stuck || crawling)) sim.danger = Math.min(1, sim.danger + dt * d.dangerRate * spec.danger);
   else sim.danger = Math.max(0, sim.danger - dt * 0.70);
   if (sim.danger > sim.dangerMax) sim.dangerMax = sim.danger;
   if (blocker && sim.blockT > 2.0 && sim.combo > 0){
     sim.combo = 0; sim.comboT = 0;
     ev.push({ type:'comboEnd', blocked:true });
   }
-  if (sim.danger >= 1 && !sim.god && !fSafe){
+  if (sim.danger >= 1 && !sim.god && !fSafe && !catchupSafe(sim)){
     return ev.concat(endRun(sim, 'danger'));
   }
 
@@ -4822,7 +4838,7 @@ function update(sim, dt){
     cam.t += dt;
     cam.y += sim.speed * SPD_SCALE * dt * relK;
     if (cam.y > sim.worldH + 160){ sim.cams.splice(i,1); continue; }
-    if (!ghostOn && !fSafe && (sim.invuln || 0) <= 0 && Math.abs(cam.x - px) < CAMERA_R + PLAYER.w / 2 && Math.abs(cam.y - py) < CAMERA_R + PLAYER.h / 2){
+    if (!ghostOn && !fSafe && !catchupSafe(sim) && (sim.invuln || 0) <= 0 && Math.abs(cam.x - px) < CAMERA_R + PLAYER.w / 2 && Math.abs(cam.y - py) < CAMERA_R + PLAYER.h / 2){
       hitCamera(sim, cam, ev);
       sim.cams.splice(i,1);
     }
@@ -4836,7 +4852,7 @@ function update(sim, dt){
     oil.t += dt;
     oil.y += sim.speed * SPD_SCALE * dt * relK;
     if (oil.y > sim.worldH + 160){ sim.oils.splice(i,1); continue; }
-    if (!ghostOn && !fSafe && (sim.invuln || 0) <= 0 && Math.abs(oil.x - px) < OIL_R + PLAYER.w / 2 && Math.abs(oil.y - py) < OIL_R + PLAYER.h / 2){
+    if (!ghostOn && !fSafe && !catchupSafe(sim) && (sim.invuln || 0) <= 0 && Math.abs(oil.x - px) < OIL_R + PLAYER.w / 2 && Math.abs(oil.y - py) < OIL_R + PLAYER.h / 2){
       hitOil(sim, oil, ev);
       sim.oils.splice(i,1);
     }
@@ -4861,6 +4877,8 @@ function update(sim, dt){
     if (gap < o.minGap) o.minGap = gap;
 
     const contact = dx < (o.w + PLAYER.w) / 2 * HIT * spec.hitbox && dy < (o.h + PLAYER.h) / 2 * HIT * spec.hitbox;
+    /* 🏎️ 1등 추격 무적: 10초 동안 차·꼬깔을 그대로 통과한다 (사고 없음) */
+    if (contact && catchupSafe(sim)) continue;
     /* 👻 유령 모드: 차체를 그대로 통과한다 (사고 없음) */
     if (contact && ghostOn) continue;
     if (!sim.god && contact){
@@ -6494,6 +6512,29 @@ function drawPlayer(ctx, sim, now){
   const spec = sim.spec || carSpec(sim.car);
   const tilt = clamp(-(sim.laneVel || 0) * 0.16 * (1 + 0.3 * (spec.laneHeavy || 0)), -0.4, 0.4);
   const car = carById(sim.car);
+
+  /* v16.2: 🏎️ 1등 추격 무적 — 주황 무적 오라가 차체를 감싼다 */
+  if (catchupSafe(sim)){
+    const cp = 0.55 + 0.45 * Math.abs(Math.sin(now * 9.0));
+    const cg = cachedGrad('player|catchup|' + cp.toFixed(2), function(){
+      const gg = ctx.createRadialGradient(0, 0, 24, 0, 0, 120);
+      gg.addColorStop(0, 'rgba(255,159,67,0)');
+      gg.addColorStop(0.70, 'rgba(255,159,67,' + (0.24 * cp).toFixed(3) + ')');
+      gg.addColorStop(1, 'rgba(255,159,67,0)');
+      return gg;
+    });
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.translate(x, y);
+    ctx.fillStyle = cg;
+    ctx.beginPath(); ctx.arc(0, 0, 120, 0, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,196,107,' + (0.62 * cp).toFixed(3) + ')';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([10, 8]);
+    ctx.lineDashOffset = -((now * 70) % 18);
+    ctx.beginPath(); ctx.arc(0, 0, 88, 0, 7); ctx.stroke();
+    ctx.restore();
+  }
 
   /* 실드 방어막 링 */
   if ((sim.shield || 0) > 0){
@@ -8827,7 +8868,8 @@ const API = {
   CATCHUP_BASE: CATCHUP_BASE, CATCHUP_MAX: CATCHUP_MAX, CATCHUP_PER_KM: CATCHUP_PER_KM,
   FEVER_SPEED_MUL: FEVER_SPEED_MUL, FEVER_DIST_MUL: FEVER_DIST_MUL, FEVER_COIN_KM: FEVER_COIN_KM,
   BULLET_SLOW: BULLET_SLOW, BULLET_DIST_MUL: BULLET_DIST_MUL,
-  warpJump: warpJump, leaderGapKm: leaderGapKm, catchupMul: catchupMul,
+  warpJump: warpJump, leaderGapKm: leaderGapKm, catchupMul: catchupMul, catchupSafe: catchupSafe,
+  CATCHUP_INVULN_AFTER: CATCHUP_INVULN_AFTER,
   itemDef: itemDef, spawnItem: spawnItem, itemPickup: itemPickup, applyItemEffect: applyItemEffect, grantShield: grantShield,
   OIL: OIL, OIL_R: OIL_R, OIL_FIRST: OIL_FIRST, OIL_CD_MIN: OIL_CD_MIN, OIL_CD_MAX: OIL_CD_MAX,
   spawnOil: spawnOil, hitOil: hitOil, oilWobbleAmp: oilWobbleAmp, oilLabel: oilLabel,
@@ -10099,7 +10141,7 @@ if (typeof document !== 'undefined'){
           else if (e.item.id === 'fever') toast('🪙 피버 타임 · ' + itemDef('fever').dur + '초 무적 동전 밭 · 키로수 1.5배');
           else if (e.item.id === 'warp') toast('🚀 워프 점프 · ' + WARP_KM + 'km 순간이동 · 착지 ' + WARP_INVULN + '초 무적');
           else if (e.item.id === 'dist2x') toast('⛽ 거리 2배 · ' + itemDef('dist2x').dur + '초 주행 거리 2배');
-          else if (e.item.id === 'catchup') toast('🏎️ 1등 추격 · ' + itemDef('catchup').dur + '초 격차만큼 최대 1.75배');
+          else if (e.item.id === 'catchup') toast('🏎️ 1등 추격 · ' + itemDef('catchup').dur + '초 무적 · 격차만큼 최대 1.75배');
           else if (e.item.id === 'bullet') toast('⏱️ 블릿 타임 · ' + itemDef('bullet').dur + '초 세상이 느려지고 거리 1.4배');
           else toast('🛡️ 실드 장착 · 충돌 1회 방어');
         } else if (e.type === 'warp'){
@@ -10641,6 +10683,17 @@ if (typeof document !== 'undefined'){
     try {
       window.BusanLive = {
         sim: function(){ return sim; },
+        /* 검증용: 내 차 바로 위에 차량/꼬깔을 놓는다 (무적 통과 확인) */
+        block: function(type, dy){
+          if (sim.state !== 'playing') return null;
+          const isCone = type === 'cone';
+          const o = addObstacle(sim, { type: isCone ? 'cone' : 'car', lane: Math.round(sim.lanePos),
+            x: playerX(sim), y: playerY(sim) + (dy === undefined ? -4 : dy),
+            w: isCone ? 24 : 50, h: isCone ? 26 : 104, speed: isCone ? 0 : 90 });
+          return o ? o.id : null;
+        },
+        /* 검증용: 내 차의 월드 좌표 (무적·충돌 확인) */
+        pos: function(){ return { x: playerX(sim), y: playerY(sim), lane: sim.lanePos }; },
         begin: beginRun,
         title: goTitle,
         revive: reviveRun,
